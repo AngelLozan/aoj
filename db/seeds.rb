@@ -1,7 +1,27 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
-#   Character.create(name: "Luke", movie: movies.first)
+require 'faker'
+
+puts "cleaning database..."
+
+Painting.destroy_all
+
+puts "Now creating some paintings"
+
+paintings = []
+paintings << { title: Faker::commerce.unique.product_name, description: Faker::Hipster.sentence(word_count: rand(4..8)), price: rand(5000..100_00).to_i }
+
+paintings.each do |attributes|
+  painting = Painting.create!(attributes)
+
+
+  3.times do |i|
+    file_path = Rails.root.join("app", "assets", "images", "photo#{i + 1}.jpeg")
+    file = File.open(file_path)
+    painting.photos.attach(io: file, filename: "photo#{i + 1}.jpeg", content_type: "image/jpeg")
+    file.close
+  end
+
+  puts "Created #{painting.title}"
+end
+
+
+puts 'Finished.'

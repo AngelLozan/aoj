@@ -1,0 +1,50 @@
+<p style="color: green"><%= notice %></p>
+
+
+
+<% if false %>
+<h1>Paintings</h1>
+
+<div id="paintings">
+  <% @paintings.each do |painting| %>
+    <%= render painting %>
+    <p>
+      <%= link_to "Show this painting", painting %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New painting", new_painting_path %>
+
+<% end %>
+
+
+<div class="container">
+  <div class="text-center">
+    <h1>My works</h1>
+  </div>
+
+  <div class="row" id="paintings">
+    <% @paintings.each do |painting| %>
+      <div class="col-sm-6">
+        <div class="card my-3 mx-3 p-3 shadow rounded">
+          <img class="card-img-top" src="https://www.rocketmortgage.com/resources-cmsassets/RocketMortgage.com/Article_Images/Large_Images/Stock-Airbnb-Home-AdobeStock-298309756%20-%20Copy-2.jpeg" alt="stock image">
+          <div class="card-body">
+              <h5 class="card-title"><%= painting.title %></h5>
+              <p class="card-text"><%= painting.description %></p>
+              <div class="d-flex flex-row">
+                  <small>
+                    <i class="fa-solid fa-euro-sign"></i>
+                    <%= painting.price / 100.0 %>
+                  </small>
+              </div>
+            </div>
+          <p>
+            <%= link_to "View this Painting", flat, class: "btn btn-primary mt-3" %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+</div>

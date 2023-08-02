@@ -1,18 +1,38 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Aoj</title>
+    <title>AOJ - The Art of Jaleh Sadravi</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="The art of the popular paint and canvas artist Jaleh Sadravi">
+    <!-- Facebook Open Graph data -->
+    <meta property="og:title" content="AOJ">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= request.original_url %>">
+    <meta property="og:image" content="aoj.jpeg">
+    <meta property="og:description" content="The Art of Jaleh Sadravi">
+    <meta property="og:site_name" content="AOJ">
+
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@twitter">
+    <meta name="twitter:title" content="AOJ">
+    <meta name="twitter:description" content="The Art of Jaleh Sadravi">
+    <meta name="twitter:creator" content="@twitter">
+    <meta name="twitter:image:src" content="aoj.jpeg">
+
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.2/css/all.css">
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    <%= favicon_link_tag "favicon.ico", rel: "icon", type: "image/x-icon" %>
   </head>
 
-  <body><%= render "shared/navbar" %>
-<%= render "shared/flashes" %>
-
+  <body>
+    <%= render "shared/navbar" %>
+    <%= render "shared/flashes" %>
     <%= yield %>
   </body>
 </html>
