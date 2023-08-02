@@ -7,7 +7,9 @@ Painting.destroy_all
 puts "Now creating some paintings"
 
 paintings = []
-paintings << { title: Faker::commerce.unique.product_name, description: Faker::Hipster.sentence(word_count: rand(4..8)), price: rand(5000..100_00).to_i }
+paintings << { title: Faker::Commerce.unique.product_name, description: Faker::Hipster.sentence(word_count: rand(4..8)), price: rand(5000..100_00).to_i }
+paintings << { title: Faker::Commerce.unique.product_name, description: Faker::Hipster.sentence(word_count: rand(4..8)), price: rand(5000..100_00).to_i }
+paintings << { title: Faker::Commerce.unique.product_name, description: Faker::Hipster.sentence(word_count: rand(4..8)), price: rand(5000..100_00).to_i }
 
 paintings.each do |attributes|
   painting = Painting.create!(attributes)

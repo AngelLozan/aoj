@@ -28,7 +28,7 @@
     <% @paintings.each do |painting| %>
       <div class="col-sm-6">
         <div class="card my-3 mx-3 p-3 shadow rounded">
-          <img class="card-img-top" src="https://www.rocketmortgage.com/resources-cmsassets/RocketMortgage.com/Article_Images/Large_Images/Stock-Airbnb-Home-AdobeStock-298309756%20-%20Copy-2.jpeg" alt="stock image">
+          <%= cl_image_tag painting.photos[0].key %>
           <div class="card-body">
               <h5 class="card-title"><%= painting.title %></h5>
               <p class="card-text"><%= painting.description %></p>
@@ -40,7 +40,7 @@
               </div>
             </div>
           <p>
-            <%= link_to "View this Painting", flat, class: "btn btn-primary mt-3" %>
+            <%= link_to "View this Painting", painting, class: "btn btn-primary mt-3" %>
           </p>
         </div>
       </div>
