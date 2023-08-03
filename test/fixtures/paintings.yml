@@ -1,4 +1,4 @@
 one:
   title: 'Cool pic'
   description: 'A very cool pic'
-  price: rand(5000..100000)
+  price: <%= rand(5000..100000) %>
