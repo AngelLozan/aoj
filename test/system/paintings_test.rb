@@ -1,23 +1,24 @@
 require "application_system_test_case"
-require "faker"
+require "colorize"
 
 class PaintingsTest < ApplicationSystemTestCase
   setup do
     sign_in users(:admin)
-    puts "\n\nSigned in the artist!"
+    puts "\n\nSigned in the artist."
     @painting = paintings(:one)
     # @painting = Painting.create!(title: Faker::Commerce.unique.product_name, description: Faker::Hipster.sentence(word_count: rand(4..8)), price: rand(5000..100_00).to_i)
     file_path = Rails.root.join("app", "assets", "images", "photo1.jpeg")
     file = File.open(file_path)
     @painting.photos.attach(io: file, filename: "photo1.jpeg", content_type: "image/jpeg")
     file.close
-    puts "Painting created with photo! \n \n"
+    puts "Painting created with photo. \n \n"
   end
 
   test "visiting the index" do
     visit paintings_url
     assert_selector "h1", text: "My works"
-    puts "1- Index route works \n"
+    # save_screenshot
+    puts "\n1- Index route works \n".green
   end
 
   test "should create painting with whole dollars" do
@@ -32,7 +33,7 @@ class PaintingsTest < ApplicationSystemTestCase
 
     assert_text "Painting was successfully created"
     click_on "Back"
-    puts "2- Able to create a painting \n"
+    puts "\n2- Able to create a painting \n".green
   end
 
   test "should update Painting" do
@@ -47,7 +48,7 @@ class PaintingsTest < ApplicationSystemTestCase
 
     assert_text "Painting was successfully updated"
     click_on "Back"
-    puts "3- Able to update the painting"
+    puts "\n3- Able to update the painting".green
   end
 
   test "should destroy Painting" do
@@ -55,6 +56,6 @@ class PaintingsTest < ApplicationSystemTestCase
     click_on "Destroy this painting", match: :first
 
     assert_text "Painting was successfully destroyed"
-    puts "\n4- Able to destroy a painting \n"
+    puts "\n4- Able to destroy a painting \n".green
   end
 end
