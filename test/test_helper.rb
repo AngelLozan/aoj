@@ -9,5 +9,13 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
-  # Add more helper methods to be used by all tests here...
+  include Devise::Test::IntegrationHelpers
+  include Warden::Test::Helpers
+  Warden.test_mode!
+
+  def log_in(user)
+    sign_in(user)
+  end
 end
+
+Capybara.save_path = Rails.root.join("tmp/capybara")

@@ -1,0 +1,4 @@
+admin:
+  email: <%= ENV['EMAIL'] %>
+  encrypted_password: <%= Devise::Encryptor.digest(User, ENV['TEST_PASSWORD']) %>
+  admin: true

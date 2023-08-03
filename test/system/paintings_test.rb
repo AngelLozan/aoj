@@ -1,13 +1,22 @@
 require "application_system_test_case"
+require "faker"
 
 class PaintingsTest < ApplicationSystemTestCase
   setup do
+    sign_in users(:admin)
+    puts "signed in the artist!"
     @painting = paintings(:one)
+    # @painting = Painting.create!(title: Faker::Commerce.unique.product_name, description: Faker::Hipster.sentence(word_count: rand(4..8)), price: rand(5000..100_00).to_i)
+    file_path = Rails.root.join("app", "assets", "images", "photo1.jpeg")
+    file = File.open(file_path)
+    @painting.photos.attach(io: file, filename: "photo1.jpeg", content_type: "image/jpeg")
+    file.close
+    puts "Painting created with photo!"
   end
 
   test "visiting the index" do
     visit paintings_url
-    assert_selector "h1", text: "Paintings"
+    assert_selector "h1", text: "My works"
   end
 
   test "should create painting" do
