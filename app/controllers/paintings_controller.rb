@@ -22,6 +22,7 @@ class PaintingsController < ApplicationController
 
   # POST /paintings or /paintings.json
   def create
+    painting_params[:price] = (painting_params[:price] * 100).to_i
     @painting = Painting.new(painting_params)
 
     respond_to do |format|

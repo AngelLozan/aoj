@@ -1,6 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "minitest/reporters"
 
 class ActiveSupport::TestCase
   # Run tests in parallel with specified workers
@@ -19,3 +20,4 @@ class ActiveSupport::TestCase
 end
 
 Capybara.save_path = Rails.root.join("tmp/capybara")
+Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new(:color => true), Minitest::Reporters::ProgressReporter.new(:color => true)]
