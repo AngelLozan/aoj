@@ -47,6 +47,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
       - name: Yarn install
         run: yarn install --frozen-lockfile
+
       - name: Prepare DB
         run: cp config/database.github.yml config/database.yml
 
@@ -62,10 +63,10 @@ jobs:
             sleep 2
           done
 
-        - name: Create test database
-          run: |
-            sleep 10  # Wait for 10 seconds
-            bundle exec rails db:create RAILS_ENV=test --trace
+      - name: Create test database
+        run: |
+          sleep 10  # Wait for 10 seconds
+          bundle exec rails db:create RAILS_ENV=test --trace
 
       - name: Migrate test database
         run: bundle exec rails db:migrate RAILS_ENV=test
