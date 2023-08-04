@@ -56,8 +56,16 @@ jobs:
       - name: Print copied database.yml
         run: cat config/database.yml
 
-      - name: Create test database
-        run: bundle exec rails db:create RAILS_ENV=test
+      - name: Check PostgreSQL health
+        run: |
+          until pg_isready -h localhost -p 5432; do
+            sleep 2
+          done
+
+        - name: Create test database
+          run: |
+            sleep 10  # Wait for 10 seconds
+            bundle exec rails db:create RAILS_ENV=test --trace
 
       - name: Migrate test database
         run: bundle exec rails db:migrate RAILS_ENV=test
