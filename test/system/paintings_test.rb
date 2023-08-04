@@ -1,6 +1,8 @@
 require "application_system_test_case"
 require "colorize"
 
+# @dev To save screenshot to tmp/capybara use save_screenshot
+
 class PaintingsTest < ApplicationSystemTestCase
   setup do
     sign_in users(:admin)
@@ -17,7 +19,6 @@ class PaintingsTest < ApplicationSystemTestCase
   test "visiting the index" do
     visit paintings_url
     assert_selector "h1", text: "My works"
-    # save_screenshot
     puts "\n1- Index route works \n".green
   end
 
