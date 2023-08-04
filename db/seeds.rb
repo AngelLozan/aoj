@@ -1,8 +1,15 @@
-require 'faker'
+require "faker"
 
 puts "cleaning database..."
 
 Painting.destroy_all
+User.destroy_all
+
+puts "creating artist user"
+
+User.create!(email: ENV["EMAIL"], password: ENV["TEST_PASSWORD"], password_confirmation: ENV["TEST_PASSWORD"], admin: true)
+
+puts "created the artist successfully"
 
 puts "Now creating some paintings"
 
@@ -14,7 +21,6 @@ paintings << { title: Faker::Commerce.unique.product_name, description: Faker::H
 paintings.each do |attributes|
   painting = Painting.create!(attributes)
 
-
   3.times do |i|
     file_path = Rails.root.join("app", "assets", "images", "photo#{i + 1}.jpeg")
     file = File.open(file_path)
@@ -25,5 +31,4 @@ paintings.each do |attributes|
   puts "Created #{painting.title}"
 end
 
-
-puts 'Finished.'
+puts "Finished."
