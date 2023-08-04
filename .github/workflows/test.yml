@@ -48,11 +48,23 @@ jobs:
       - name: Yarn install
         run: yarn install --frozen-lockfile
       - name: Prepare DB
-        run: |
-          cp config/database.github.yml config/database.yml
-          bundle exec rails db:create db:migrate
+        run: cp config/database.github.yml config/database.yml
+
+      - name: List config directory
+        run: ls config
+
+      - name: Print copied database.yml
+        run: cat config/database.yml
+
+      - name: Create test database
+        run: bundle exec rails db:create RAILS_ENV=test
+
+      - name: Migrate test database
+        run: bundle exec rails db:migrate RAILS_ENV=test
+        # run: |
+        #   cp config/database.github.yml config/database.yml
+        #   bundle exec rails db:create db:migrate
       - name: Run model tests
         run: bundle exec rails test
       - name: Run system tests
         run: bundle exec rails test:system
-
