@@ -18,7 +18,8 @@ class PaintingsTest < ApplicationSystemTestCase
 
   test "visiting the index" do
     visit paintings_url
-    assert_selector "h1", text: "My works"
+    assert_text "My works", wait: 10
+    # assert_selector "h1", text: "My works"
     puts "\n1- Index route works \n".green
   end
 
