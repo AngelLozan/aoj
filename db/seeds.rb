@@ -6,8 +6,10 @@ Painting.destroy_all
 User.destroy_all
 
 puts "creating artist user"
+email = ENV['EMAIL']
+password = ENV['TEST_PASSWORD']
 
-User.create!(email: ENV["EMAIL"], password: ENV["TEST_PASSWORD"], password_confirmation: ENV["TEST_PASSWORD"], admin: true)
+User.create!(email: email, password: password, password_confirmation: ENV["TEST_PASSWORD"], admin: true)
 
 puts "created the artist successfully"
 
