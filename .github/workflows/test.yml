@@ -8,6 +8,8 @@ jobs:
     env:
       RAILS_ENV: test
       NODE_ENV: test
+      EMAIL: ${{ secrets.EMAIL }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
     runs-on: ubuntu-latest # runner
     services:
       # Label used to access the service container
@@ -64,15 +66,15 @@ jobs:
           done
 
       - name: Create test database
-        run: bundle exec rails db:create RAILS_ENV=test
+        run: bundle exec rails db:create
 
       - name: Migrate test database
-        run: bundle exec rails db:migrate RAILS_ENV=test
+        run: bundle exec rails db:migrate
         # run: |
         #   cp config/database.github.yml config/database.yml
         #   bundle exec rails db:create db:migrate
       - name: Seed test database
-        run: bundle exec rails db:seed RAILS_ENV=test
+        run: bundle exec rails db:seed
       - name: Run model tests
         run: bundle exec rails test:models
       - name: Run system tests
