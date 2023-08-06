@@ -23,6 +23,7 @@ class PaintingsTest < ApplicationSystemTestCase
   # end
 
   test "should create painting with whole dollars" do
+    sign_in users(:admin)
     visit new_painting_url
     # click_on "New painting"
     fill_in "Description", with: @painting.description
@@ -37,6 +38,7 @@ class PaintingsTest < ApplicationSystemTestCase
   end
 
   test "should update Painting" do
+    sign_in users(:admin)
     visit painting_url(@painting)
     click_on "Edit this painting", match: :first
     fill_in "Description", with: @painting.description
@@ -51,6 +53,7 @@ class PaintingsTest < ApplicationSystemTestCase
   end
 
   test "should destroy Painting" do
+    sign_in users(:admin)
     visit painting_url(@painting)
     accept_alert do
       click_on "Delete", match: :first
