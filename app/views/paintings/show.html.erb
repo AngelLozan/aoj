@@ -1,10 +1,14 @@
-<p style="color: green"><%= notice %></p>
+<div class="container-fluid">
+  <p style="color: green"><%= notice %></p>
 
-<%= render @painting %>
+  <%= render @painting %>
 
-<div>
-  <%= link_to "Edit this painting", edit_painting_path(@painting) %> |
-  <%= link_to "Back to paintings", paintings_path %>
+  <% if current_user %>
+    <div>
+      <%= link_to "Edit this painting", edit_painting_path(@painting) %> |
+      <%= link_to "Back to paintings", paintings_path %>
 
-  <%= button_to "Destroy this painting", @painting, method: :delete %>
+      <%= button_to "Destroy this painting", @painting, method: :delete %>
+    </div>
+  <% end %>
 </div>

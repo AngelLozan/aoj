@@ -1,22 +1,26 @@
-<div id="<%= dom_id painting %>">
-  <p>
-    <strong>Description:</strong>
-    <%= painting.description %>
-  </p>
+<div class="container-fluid">
+  <div id="<%= dom_id painting %>">
+    <h1><%= painting.title %></h1>
+    <p class="mb-3">
+        <%=cl_image_tag painting.photos[0].key, height: 300 %>
+    </p>
 
-  <p>
-    <strong>Price:</strong>
-    <%= painting.price %>
-  </p>
+    <p>
+      <strong>Description:</strong>
+      <%= painting.description %>
+    </p>
 
-  <p>
-    <strong>Title:</strong>
-    <%= painting.title %>
-  </p>
+    <p>
+      <strong>Price:</strong>
+      <i class="fa-solid fa-euro-sign"></i>
+      <%= painting.price / 100.00 %>
+    </p>
 
-  <p>
-    <strong>Discount code:</strong>
-    <%= painting.discount_code %>
-  </p>
-
+    <% if painting.discount_code %>
+      <p>
+        <strong>Discount code:</strong>
+        <%= painting.discount_code %>
+      </p>
+    <% end %>
+  </div>
 </div>
