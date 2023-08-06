@@ -1,9 +1,11 @@
 <div class="container-fluid">
   <div id="<%= dom_id painting %>">
     <h1><%= painting.title %></h1>
-    <p class="mb-3">
-        <%=cl_image_tag painting.photos[0].key, height: 300 %>
-    </p>
+    <% if painting.photos[0] %>
+      <p class="mb-3">
+          <%=cl_image_tag painting.photos[0].key, height: 300 %>
+      </p>
+    <% end %>
 
     <p>
       <strong>Description:</strong>

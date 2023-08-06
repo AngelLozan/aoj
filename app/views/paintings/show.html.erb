@@ -8,7 +8,8 @@
       <%= link_to "Edit this painting", edit_painting_path(@painting) %> |
       <%= link_to "Back to paintings", paintings_path %>
 
-      <%= button_to "Destroy this painting", @painting, method: :delete %>
+      <%= link_to "Delete", @painting, class: "btn btn-danger mt-3 text-white", data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
+      <%# <%= button_to "Destroy this painting", @painting, method: :delete %>
     </div>
   <% end %>
 </div>

@@ -8,9 +8,10 @@
     <%= f.input :price %>
     <%= f.input :title %>
     <%= f.input :discount_code %>
+    <%= f.input :photos, as: :file, input_html: { multiple: true } %>
   </div>
 
   <div class="form-actions">
-    <%= f.button :submit %>
+    <%= f.button :submit, class: 'btn btn-primary' %>
   </div>
 <% end %>

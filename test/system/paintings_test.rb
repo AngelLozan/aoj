@@ -52,8 +52,9 @@ class PaintingsTest < ApplicationSystemTestCase
 
   test "should destroy Painting" do
     visit painting_url(@painting)
-    click_on "Destroy this painting", match: :first
-
+    accept_alert do
+      click_on "Delete", match: :first
+    end
     assert_text "Painting was successfully destroyed"
     puts "\n5- Able to destroy a painting \n".green
   end
