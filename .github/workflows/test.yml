@@ -86,6 +86,6 @@ jobs:
         if: failure()
         with:
             name: gha-snapshots
-            path: test/snapshots
+            path: test/snapshots/
       # - name: Run tests model and controllers
       #   run: bundle exec rails test
