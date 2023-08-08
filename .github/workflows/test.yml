@@ -76,15 +76,16 @@ jobs:
       - name: Seed test database
         run: bundle exec rails db:seed
 
+      - name: Run model tests
+        run: bundle exec rails test:models
+      - name: Run system tests
+        run: bundle exec rails test:system
+
       - name: Upload screenshots
         uses: actions/upload-artifact@v3
         if: failure()
         with:
             name: gha-snapshots
             path: test/snapshots
-      - name: Run model tests
-        run: bundle exec rails test:models
-      - name: Run system tests
-        run: bundle exec rails test:system
       # - name: Run tests model and controllers
       #   run: bundle exec rails test
