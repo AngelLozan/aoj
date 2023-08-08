@@ -65,6 +65,9 @@ jobs:
             sleep 2
           done
 
+      - name: Teardown old database
+        run: bundle exec rails db:test:purge
+
       - name: Create test database
         run: bundle exec rails db:create
 
