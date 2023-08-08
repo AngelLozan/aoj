@@ -84,8 +84,8 @@ jobs:
 
       - name: Run tests model and controllers
         run: bundle exec rails test
-      # - name: Run system tests
-      #   run: bundle exec rails test:system
+      - name: Run system tests
+        run: bundle exec rails test:system
 
       - name: Upload screenshots
         uses: actions/upload-artifact@v3
