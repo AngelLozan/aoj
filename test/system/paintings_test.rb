@@ -2,6 +2,7 @@ require "application_system_test_case"
 require "colorize"
 
 # @dev To save screenshot to tmp/capybara use save_screenshot
+# @dev Run `rails db:test:purge` if testing with blob creation before test
 
 class PaintingsTest < ApplicationSystemTestCase
 
