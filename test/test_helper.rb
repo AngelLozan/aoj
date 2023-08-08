@@ -3,6 +3,7 @@ require_relative "../config/environment"
 require "rails/test_help"
 require "minitest/reporters"
 require "capybara" # For rakefile
+# require 'webmock/minitest'
 
 class ActiveSupport::TestCase
   # Run tests in parallel with specified workers

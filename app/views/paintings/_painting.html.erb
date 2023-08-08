@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <div id="<%= dom_id painting %>">
     <h1><%= painting.title %></h1>
-    <% if painting.photos[0] %>
+    <% if painting.photos.attached? %>
       <p class="mb-3">
           <%=cl_image_tag painting.photos[0].key, height: 300 %>
       </p>
