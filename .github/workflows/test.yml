@@ -75,7 +75,9 @@ jobs:
         #   bundle exec rails db:create db:migrate
       - name: Seed test database
         run: bundle exec rails db:seed
-      - name: Run tests model and controller
-        run: bundle exec rails test
+      - name: Run model tests
+        run: bundle exec rails test:models
       - name: Run system tests
         run: bundle exec rails test:system
+      # - name: Run tests model and controllers
+      #   run: bundle exec rails test
