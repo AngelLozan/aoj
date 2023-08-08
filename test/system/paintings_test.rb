@@ -15,12 +15,11 @@ class PaintingsTest < ApplicationSystemTestCase
     puts "Painting created with photo. \n \n"
   end
 
-  # @dev Remove this for gha as cloudinary file upload fails this.
-  # test "visiting the index" do
-  #   visit paintings_url
-  #   assert_selector "h1", text: "My works"
-  #   puts "\n2- Index route works \n".green
-  # end
+  test "visiting the index" do
+    visit paintings_url
+    assert_selector "h1", text: "My works"
+    puts "\n2- Index route works \n".green
+  end
 
   test "should create painting with whole dollars" do
     visit new_painting_url

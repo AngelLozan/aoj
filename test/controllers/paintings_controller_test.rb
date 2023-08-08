@@ -2,17 +2,26 @@ require "test_helper"
 
 class PaintingsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in users(:admin)
+    puts "\n\nSigned in the artist."
     @painting = paintings(:one)
+    file_path = Rails.root.join("app", "assets", "images", "photo1.jpeg")
+    file = File.open(file_path)
+    @painting.photos.attach(io: file, filename: "photo1.jpeg", content_type: "image/jpeg")
+    file.close
+    puts "Painting created with photo. \n \n"
   end
 
   test "should get index" do
     get paintings_url
     assert_response :success
+    puts "\n1- Index route works \n".green
   end
 
   test "should get new" do
     get new_painting_url
     assert_response :success
+    puts "\n2- New route works \n".green
   end
 
   test "should create painting" do
@@ -21,21 +30,25 @@ class PaintingsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to painting_url(Painting.last)
+    puts "\n3- Able to create a painting \n".green
   end
 
   test "should show painting" do
     get painting_url(@painting)
     assert_response :success
+    puts "\n4- Show route works \n".green
   end
 
   test "should get edit" do
     get edit_painting_url(@painting)
     assert_response :success
+    puts "\n5- Edit route works \n".green
   end
 
   test "should update painting" do
     patch painting_url(@painting), params: { painting: { description: @painting.description, discount_code: @painting.discount_code, price: @painting.price, title: @painting.title } }
     assert_redirected_to painting_url(@painting)
+    puts "\n6- Allows update to paintings \n".green
   end
 
   test "should destroy painting" do
@@ -44,5 +57,6 @@ class PaintingsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to paintings_url
+    puts "\n7- Can delete a painting \n".green
   end
 end
