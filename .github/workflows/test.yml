@@ -85,7 +85,6 @@ jobs:
         uses: actions/upload-artifact@v3
         if: failure()
         with:
-            name: gha-snapshots
             path: test/snapshots/
       # - name: Run tests model and controllers
       #   run: bundle exec rails test
