@@ -5,5 +5,7 @@ Rails.application.routes.draw do
     sessions: 'custom_devise/sessions'
   }
   root to: "pages#home"
+  get '/cv', to: "pages#cv", as: 'cv'
+  get '/about', to: "pages#about", as: 'about'
 
 end
