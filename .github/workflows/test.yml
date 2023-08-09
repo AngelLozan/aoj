@@ -92,3 +92,6 @@ jobs:
         if: failure()
         with:
             path: test/snapshots/
+
+      - name: Teardown old database at end
+        run: bundle exec rails db:test:purge
