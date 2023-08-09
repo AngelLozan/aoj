@@ -59,6 +59,10 @@ class PaintingsController < ApplicationController
     end
   end
 
+  def admin
+    @paintings = Painting.all
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_painting

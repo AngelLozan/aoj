@@ -1,0 +1,29 @@
+<p style="color: green"><%= notice %></p>
+
+<div class="container">
+  <div class="text-center">
+    <h1>Administrative Panel</h1>
+  </div>
+
+  <div class="row" id="paintings">
+    <% @paintings.each do |painting| %>
+      <%= link_to painting, style: "text-decoration: none;" do %>
+        <div class="col-12">
+          <div class="card-product mt-3">
+            <%= cl_image_tag painting.photos[0].key %>
+            <div class="card-product-infos">
+              <h2><%= painting.title %></h2>
+              <div class="d-flex flex-row">
+                  <small>
+                    <i class="fa-solid fa-euro-sign"></i>
+                    <%= painting.price / 100.0 %>
+                  </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+</div>
