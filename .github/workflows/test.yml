@@ -91,7 +91,6 @@ jobs:
         uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: gha-snapshots
           path: tmp/capybara
 
       - name: Teardown old database at end
