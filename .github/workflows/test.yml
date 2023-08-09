@@ -90,8 +90,9 @@ jobs:
       - name: Upload screenshots
         uses: actions/upload-artifact@v3
         if: failure()
+        name: gha-snapshots
         with:
-            path: test/snapshots/
+            path: tmp/capybara
 
       - name: Teardown old database at end
         run: bundle exec rails db:test:purge
