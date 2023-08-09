@@ -4,7 +4,7 @@
 
       <p class="mb-3">
         <% if Rails.env.test? %>
-          <%= image_tag("app/assets/images/photo1.jpeg") %>
+          <%= image_tag "photo1.jpeg", alt: "test image", height: 300 %>
         <% else %>
           <%=cl_image_tag painting.photos[0].key, height: 300 %>
         <% end %>
