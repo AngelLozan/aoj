@@ -26,10 +26,3 @@ end
 Capybara.save_path = Rails.root.join("tmp/capybara")
 Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new(:color => true), Minitest::Reporters::ProgressReporter.new(:color => true)]
 
-
-# Minitest.after_run do
-#   puts "Running db:test:purge after all tests are done..."
-#   sleep 5
-#   system("bin/rails db:test:purge")
-#   puts "\n==> Successfully purged db".green
-# end

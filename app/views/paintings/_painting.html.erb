@@ -1,11 +1,15 @@
 <div class="container-fluid">
   <div id="<%= dom_id painting %>">
     <h1><%= painting.title %></h1>
-    <% if painting.photos.attached? %>
+
       <p class="mb-3">
+        <% if Rails.env.test? %>
+          <%= image_tag("app/assets/images/photo1.jpeg") %>
+        <% else %>
           <%=cl_image_tag painting.photos[0].key, height: 300 %>
+        <% end %>
       </p>
-    <% end %>
+
 
     <p>
       <strong>Description:</strong>

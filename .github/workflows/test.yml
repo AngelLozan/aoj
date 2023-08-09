@@ -91,7 +91,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: failure()
         with:
-          path: tmp/capybara
+          path: tmp/capybara/
 
       - name: Teardown old database at end
         run: bundle exec rails db:test:purge
