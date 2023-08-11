@@ -2,29 +2,23 @@ class PaintingsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
   before_action :set_painting, only: %i[ show edit update destroy ]
 
-  # GET /paintings or /paintings.json
   def index
     @paintings = Painting.all
   end
 
-  # GET /paintings/1 or /paintings/1.json
   def show
   end
 
-  # GET /paintings/new
   def new
     @painting = Painting.new
   end
 
-  # GET /paintings/1/edit
   def edit
   end
 
-  # POST /paintings or /paintings.json
   def create
-    painting_params[:price] = (painting_params[:price] * 100).to_i
-    @painting = Painting.new(painting_params)
-
+    adjusted_params = painting_params.merge(price: (painting_params[:price].to_f * 100).to_i)
+    @painting = Painting.new(adjusted_params)
     respond_to do |format|
       if @painting.save
         format.html { redirect_to painting_url(@painting), notice: "Painting was successfully created." }
@@ -36,7 +30,6 @@ class PaintingsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /paintings/1 or /paintings/1.json
   def update
     respond_to do |format|
       if @painting.update(painting_params)
@@ -49,7 +42,6 @@ class PaintingsController < ApplicationController
     end
   end
 
-  # DELETE /paintings/1 or /paintings/1.json
   def destroy
     @painting.destroy
 
@@ -64,12 +56,10 @@ class PaintingsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_painting
       @painting = Painting.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
     def painting_params
       params.require(:painting).permit(:description, :price, :title, :discount_code, photos: [])
     end

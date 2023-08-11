@@ -4,13 +4,18 @@
   <div class="text-center">
     <h1>Administrative Panel</h1>
   </div>
+  <div class="d-flex justify-content-center">
+    <%= link_to new_painting_path, class: 'btn btn-success' do %>
+      <i class="fa-solid fa-plus"></i>
+    <% end %>
+  </div>
 
   <div class="row" id="paintings">
     <% @paintings.each do |painting| %>
       <%= link_to painting, style: "text-decoration: none;" do %>
         <div class="col-12">
           <div class="card-product mt-3">
-            <%= cl_image_tag painting.photos[0].key %>
+            <%= cl_image_tag painting.photos[0].key if painting.photos.present? %>
             <div class="card-product-infos">
               <h2><%= painting.title %></h2>
               <div class="d-flex flex-row">

@@ -28,7 +28,7 @@
     <% @paintings.each do |painting| %>
       <div class="col-sm-6 d-flex align-items-stretch">
         <div class="card my-5 mx-3 p-3 shadow rounded">
-          <%= cl_image_tag painting.photos[0].key %>
+          <%= cl_image_tag painting.photos[0].key if painting.photos.present?%>
           <div class="card-body">
               <h5 class="card-title"><%= painting.title %></h5>
               <p class="card-text"><%= painting.description %></p>
