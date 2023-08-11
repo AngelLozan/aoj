@@ -5,7 +5,7 @@
 
   <div class="form-inputs">
     <%= f.input :description %>
-    <%= f.input :price %>
+    <%= f.input :price, input_html: { value: (@painting.price / 100.0) } %>
     <%= f.input :title %>
     <%= f.input :discount_code %>
     <%= f.input :photos, as: :file, input_html: { multiple: true } %>
