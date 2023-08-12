@@ -6,14 +6,72 @@
   </div>
 </div>
 <div class="container-fluid mt-3">
+
   <div class="d-flex justify-content-center p-5 mx-3">
-    <h2 class="text-center">
+    <h2 class="text-center w-50">
       <strong>
-        Jaleh Sadravi works out of her home studio and participates in several group and solo exhibitions each year. Her work is found in collections around the world.
+        Jaleh Sadravi works out of her home studio and participates in several group and solo exhibitions each year. <br>
+        Her work is found in collections around the world.
       </strong>
     </h2>
   </div>
-  <div class>
 
+  <div class="d-flex justify-content-center mb-3 p-5">
+    <%= link_to "Shop", paintings_path, class: "btn btn-primary fs-2 rounded" %>
   </div>
+
+  <div class="row justify-content-center">
+    <div class="col-11 col-lg-6 text-center mt-3">
+    <h3>Abstract Art</h3>
+      <%= link_to paintings_path do %>
+        <%= image_tag "abstractart.png", alt: "Abstract art", class: "img_landing_lnk img-fluid" %>
+      <% end %>
+    </div>
+
+    <div class="col-11 col-lg-6 mt-3 text-center">
+      <h3>Photography</h3>
+      <%= link_to paintings_path do %>
+        <%= image_tag "jsadravi-mexican-american-.png", alt: "Photography art", class: "img_landing_lnk img-fluid" %>
+      <% end %>
+    </div>
+  </div>
+
+  <hr style="height:2px;border-width:0;color:gray;background-color:gray;margin-top:150px">
+
+  <div class="d-flex justify-content-center mt-5">
+    <%= image_tag "minibio.png", alt: "The artist", class: "img-fluid rounded" %>
+  </div>
+
+  <div class="d-flex justify-content-center p-5 mx-3">
+    <h2 class="text-center w-50">
+        Born in Oakland, California, Jaleh Sadravi started as a videographer and photographer. She started painting during the pandemic in 2020. She is an instinctive artist who paints in acrylics by applying colors directly to the canvas using squeeze bottles and spreading the paint with scrapers. Her movement and sensitivity are at the heart of her bright and colorful work. Passion, perseverance and commitment have contributed to her success as a painter. From her abstract paintings to her portraits, there is a movement and freshness that makes her work interesting and popular.
+    </h2>
+  </div>
+
+  <div class="text-center">
+    <h2><strong>Get in Touch</strong></h2>
+    <p>For inquiries, commissions, or partnerships, please email me.</p>
+    <button class="btn btn-primary mb-3">Contact me</button>
+     <div class="d-flex justify-content-center">
+      <ul class="social-line">
+        <li>
+          <a href="https://github.com/AngelLozan" target="_blank">
+            <i class="fab fa-github-square"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://twitter.com/bytebuildcrypto" target="_blank">
+            <i class="fab fa-twitter-square"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.linkedin.com/in/angel-lozans/?lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BKQVPEitFSiyfczhglTj%2B7Q%3D%3D" target="_blank">
+            <i class="fab fa-linkedin"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+
 </div>

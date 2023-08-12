@@ -20,3 +20,29 @@
   opacity: .7;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
 }
+
+.img_landing_lnk {
+  border-radius: 25%;
+}
+
+.img_landing_lnk:hover {
+  opacity: 0.5;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.social-line {
+  list-style: none;
+  padding-left: 0px;
+}
+
+.social-line li {
+  display: inline;
+  padding: 10px;
+}
+.social-line i {
+  font-size: 50px;
+  color: rgb(174, 204, 211);
+}
+.social-line i:hover {
+  color: black;
+}
