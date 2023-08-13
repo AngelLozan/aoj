@@ -33,16 +33,32 @@
 .social-line {
   list-style: none;
   padding-left: 0px;
+  text-decoration: none;
 }
 
 .social-line li {
   display: inline;
   padding: 10px;
 }
+
+.social-line a {
+  text-decoration: none;
+}
+
 .social-line i {
   font-size: 50px;
   color: rgb(174, 204, 211);
+  text-decoration: none;
 }
 .social-line i:hover {
   color: black;
 }
+
+// .fa {
+//   padding: 20px;
+//   font-size: 30px;
+//   width: 50px;
+//   text-align: center;
+//   text-decoration: none;
+//   margin: 5px 2px;
+// }

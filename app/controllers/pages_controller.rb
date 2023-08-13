@@ -1,5 +1,5 @@
 class PagesController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[ home about cv]
+  skip_before_action :authenticate_user!, only: %i[ home about cv photography]
 
   def home
   end
@@ -9,5 +9,8 @@ class PagesController < ApplicationController
 
   def cv
   end
-  
+
+  def photography
+  end
+
 end

@@ -7,5 +7,6 @@ Rails.application.routes.draw do
   root to: "pages#home"
   get '/cv', to: "pages#cv", as: 'cv'
   get '/about', to: "pages#about", as: 'about'
+  get '/photography', to: "pages#photography", as: 'photography'
 
 end

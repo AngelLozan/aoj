@@ -7,17 +7,18 @@
 </div>
 <div class="container-fluid mt-3">
 
-  <div class="d-flex justify-content-center p-5 mx-3">
-    <h2 class="text-center w-50">
-      <strong>
-        Jaleh Sadravi works out of her home studio and participates in several group and solo exhibitions each year. <br>
-        Her work is found in collections around the world.
+  <div class="d-flex justify-content-center p-5">
+    <h1 class="text-center">
+      <strong class="col-10">
+        Jaleh Sadravi works out of her home studio and participates in several group and solo exhibitions each year. Her work is found in collections around the world.
       </strong>
-    </h2>
+    </h1>
   </div>
 
   <div class="d-flex justify-content-center mb-3 p-5">
-    <%= link_to "Shop", paintings_path, class: "btn btn-primary fs-2 rounded" %>
+    <%= link_to paintings_path, class: "btn btn-primary fs-2 rounded" do %>
+      <i class="fa-solid fa-palette"> Shop </i>
+    <% end %>
   </div>
 
   <div class="row justify-content-center">
@@ -39,11 +40,11 @@
   <hr style="height:2px;border-width:0;color:gray;background-color:gray;margin-top:150px">
 
   <div class="d-flex justify-content-center mt-5">
-    <%= image_tag "minibio.png", alt: "The artist", class: "img-fluid rounded" %>
+    <%= image_tag "minibio.png", alt: "The artist", class: "img-fluid shadow rounded-pill" %>
   </div>
 
-  <div class="d-flex justify-content-center p-5 mx-3">
-    <h2 class="text-center w-50">
+  <div class="d-flex justify-content-center p-3">
+    <h2 class="col-10">
         Born in Oakland, California, Jaleh Sadravi started as a videographer and photographer. She started painting during the pandemic in 2020. She is an instinctive artist who paints in acrylics by applying colors directly to the canvas using squeeze bottles and spreading the paint with scrapers. Her movement and sensitivity are at the heart of her bright and colorful work. Passion, perseverance and commitment have contributed to her success as a painter. From her abstract paintings to her portraits, there is a movement and freshness that makes her work interesting and popular.
     </h2>
   </div>
@@ -54,24 +55,48 @@
     <button class="btn btn-primary mb-3">Contact me</button>
      <div class="d-flex justify-content-center">
       <ul class="social-line">
-        <li>
-          <a href="https://github.com/AngelLozan" target="_blank">
-            <i class="fab fa-github-square"></i>
+      <li>
+          <a href="https://www.patreon.com/jalehsart" target="_blank">
+            <i class="fa-brands fa-patreon"></i>
           </a>
         </li>
         <li>
-          <a href="https://twitter.com/bytebuildcrypto" target="_blank">
+          <a href="https://twitter.com/TheArtofJaleh" target="_blank">
             <i class="fab fa-twitter-square"></i>
           </a>
         </li>
         <li>
-          <a href="https://www.linkedin.com/in/angel-lozans/?lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BKQVPEitFSiyfczhglTj%2B7Q%3D%3D" target="_blank">
+          <a href="https://www.linkedin.com/in/jalehsadravi/" target="_blank">
             <i class="fab fa-linkedin"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.tiktok.com/@theartofjaleh" target="_blank">
+            <i class="fa-brands fa-tiktok"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.etsy.com/shop/TheArtofJaleh" target="_blank">
+            <i class="fa-brands fa-etsy"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.facebook.com/theartofjaleh" target="_blank">
+            <i class="fa-brands fa-facebook"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/theartofjaleh/" target="_blank">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.youtube.com/c/JalehLozano" target="_blank">
+            <i class="fa-brands fa-youtube"></i>
           </a>
         </li>
       </ul>
     </div>
   </div>
-
 
 </div>
