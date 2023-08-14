@@ -3,6 +3,11 @@
 // ./bin/rails generate stimulus controllerName
 
 import { application } from "./application"
+import Lightbox from 'stimulus-lightbox'
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import PhotographyController from "./photography_controller"
+application.register("photography", PhotographyController)
+application.register('lightbox', Lightbox)
