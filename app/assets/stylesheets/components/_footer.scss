@@ -6,6 +6,8 @@
   height: 100px;
   padding: 0px 50px;
   color: rgba(0,0,0,0.3);
+  bottom: 0;
+  position: fixed;
 }
 .footer-links {
   display: flex;
@@ -26,5 +28,5 @@
 }
 
 .footer-copyright {
-  font-size: 1vw;
+  font-size: .5vw;
 }

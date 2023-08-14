@@ -21,6 +21,12 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     puts "\n3- Home route works \n".green
   end
 
+  test "should get photography page" do
+    get photography_url
+    assert_response :success
+    puts "\n4- Photography route works \n".green
+  end
+
   # test "should show painting" do
   #   get painting_url(@painting)
   #   assert_response :success
