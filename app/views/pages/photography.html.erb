@@ -1,67 +1,70 @@
 <div class="container-fluid">
+
   <div class="d-flex justify-content-center my-3">
     <h1>Photography</h1>
   </div>
 
-    <section>
-      <%= image_tag "r1.png", id: "scroll" %>
-      <div class="cvtext">
-        <h2><a href="r1.png">Our New World</a>, 2022</h2>
-        <p>FORA Gallery, London, England</p>
+<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="3" aria-label="Slide 4"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="4" aria-label="Slide 5"></button>
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="5" aria-label="Slide 6"></button>
+  </div>
+  <div class="carousel-inner text-center">
+    <div class="carousel-item active">
+       <%= image_tag "r1.png", alt: "The artist", class: "d-block img-fluid mx-auto" %>
+      <div class="carousel-caption d-none d-md-block">
+        <h5>First slide label</h5>
+        <p>Some representative placeholder content for the first slide.</p>
       </div>
-    </section>
-    <section>
-      <img id="scroll" src='https://images.unsplash.com/photo-1548248823-ce16a73b6d49?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2OTAwOTk3NjN8&ixlib=rb-4.0.3&q=85' alt=''>
-      <div class="text">
-        <h2>A Gathering of Community, 2021</h2>
-        <p>Solo Exhibition, Seattle, Washington</p>
-        <h2><a href="https://openiartspace.com/current-exhibition">Think Outside the Walls</a></h2>
-        <p>Open i Art Space, Santa Barbara, California</p>
-        <h2><a href="https://www.blueskygallery.org/news/2021/1/11/diversity-is-our-strength">Our Diversity is Our Strength</a></h2>
-        <p>Blue Sky Gallery, Portland, Oregon</p>
+    </div>
+    <div class="carousel-item">
+       <%= image_tag "r2.png", alt: "The artist", class: "d-block img-fluid mx-auto" %>
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Second slide label</h5>
+        <p>Some representative placeholder content for the second slide.</p>
       </div>
-    </section>
-    <section>
-      <img id="scroll" src='https://images.unsplash.com/photo-1502462456379-a6dbfdd0faef?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2OTAwOTk3NjN8&ixlib=rb-4.0.3&q=85' alt=''>
-      <div class="cvtext">
-        <h2>These can create some cool effects</h2>
-        <p>When entering or leaving the scroll view</p>
+    </div>
+    <div class="carousel-item">
+       <%= image_tag "r3.png", alt: "The artist", class: "d-block img-fluid mx-auto" %>
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Third slide label</h5>
+        <p>Some representative placeholder content for the third slide.</p>
       </div>
-    </section>
-    <section>
-      <img id="scroll" src='https://images.unsplash.com/photo-1600540984005-c7f3a641fbe5?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2OTAwOTk3NjN8&ixlib=rb-4.0.3&q=85' alt=''>
-      <div class="cvtext">
-        <h2>I really think this opens a lot of possibilities</h2>
-        <p>For a performant web, with a bit of</p>
+    </div>
+    <div class="carousel-item">
+       <%= image_tag "r4.png", alt: "The artist", class: "d-block img-fluid mx-auto" %>
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Third slide label</h5>
+        <p>Some representative placeholder content for the third slide.</p>
       </div>
-    </section>
-    <section>
-      <img id="scroll" src='https://images.unsplash.com/photo-1472148083604-64f1084980b9?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2OTAwOTk3NjN8&ixlib=rb-4.0.3&q=85' alt=''>
-      <div class="cvtext">
-        <h2>Extra ooooomph</h2>
-        <p>(yes, i'm running a bit out of inspiration here)</p>
+    </div>
+    <div class="carousel-item">
+       <%= image_tag "r5.png", alt: "The artist", class: "d-block img-fluid mx-auto" %>
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Third slide label</h5>
+        <p>Some representative placeholder content for the third slide.</p>
       </div>
-    </section>
-    <section>
-      <img id="scroll" src='https://images.unsplash.com/photo-1598818384697-62330d600309?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2OTAxMDAxNDd8&ixlib=rb-4.0.3&q=85' alt=''>
-      <div class="cvtext">
-        <h2>These are some pretty architecture images right?</h2>
-        <p>Just used unsplash for them</p>
+    </div>
+       <div class="carousel-item">
+       <%= image_tag "r6.png", alt: "The artist", class: "d-block img-fluid mx-auto" %>
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Third slide label</h5>
+        <p>Some representative placeholder content for the third slide.</p>
       </div>
-    </section>
-    <section>
-      <img id="scroll" src='https://images.unsplash.com/photo-1553448539-a13a5595a494?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2OTAxMDAxNDd8&ixlib=rb-4.0.3&q=85' alt=''>
-      <div class="cvtext">
-        <h2>Time for me to stop adding some random stuff here</h2>
-        <p>"Lorem ipsum dolor sit amet" could work just as well</p>
-      </div>
-    </section>
-    <section>
-      <img id="scroll" src='https://images.unsplash.com/photo-1506438481471-719be21dadee?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2OTAxMDAxNDd8&ixlib=rb-4.0.3&q=85' alt=''>
-      <div class="cvtext">
-        <h2>For the love of Scroll Driven Animations</h2>
-        <p>and a bit for scroll-snap as well</p>
-      </div>
-    </section>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
 
 </div>
