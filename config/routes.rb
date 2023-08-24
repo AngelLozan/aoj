@@ -8,5 +8,6 @@ Rails.application.routes.draw do
   get '/cv', to: "pages#cv", as: 'cv'
   get '/about', to: "pages#about", as: 'about'
   get '/photography', to: "pages#photography", as: 'photography'
-
+  post '/add_to_cart/:id', to: "paintings#add_to_cart", as: 'add_to_cart'
+  delete '/remove_from_cart/:id', to: "paintings#remove_from_cart", as: 'remove_from_cart'
 end

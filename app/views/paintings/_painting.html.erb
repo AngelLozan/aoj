@@ -18,8 +18,7 @@
 
     <p>
       <strong>Price:</strong>
-      <i class="fa-solid fa-euro-sign"></i>
-      <%= painting.price / 100.00 %>
+      <%= number_to_currency(painting.price / 100.00, :unit=> '€') %>
     </p>
 
     <% if painting.discount_code %>
