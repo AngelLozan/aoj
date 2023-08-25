@@ -1,5 +1,7 @@
 require "test_helper"
 
+# @dev Run `rails db:test:purge` if testing with blob creation before test
+
 class PaintingsControllerTest < ActionDispatch::IntegrationTest
 
   Blob = ActiveStorage::Blob.create!(
@@ -29,7 +31,6 @@ class PaintingsControllerTest < ActionDispatch::IntegrationTest
     )
 
     @painting.save!
-
     puts "Painting created with photo. \n \n"
   end
 
@@ -80,6 +81,32 @@ class PaintingsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to paintings_url
     puts "\n7- Can delete a painting \n".green
   end
+
+  test "should get admin" do
+    get admin_url
+    assert_response :success
+    puts "\n8- Admin route works \n".green
+  end
+
+  # test "should add item to session cart" do
+  #   session = @request.session
+  #   assert_difference("session[:cart].count", 1) do
+  #     # @controller.session[:cart] = []
+  #     post add_to_cart_url(@painting)
+  #   end
+  #   assert_redirected_to paintings_url
+  #   puts "\n9- Successfully adds items to cart \n".green
+  # end
+
+  # test "should remove item from cart" do
+
+  #   assert_difference("@request.session[:cart].count", -1) do
+  #     post add_to_cart_url(@painting)
+  #     delete remove_from_cart_url(@painting)
+  #   end
+  #   assert_redirected_to paintings_url
+  #   puts "\n10- Can remove items from cart \n".green
+  # end
 
 
 end
