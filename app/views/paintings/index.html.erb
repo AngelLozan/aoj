@@ -4,6 +4,15 @@
     <h1>My works</h1>
   </div>
 
+<details>
+  <summary>Shopping cart 🛒</summary>
+  <ul>
+    <% @cart.each do |painting| %>
+      <li><%= painting.title %> <%= button_to 'Remove from cart', remove_from_cart_path(painting), method: :delete, class: 'btn btn-danger' %></li>
+    <% end %>
+  </ul>
+</details>
+
   <div class="row" id="paintings">
     <% @paintings.each do |painting| %>
       <div class="col-sm-6 d-flex align-items-stretch">
@@ -21,9 +30,13 @@
           <p>
             <%= link_to "View this Painting", painting, class: "btn btn-primary mt-3" %>
           </p>
-          <p>
-            <%= link_to "Add to cart", add_to_cart_path(painting), method: :post, class: "btn btn-primary mt-3" %>
-          </p>
+          <% if @cart.include?(painting) %>
+            <%= button_to 'Remove from cart', remove_from_cart_path(painting), method: :delete, class: 'btn btn-danger' %>
+          <% else %>
+            <p>
+              <%= button_to "Add to cart", add_to_cart_path(painting), method: :post, class: "btn btn-primary mt-3" %>
+            </p>
+          <% end %>
         </div>
       </div>
 
