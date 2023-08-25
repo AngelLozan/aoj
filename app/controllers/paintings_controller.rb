@@ -4,6 +4,7 @@ class PaintingsController < ApplicationController
 
   def index
     @paintings = Painting.all
+    session[:cart] ||= []
   end
 
   def show
@@ -44,7 +45,6 @@ class PaintingsController < ApplicationController
 
   def destroy
     @painting.destroy
-
     respond_to do |format|
       format.html { redirect_to paintings_url, notice: "Painting was successfully destroyed." }
       format.json { head :no_content }
@@ -53,6 +53,18 @@ class PaintingsController < ApplicationController
 
   def admin
     @paintings = Painting.all
+  end
+
+  # @dev Cart functionality
+
+  def add_to_cart
+    session[:cart] << params[:id]
+    redirect_to paintings_path
+  end
+
+  def remove_from_cart
+    session[:cart].delete(params[:id])
+    redirect_to paintings_path
   end
 
   private

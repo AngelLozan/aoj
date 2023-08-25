@@ -13,7 +13,7 @@ gem "sprockets-rails"
 gem "pg", "~> 1.1"
 
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma", "~> 5.0"
+gem "puma", "~> 6.3.1"
 
 # Bundle and transpile JavaScript [https://github.com/rails/jsbundling-rails]
 gem "jsbundling-rails"
@@ -57,7 +57,10 @@ gem 'bootstrap', '~> 5.2'
 gem 'cloudinary'
 gem "pg_search"
 gem 'faker'
-# gem "pundit"
+# Security audits for dependencies and code.
+gem 'bundler-audit', require: false
+gem 'ruby_audit', require: false
+gem "brakeman"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
