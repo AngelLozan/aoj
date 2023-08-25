@@ -1,10 +1,11 @@
 class PaintingsController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[index show]
+  skip_before_action :authenticate_user!, only: %i[index show add_to_cart remove_from_cart]
   before_action :set_painting, only: %i[ show edit update destroy ]
+  before_action :initalize_cart, only: %i[load_cart add_to_cart remove_from_cart ]
+  before_action :load_cart, only: %i[ index show add_to_cart remove_from_cart ]
 
   def index
     @paintings = Painting.all
-    session[:cart] ||= []
   end
 
   def show
@@ -57,13 +58,25 @@ class PaintingsController < ApplicationController
 
   # @dev Cart functionality
 
+  # @dev only display cart if the painting isn't in cart already (not etsy)
+  def load_cart
+    if session[:cart].nil?
+      session[:cart] = []
+      @cart = session[:cart]
+    else
+      @cart = Painting.find(session[:cart])
+    end
+  end
+
   def add_to_cart
-    session[:cart] << params[:id]
+    id = params[:id].to_i
+    session[:cart] << id unless session[:cart].include?(id)
     redirect_to paintings_path
   end
 
   def remove_from_cart
-    session[:cart].delete(params[:id])
+    id = params[:id].to_i
+    session[:cart].delete(id)
     redirect_to paintings_path
   end
 
@@ -74,5 +87,9 @@ class PaintingsController < ApplicationController
 
     def painting_params
       params.require(:painting).permit(:description, :price, :title, :discount_code, photos: [])
+    end
+
+    def initalize_cart
+      session[:cart] ||= []
     end
 end

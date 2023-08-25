@@ -84,6 +84,10 @@ jobs:
 
       - name: Run tests model and controllers
         run: bundle exec rails test
+
+      - name: Teardown old database for system tests
+        run: bundle exec rails db:test:purge
+
       - name: Run system tests
         run: bundle exec rails test:system
 
