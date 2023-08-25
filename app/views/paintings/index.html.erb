@@ -14,13 +14,15 @@
               <p class="card-text"><%= painting.description %></p>
               <div class="d-flex flex-row">
                   <small>
-                    <i class="fa-solid fa-euro-sign"></i>
-                    <%= painting.price / 100.0 %>
+                    <%= number_to_currency(painting.price / 100.00, :unit=> '€') %>
                   </small>
               </div>
             </div>
           <p>
             <%= link_to "View this Painting", painting, class: "btn btn-primary mt-3" %>
+          </p>
+          <p>
+            <%= link_to "Add to cart", add_to_cart_path(painting), method: :post, class: "btn btn-primary mt-3" %>
           </p>
         </div>
       </div>
