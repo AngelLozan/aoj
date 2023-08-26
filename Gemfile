@@ -57,6 +57,7 @@ gem 'bootstrap', '~> 5.2'
 gem 'cloudinary'
 gem "pg_search"
 gem 'faker'
+gem 'stripe'
 # Security audits for dependencies and code.
 gem 'bundler-audit', require: false
 gem 'ruby_audit', require: false
