@@ -11,12 +11,22 @@
       <li><%= painting.title %> <%= button_to 'Remove from cart', remove_from_cart_path(painting), method: :delete, class: 'btn btn-danger' %></li>
     <% end %>
   </ul>
+  <p>
+    Total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %>
+  </p>
+  <%= link_to "Checkout", new_payment_path, class: 'btn btn-success' %>
 </details>
 
   <div class="row" id="paintings">
     <% @paintings.each do |painting| %>
       <div class="col-sm-6 d-flex align-items-stretch">
         <div class="card my-5 mx-3 p-3 shadow rounded">
+        <% if painting.status == 'available' %>
+          <div class="ribbon"><span>Available</span></div>
+        <% else %>
+          <div class="ribbon red"><span>Sold</span></div>
+        <% end %>
+
           <%= cl_image_tag painting.photos[0].key if painting.photos.present?%>
           <div class="card-body">
               <h5 class="card-title"><%= painting.title %></h5>
@@ -32,6 +42,10 @@
           </p>
           <% if @cart.include?(painting) %>
             <%= button_to 'Remove from cart', remove_from_cart_path(painting), method: :delete, class: 'btn btn-danger' %>
+          <% elsif painting.status == "sold" %>
+            <p>
+              <%= button_to "Sold", painting, class: "btn btn-danger mt-3", disabled: true %>
+            </p>
           <% else %>
             <p>
               <%= button_to "Add to cart", add_to_cart_path(painting), method: :post, class: "btn btn-primary mt-3" %>
