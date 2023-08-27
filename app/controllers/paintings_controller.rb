@@ -71,7 +71,7 @@ class PaintingsController < ApplicationController
   def add_to_cart
     id = params[:id].to_i
     session[:cart] << id unless session[:cart].include?(id)
-    redirect_to paintings_path
+    redirect_to new_payment_path
   end
 
   def remove_from_cart
