@@ -4,23 +4,12 @@
     <h1>My works</h1>
   </div>
 
-<details>
-  <summary>Shopping cart 🛒</summary>
-  <ul>
-    <% @cart.each do |painting| %>
-      <li><%= painting.title %> <%= button_to 'Remove from cart', remove_from_cart_path(painting), method: :delete, class: 'btn btn-danger' %></li>
-    <% end %>
-  </ul>
-  <p>
-    Total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %>
-  </p>
-  <%= link_to "Checkout", new_payment_path, class: 'btn btn-success' %>
-</details>
 
-  <div class="row" id="paintings">
+
+  <div class="row" id="paintings" data-controller="works">
     <% @paintings.each do |painting| %>
       <div class="col-sm-6 d-flex align-items-stretch">
-        <div class="card my-5 mx-3 p-3 shadow rounded">
+        <div class="card my-5 mx-3 p-3 shadow rounded" data-action="click->works#openPainting" data-url="paintings/<%= painting.id %>">
         <% if painting.status == 'available' %>
           <div class="ribbon"><span>Available</span></div>
         <% else %>
