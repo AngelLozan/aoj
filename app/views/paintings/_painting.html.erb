@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid mt-3">
   <div id="<%= dom_id painting %>">
     <h1><%= painting.title %></h1>
 
@@ -25,6 +25,18 @@
       <p>
         <strong>Discount code:</strong>
         <%= painting.discount_code %>
+      </p>
+    <% end %>
+
+    <% if @cart.include?(painting) %>
+      <%= button_to 'Remove from cart', remove_from_cart_path(painting), method: :delete, class: 'btn btn-danger' %>
+    <% elsif painting.status == "sold" %>
+      <p>
+        <%= button_to "Sold", painting, class: "btn btn-danger mt-3", disabled: true %>
+      </p>
+    <% else %>
+      <p>
+        <%= button_to "Add to cart", add_to_cart_path(painting), method: :post, class: "btn btn-primary mt-3" %>
       </p>
     <% end %>
   </div>
