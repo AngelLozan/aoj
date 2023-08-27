@@ -30,6 +30,16 @@
             </div>
           </li>
         <% else %>
+          <% if @cart && @cart.count > 0 %>
+            <li class="nav-item">
+              <%= link_to new_payment_path, class: "btn btn-primary rounded" do %>
+                Cart 🛒 <span class="badge bg-secondary"><%= @cart.count %></span>
+              <% end %>
+            </li>
+          <% end %>
+          <li class="nav-item">
+            <%= link_to "Works", paintings_path, class: "nav-link" %>
+          </li>
           <li class="nav-item">
             <%= link_to "About", about_path, class: "nav-link" %>
           </li>
