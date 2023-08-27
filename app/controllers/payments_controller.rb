@@ -8,8 +8,6 @@ class PaymentsController < ApplicationController
   def create
     # Amount in cents
     @amount = @cart.sum(&:price)
-    # @amount = (current_user.cart_total * 100).to_i
-    # @amount = number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€')
     customer = Stripe::Customer.create({
       email: params[:stripeEmail],
       source: params[:stripeToken],
