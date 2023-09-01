@@ -1,16 +1,19 @@
 
-<%= simple_form_for(@painting) do |f| %>
+<%= simple_form_for(@painting, data: { controller: 'price' }) do |f| %>
   <%= f.error_notification %>
   <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
 
   <div class="form-inputs">
     <%= f.input :description %>
+
     <% if @painting.price? %>
-      <%= f.input :price, input_html: { value: (@painting.price / 100.0) } %>
+      <%= f.input :price, data: { target: 'price.input' } %>
     <% else %>
-      <%= f.input :price %>
+      <%= f.input :price, label: 'Price in cents' %>
     <% end %>
+
     <%= f.input :title %>
+    <%= f.input :status, collection: %w(sold available) %>
     <%= f.input :discount_code %>
     <%= f.input :photos, as: :file, input_html: { multiple: true } %>
   </div>

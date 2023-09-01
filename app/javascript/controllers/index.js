@@ -10,5 +10,8 @@ application.register("hello", HelloController)
 import PhotographyController from "./photography_controller"
 application.register("photography", PhotographyController)
 
+import PriceController from "./price_controller"
+application.register("price", PriceController)
+
 import WorksController from "./works_controller"
 application.register("works", WorksController)

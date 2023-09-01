@@ -9,7 +9,7 @@
   <div class="row" id="paintings" data-controller="works">
     <% @paintings.each do |painting| %>
       <div class="col-sm-6 d-flex align-items-stretch">
-        <div class="card my-5 mx-3 p-3 shadow rounded" data-action="click->works#openPainting" data-url="paintings/<%= painting.id %>">
+        <div class="card my-5 mx-3 p-3 shadow rounded" data-action="click->works#openPainting" data-url="/paintings/<%= painting.id %>">
         <% if painting.status == 'available' %>
           <div class="ribbon"><span>Available</span></div>
         <% else %>

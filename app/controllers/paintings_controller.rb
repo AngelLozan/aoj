@@ -71,7 +71,7 @@ class PaintingsController < ApplicationController
   def add_to_cart
     id = params[:id].to_i
     session[:cart] << id unless session[:cart].include?(id)
-    redirect_to new_payment_path
+    redirect_to new_order_path
   end
 
   def remove_from_cart
@@ -86,7 +86,7 @@ class PaintingsController < ApplicationController
     end
 
     def painting_params
-      params.require(:painting).permit(:description, :price, :title, :discount_code, photos: [])
+      params.require(:painting).permit(:description, :status, :price, :title, :discount_code, photos: [])
     end
 
     def initalize_cart

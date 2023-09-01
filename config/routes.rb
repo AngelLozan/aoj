@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   # resources :payments, only: %i[ new create ]
-  get 'payments/new', to: 'payments#new', as: 'new_payment'
-  post 'payments/create', to: 'payments#create', as: 'payments'
+  # get 'payments/new', to: 'payments#new', as: 'new_payment'
+  # post 'payments/create', to: 'payments#create', as: 'payments'
 
   resources :paintings
   get '/admin', to: 'paintings#admin', as: 'admin'
