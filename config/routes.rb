@@ -19,6 +19,8 @@ Rails.application.routes.draw do
   post '/orders', to: "orders#create", as: 'create_order'
   get '/orders/:id', to: "orders#show", as: 'order'
   get '/orders', to: "orders#index", as: 'orders'
-  # Need update and destroy for orders
+  get '/orders/:id/edit', to: "orders#edit", as: 'edit_order'
+  patch '/orders/:id', to: "orders#update", as: 'update_order'
+  delete '/orders/:id', to: "orders#destroy", as: 'destroy_order'
 
 end
