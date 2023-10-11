@@ -1,7 +1,7 @@
 class OrdersController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[new create]
   before_action :set_order, only: %i[ show edit update destroy ]
-  before_action :load_cart
+  before_action :set_cart
 
   def index
     @orders = Order.all
@@ -9,14 +9,48 @@ class OrdersController < ApplicationController
 
   def new
     @order = Order.new
-    @cart.each do |painting|
-      @order.order_paintings << painting
-    end
   end
 
   def create
     @order = Order.new(order_params)
-    # TODO: Add logic to set order status to "open" and create order
+    # Add paintings from cart to order
+    @cart.each do |painting|
+      @order.order_paintings << painting
+    end
+
+    # Payment logic, amount in cents
+    @amount = @cart.sum(&:price)
+    customer = Stripe::Customer.create({
+      email: params[:stripeEmail],
+      source: params[:stripeToken],
+    })
+
+    charge = Stripe::Charge.create({
+      customer: customer.id,
+      amount: @amount,
+      description: "Rails Stripe customer",
+      currency: "eur",
+    })
+
+    @cart.each do |painting|
+      painting.update(status: "sold")
+    end
+
+    session[:cart] = []
+    flash[:notice] = "Thank you for your purchase!"
+
+    redirect_to paintings_path
+  rescue Stripe::CardError => e
+    flash[:error] = e.message
+    redirect_to new_order_path
+
+    # respond_to do |format|
+    #   if @order.save
+    #     format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+    #   else
+    #     format.html { render :new, status: :unprocessable_entity }
+    #   end
+    # end
   end
 
   def show
@@ -45,25 +79,18 @@ class OrdersController < ApplicationController
     end
   end
 
-  def load_cart
-    if session[:cart].nil?
-      session[:cart] = []
-      @cart = session[:cart]
-    else
-      @cart = Painting.find(session[:cart])
-    end
-  end
-
   private
 
   def order_params
     # order_paintings: [] is an array of painting ids to set from the cart before save
-    params.require(:order).permit(:address, :phone, :status, order_paintings:[])
+    params.require(:order).permit(:address, :phone, :status, order_paintings: [])
   end
 
   def set_order
     @order = Order.find(params[:id])
   end
 
-
+  def set_cart
+    @cart = Painting.find(session[:cart])
+  end
 end
