@@ -1,4 +1,5 @@
 <%# Need to add ability to enter address, name, phone number before stripe checkout %>
+<%# Make into Simple form %>
 <%= form_tag create_order_path do %>
   <label class="amount">
         Total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %>
@@ -13,7 +14,7 @@
 
     <%= label_tag :name %>
     <%= text_field_tag :name, nil, class: 'form-control' %>
-    
+
   </div>
 
 
