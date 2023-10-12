@@ -1,29 +1,59 @@
 <%# Need to add ability to enter address, name, phone number before stripe checkout %>
 <%# Make into Simple form %>
-<%= form_tag create_order_path do %>
-  <label class="amount">
+<div class="container">
+  <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
+    <div class="form-inputs">
+      <label class="amount">
         Total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %>
-  </label>
+      </label>
 
-  <div class="form-group">
-    <%= label_tag :address %>
-    <%= text_field_tag :address, nil, class: 'form-control' %>
+      <%= f.input :address, label: 'Address', input_html: { class: 'form-control' } %>
+      <%= f.input :phone, label: 'Phone', input_html: { class: 'form-control' } %>
+      <%= f.input :name, label: 'Name', input_html: { class: 'form-control' } %>
+    </div>
 
-    <%= label_tag :phone %>
-    <%= text_field_tag :phone, nil, class: 'form-control' %>
+    <% amount = @cart.sum(&:price) %>
+    <script
+      src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+      data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
+      data-description="Your art is on the way!"
+      data-amount="<%= amount %>"
+      data-locale="auto">
+    </script>
 
-    <%= label_tag :name %>
-    <%= text_field_tag :name, nil, class: 'form-control' %>
 
-  </div>
+  <% end %>
+
+</div>
 
 
-  <% amount = @cart.sum(&:price) %>
-  <script
-    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-    data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
-    data-description="Your art is on the way!"
-    data-amount="<%= amount %>"
-    data-locale="auto">
-  </script>
+
+
+
+<% if false %>
+  <%= form_tag create_order_path do %>
+    <label class="amount">
+          Total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %>
+    </label>
+
+    <div class="form-group">
+      <%= label_tag :address %>
+      <%= text_field_tag :address, nil, class: 'form-control' %>
+
+      <%= label_tag :phone %>
+      <%= text_field_tag :phone, nil, class: 'form-control' %>
+
+      <%= label_tag :name %>
+      <%= text_field_tag :name, nil, class: 'form-control' %>
+    </div>
+
+    <% amount = @cart.sum(&:price) %>
+    <script
+      src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+      data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
+      data-description="Your art is on the way!"
+      data-amount="<%= amount %>"
+      data-locale="auto">
+    </script>
+  <% end %>
 <% end %>

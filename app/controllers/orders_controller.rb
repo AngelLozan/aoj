@@ -15,7 +15,7 @@ class OrdersController < ApplicationController
     @order = Order.new(order_params)
     # Add paintings from cart to order
     @cart.each do |painting|
-      @order.order_paintings << painting
+      @order.paintings << painting
     end
 
     # Payment logic, amount in cents
@@ -83,7 +83,7 @@ class OrdersController < ApplicationController
 
   def order_params
     # order_paintings: [] is an array of painting ids to set from the cart before save
-    params.require(:order).permit(:address, :phone, :status, order_paintings: [])
+    params.require(:order).permit(:name, :address, :phone, :status, paintings: [])
   end
 
   def set_order
