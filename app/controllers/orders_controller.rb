@@ -15,7 +15,9 @@ class OrdersController < ApplicationController
     @order = Order.new(order_params)
     # Add paintings from cart to order
     @cart.each do |painting|
-      @order.paintings << painting
+      # To do: Find painting by id ( which is what is stored in the cart ), then attach it to the order
+      # @order.paintings << painting
+      # @order.paintings.attach(painting)
     end
 
     # Payment logic, amount in cents
