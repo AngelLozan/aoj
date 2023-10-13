@@ -1,0 +1,13 @@
+<div class="container-fluid mt-3 text-center">
+  <div id="<%= dom_id order %>">
+    <h1> For: <%= order.name %></h1>
+    <p>Address: <%= order.address %></p>
+    <p>Contact: <%= order.phone %></p>
+    <p>Paintings:
+      <% order.paintings.each do |painting| %>
+        <%= painting.title %> <br>
+        <%=cl_image_tag painting.photos[0].key if painting.photos.present? %>
+      <% end %>
+    </p>
+  </div>
+</div>

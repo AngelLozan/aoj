@@ -1,0 +1,24 @@
+
+<div class="container mt-3">
+  <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
+    <div class="form-inputs">
+      <label class="amount">
+        Your total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %>
+      </label>
+
+      <%= f.input :address, label: 'Address', input_html: { class: 'form-control' } %>
+      <%= f.input :phone, label: 'Phone', input_html: { class: 'form-control' } %>
+      <%= f.input :name, label: 'Name', input_html: { class: 'form-control' } %>
+    </div>
+
+    <% amount = @cart.sum(&:price) %>
+    <script
+      src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+      data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
+      data-description="Your art is on the way!"
+      data-amount="<%= amount %>"
+      data-locale="auto">
+    </script>
+
+  <% end %>
+</div>
