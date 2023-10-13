@@ -4,11 +4,14 @@
 
 import { application } from "./application"
 
-import CheckoutController from "./checkout_controller"
-application.register("checkout", CheckoutController)
+// import CheckoutController from "./checkout_controller"
+// application.register("checkout", CheckoutController)
 
-import HelloController from "./hello_controller"
-application.register("hello", HelloController)
+// import HelloController from "./hello_controller"
+// application.register("hello", HelloController)
+
+import OrdersController from "./orders_controller"
+application.register("orders", OrdersController)
 
 import PhotographyController from "./photography_controller"
 application.register("photography", PhotographyController)

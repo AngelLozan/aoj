@@ -3,6 +3,7 @@ class PaintingsController < ApplicationController
   before_action :set_painting, only: %i[ show edit update destroy ]
   before_action :initalize_cart, only: %i[load_cart add_to_cart remove_from_cart ]
   before_action :load_cart # Load for all pages since in navbar, only: %i[ index show add_to_cart remove_from_cart ]
+  before_action :load_orders
 
   def index
     @paintings = Painting.all
@@ -67,6 +68,11 @@ class PaintingsController < ApplicationController
       @cart = Painting.find(session[:cart])
     end
   end
+
+  def load_orders
+    @orders = Order.all
+  end
+
 
   def add_to_cart
     id = params[:id].to_i

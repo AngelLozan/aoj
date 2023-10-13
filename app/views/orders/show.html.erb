@@ -1,10 +1,9 @@
-<p style="color: green"><%= notice %></p>
+<div class="container-fluid pb-5" data-controller="orders">
+  <p style="color: green"><%= notice %></p>
 
-<%= render @order %>
-
-<div>
-  <%= link_to "Edit this order", edit_order_path(@order) %> |
-  <%= link_to "Back to orders", orders_path %>
-
-  <%= button_to "Destroy this order", @order, method: :delete %>
+  <%= render @order %>
+  <div class="d-flex justify-content-center p-3">
+    <%= link_to "Delete", @order, class: "btn btn-danger btn-sm text-white", data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %> |
+    <%= link_to "Back to orders", orders_path, class: "btn btn-secondary btn-sm" %>
+  </div>
 </div>

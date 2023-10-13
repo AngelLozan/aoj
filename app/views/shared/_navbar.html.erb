@@ -18,6 +18,11 @@
           <li class="nav-item">
             <%= link_to "Admin", "/admin", class: "nav-link" %>
           </li>
+          <% if @orders.count > 0 && @orders.find_by(status: 0) != nil %>
+             <%= link_to orders_path, class: "btn btn-primary rounded" do %>
+                📬 <span class="badge bg-secondary"><%= @orders.count %></span>
+              <% end %>
+          <% end %>
           <li class="nav-item dropdown">
           <a href="#" class="avatar" id="navbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <%= image_tag "aoj.jpeg", class: "avatar", alt: "dropdown menu" %>
@@ -26,6 +31,7 @@
               <%= link_to "About", "/about", class: "dropdown-item" %>
               <%= link_to "CV", "/cv", class: "dropdown-item" %>
               <%= link_to "Photography", "/photography", class: "dropdown-item" %>
+              <%= link_to "Orders", "/orders", class: "dropdown-item" %>
               <%= link_to "Log out", destroy_user_session_path, data: {turbo_method: :delete}, class: "dropdown-item" %>
             </div>
           </li>
