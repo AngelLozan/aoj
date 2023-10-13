@@ -7,9 +7,13 @@ class OrdersController < ApplicationController
     @orders = Order.all
   end
 
+  def show
+  end
+
   def new
     @order = Order.new
   end
+
 
   def create
     @order = Order.new(order_params)
@@ -32,29 +36,28 @@ class OrdersController < ApplicationController
       currency: "eur",
     })
 
-    @cart.each do |painting|
-      painting.update(status: "sold")
+    respond_to do |format|
+      byebug
+      if @order.save
+        @cart.each do |painting|
+          painting.update(status: "sold")
+        end
+        session[:cart] = []
+        format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+      else
+        format.html { render :new, status: :unprocessable_entity }
+      end
     end
 
-    session[:cart] = []
-    flash[:notice] = "Thank you for your purchase!"
+    # flash[:notice] = "Thank you for your purchase!"
+    # redirect_to paintings_path
 
-    redirect_to paintings_path
   rescue Stripe::CardError => e
     flash[:error] = e.message
     redirect_to new_order_path
 
-    # respond_to do |format|
-    #   if @order.save
-    #     format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
-    #   else
-    #     format.html { render :new, status: :unprocessable_entity }
-    #   end
-    # end
   end
 
-  def show
-  end
 
   def edit
   end
