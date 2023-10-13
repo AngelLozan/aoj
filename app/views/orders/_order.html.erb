@@ -1,25 +1,13 @@
 <div class="container-fluid mt-3 text-center">
   <div id="<%= dom_id order %>">
-    <div class="prod-card my-3">
-      <% if Rails.env.test? %>
-          <%= image_tag "photo1.jpeg", alt: "test image" %>
-        <% else %>
-          <%=cl_image_tag painting.photos[0].key if painting.photos.present? %>
-        <% end %>
-      <h1 class="mt-3"><%= painting.title %></h1>
-      <p class="prod-price"> <%= number_to_currency(painting.price / 100.00, :unit=> '€') %></p>
-      <p><%= painting.description %></p>
-        <% if @cart.include?(painting) %>
-          <%= button_to 'Remove from cart', remove_from_cart_path(painting), method: :delete, class: 'btn btn-danger' %>
-        <% elsif painting.status == "sold" %>
-          <p>
-            <%= button_to "Sold", painting, class: "btn btn-danger mt-3", disabled: true %>
-          </p>
-        <% else %>
-          <p>
-            <%= button_to "Add to cart", add_to_cart_path(painting), method: :post, class: "btn btn-primary mt-3" %>
-          </p>
-        <% end %>
-    </div>
+    <h1> For: <%= order.name %></h1>
+    <p>Address: <%= order.address %></p>
+    <p>Contact: <%= order.phone %></p>
+    <p>Paintings:
+      <% order.paintings.each do |painting| %>
+        <%= painting.title %> <br>
+        <%=cl_image_tag painting.photos[0].key if painting.photos.present? %>
+      <% end %>
+    </p>
   </div>
 </div>
