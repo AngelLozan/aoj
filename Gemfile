@@ -62,6 +62,8 @@ gem 'stripe'
 gem 'bundler-audit', require: false
 gem 'ruby_audit', require: false
 gem "brakeman"
+gem "sidekiq", "< 7"
+gem "sidekiq-failures", "~> 1.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
