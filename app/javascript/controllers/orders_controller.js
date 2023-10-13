@@ -13,4 +13,11 @@ export default class extends Controller {
     window.location.href = url;
   }
 
+  editOrder(e) {
+    console.log("Edit order");
+    const order = e.currentTarget;
+    const url = order.getAttribute("data-url");
+    window.location.href = url;
+  }
+
 }

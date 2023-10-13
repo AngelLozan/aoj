@@ -1,7 +1,7 @@
 <div class="container-fluid mt-3">
   <div id="<%= dom_id order %>">
 
-    <div class="card">
+    <div class="card" data-action="click->orders#editOrder" data-url="/orders/<%= order.id %>/edit">
       <div class="card-body">
         <h5 class="card-title">For: <%= order.name %></h5>
         <h6 class="card-text">Contact: <%= order.phone %></h6>
