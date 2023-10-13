@@ -2,11 +2,10 @@
   <p style="color: green"><%= notice %></p>
 
   <%= render @order %>
-
-  <div>
-    <%= link_to "Edit this order", edit_order_path(@order) %> |
-    <%= link_to "Back to orders", orders_path %>
-
-    <%= link_to "Delete", @order, class: "btn btn-danger mt-3 text-white", data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
+  <div class="d-flex justify-content-center p-3">
+    <%= link_to "Edit this order", edit_order_path(@order), class: "btn btn-primary btn-sm" %> |
+    <%= link_to "Back to orders", orders_path, class: "btn btn-secondary btn-sm" %> |
+    <br>
+    <%= link_to "Delete", @order, class: "btn btn-danger btn-sm text-white", data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
   </div>
 </div>
