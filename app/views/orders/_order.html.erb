@@ -3,7 +3,8 @@
 
     <div class="card" data-action="click->orders#editOrder" data-url="/orders/<%= order.id %>/edit">
       <div class="card-body">
-        <h5 class="card-title">For: <%= order.name %></h5>
+        <h5 class="card-title">Order #<%= order.id %></h5>
+        <h6 class="card-text">For: <%= order.name %></h5>
         <h6 class="card-text">Contact: <%= order.phone %></h6>
         <p class="card-text">Address: <%= order.address %></p>
         <p>Paintings:
