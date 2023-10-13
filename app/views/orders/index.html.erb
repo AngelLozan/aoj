@@ -1,14 +1,23 @@
-<p style="color: green"><%= notice %></p>
+<div class="container pb-5">
+  <div class="text-center mt-3">
+    <h1>My Orders</h1>
+  </div>
 
-<h1>Orders</h1>
+  <div class="d-flex justify-content-center">
+    <%= link_to paintings_path, class: 'btn btn-success' do %>
+      <i class="fa-solid fa-plus"></i>
+    <% end %>
+  </div>
 
-<div id="orders">
-  <% @orders.each do |order| %>
-    <%= render order %>
-    <p>
-      <%= link_to "Show this order", order %>
-    </p>
-  <% end %>
+  <div id="orders">
+    <% @orders.each do |order| %>
+      <% if order.status == "open" %>
+        <%= render order %>
+        <p>
+          <%= link_to "Show this order", order %>
+        </p>
+      <% end %>
+    <% end %>
+  </div>
+
 </div>
-
-<%= link_to "New order", new_order_path %>

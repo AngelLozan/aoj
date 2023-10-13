@@ -48,7 +48,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_13_100544) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "status"
+    t.integer "status", default: 0
   end
 
   create_table "paintings", force: :cascade do |t|

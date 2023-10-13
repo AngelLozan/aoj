@@ -1,6 +1,7 @@
 class PagesController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[ home about cv photography]
   before_action :load_cart
+  before_action :load_orders
 
   def home
   end
@@ -21,6 +22,10 @@ class PagesController < ApplicationController
     else
       @cart = Painting.find(session[:cart])
     end
+  end
+
+  def load_orders
+    @orders = Order.all
   end
 
 end

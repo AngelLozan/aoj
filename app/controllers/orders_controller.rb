@@ -2,6 +2,7 @@ class OrdersController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[new create]
   before_action :set_order, only: %i[ show edit update destroy ]
   before_action :set_cart
+  before_action :load_orders
 
   def index
     @orders = Order.all
@@ -91,6 +92,10 @@ class OrdersController < ApplicationController
 
   def set_order
     @order = Order.find(params[:id])
+  end
+
+  def load_orders
+    @orders = Order.all
   end
 
   def set_cart

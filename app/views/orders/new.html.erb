@@ -6,9 +6,9 @@
         Your total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %>
       </label>
 
-      <%= f.input :address, label: 'Address', input_html: { class: 'form-control' } %>
-      <%= f.input :phone, label: 'Phone', input_html: { class: 'form-control' } %>
-      <%= f.input :name, label: 'Name', input_html: { class: 'form-control' } %>
+      <%= f.input :address, label: 'Shipping Address', input_html: { class: 'form-control' } %>
+      <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
+      <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
     </div>
 
     <% amount = @cart.sum(&:price) %>
