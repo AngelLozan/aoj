@@ -13,7 +13,7 @@
     <% @orders.each do |order| %>
       <div class="col-sm-6 d-flex align-items-stretch">
         <div data-action="click->orders#openOrder" data-url="/orders/<%= order.id %>">
-          <% if order.status == "open" %>
+          <% if order.status != "complete" %>
               <%= render order %>
             <% end %>
         </div>
