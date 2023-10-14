@@ -10,3 +10,19 @@
 // Your CSS partials
 @import "components/index";
 @import "pages/index";
+
+// html {
+//   height: 100%;
+// }
+
+.page-container {
+  position: relative;
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+// .page-container {
+//   display: grid;
+//   min-height: 100vh;
+//   grid-template-rows: auto 1fr auto;
+// }

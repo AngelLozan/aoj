@@ -1,7 +1,7 @@
 class OrdersController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[new create]
   before_action :set_order, only: %i[ show edit update destroy ]
-  before_action :set_cart
+  before_action :set_cart, only: %i[ new create ]
   before_action :load_orders
 
   def index
@@ -44,6 +44,7 @@ class OrdersController < ApplicationController
           painting.update(status: "sold")
         end
         session[:cart] = []
+        OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
         format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -96,6 +97,15 @@ class OrdersController < ApplicationController
 
   def load_orders
     @orders = Order.all
+  end
+
+  def load_cart
+    if session[:cart].nil?
+      session[:cart] = []
+      @cart = session[:cart]
+    else
+      @cart = Painting.find(session[:cart])
+    end
   end
 
   def set_cart
