@@ -39,7 +39,7 @@
           <% if @cart && @cart.count > 0 %>
             <li class="nav-item">
               <%= link_to new_order_path, class: "btn btn-primary rounded" do %>
-                Cart 🛒 <span class="badge bg-secondary"><%= @cart.count %></span>
+                <i class="fa-solid fa-cart-shopping me-3"></i><span class="badge bg-secondary"><%= @cart.count %></span>
               <% end %>
             </li>
           <% end %>
