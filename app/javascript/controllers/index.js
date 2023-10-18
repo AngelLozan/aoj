@@ -7,9 +7,6 @@ import { application } from "./application"
 import AdminController from "./admin_controller"
 application.register("admin", AdminController)
 
-import CheckoutController from "./checkout_controller"
-application.register("checkout", CheckoutController)
-
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
