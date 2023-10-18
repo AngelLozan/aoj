@@ -1,3 +1,5 @@
+# Saved for reference
+
 class PaymentsController < ApplicationController
   before_action :set_cart
   skip_before_action :authenticate_user!, only: %i[new create]

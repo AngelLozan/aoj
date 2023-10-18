@@ -23,7 +23,9 @@
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%= include_gon %>
 
+    <script src="https://js.braintreegateway.com/web/dropin/1.40.2/js/dropin.min.js"></script>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.2/css/all.css">
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
@@ -32,11 +34,14 @@
   </head>
 
   <body>
-    <div class="page-container">
+    <div class="page-container" data-controller="top">
       <%= render "shared/navbar" %>
       <%= render "shared/flashes" %>
       <%= yield %>
-       <%= render "shared/footer" %>
+      <button id="topBtn" data-top-target="topBtn" data-action="click->top#scrollToTop">
+       <i class="fa-solid fa-arrow-up"></i>
+      </button>
+      <%= render "shared/footer" %>
     </div>
   </body>
 </html>
