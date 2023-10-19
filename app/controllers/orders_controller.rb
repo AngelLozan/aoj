@@ -13,6 +13,7 @@ class OrdersController < ApplicationController
 
   def new
     @order = Order.new
+    gon.client_token = generate_client_token
   end
 
   def create_paypal
@@ -25,7 +26,7 @@ class OrdersController < ApplicationController
     # Payment logic, amount in cents
     @amount = @cart.sum(&:price)
 
-    
+
     respond_to do |format|
       byebug
       if @order.save
@@ -135,5 +136,9 @@ class OrdersController < ApplicationController
 
   def set_cart
     @cart = Painting.find(session[:cart])
+  end
+
+  def generate_client_token
+    Braintree::ClientToken.generate
   end
 end
