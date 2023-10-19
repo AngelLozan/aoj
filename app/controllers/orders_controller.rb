@@ -26,20 +26,47 @@ class OrdersController < ApplicationController
     # Payment logic, amount in cents
     @amount = @cart.sum(&:price)
 
+    gateway = Braintree::Gateway.new(
+      :environment => :sandbox,
+      :merchant_id => ENV["BRAINTREE_MERCHANT_ID"],
+      :public_key => ENV["BRAINTREE_PUBLIC_KEY"],
+      :private_key => ENV["BRAINTREE_PRIVATE_KEY"],
+    )
+    nonce_from_the_client = params[:payment_method_nonce]
 
-    respond_to do |format|
-      byebug
-      if @order.save
-        @cart.each do |painting|
-          painting.update(status: "sold")
+    result = gateway.transaction.sale(
+      :amount => @amount,
+      :payment_method_nonce => nonce_from_the_client,
+      options: { submit_for_settlement: true }
+    )
+
+    if result.success?
+      puts "success!: #{result.transaction.id}"
+
+      respond_to do |format|
+        byebug
+        if @order.save
+          @cart.each do |painting|
+            painting.update(status: "sold")
+          end
+          session[:cart] = []
+          OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+          format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+        else
+          format.html { render :new, status: :unprocessable_entity }
         end
-        session[:cart] = []
-        OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
-        format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
-      else
-        format.html { render :new, status: :unprocessable_entity }
       end
+
+    elsif result.transaction
+      puts "Error processing transaction:"
+      puts "  code: #{result.transaction.processor_response_code}"
+      puts "  text: #{result.transaction.processor_response_text}"
+      redirect_to new_order_path
+    else
+      p result.errors
+      redirect_to new_order_path
     end
+
   end
 
   def create
