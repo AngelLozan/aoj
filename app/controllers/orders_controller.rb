@@ -15,6 +15,31 @@ class OrdersController < ApplicationController
     @order = Order.new
   end
 
+  def create_paypal
+    @order = Order.new(order_params)
+    # Add paintings from cart to order
+    @cart.each do |painting|
+      @order.paintings << painting
+    end
+
+    # Payment logic, amount in cents
+    @amount = @cart.sum(&:price)
+
+    
+    respond_to do |format|
+      byebug
+      if @order.save
+        @cart.each do |painting|
+          painting.update(status: "sold")
+        end
+        session[:cart] = []
+        OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+        format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+      else
+        format.html { render :new, status: :unprocessable_entity }
+      end
+    end
+  end
 
   def create
     @order = Order.new(order_params)
