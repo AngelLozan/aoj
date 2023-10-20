@@ -1,7 +1,7 @@
 class OrdersController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[new create]
+  skip_before_action :authenticate_user!, only: %i[new create create_paypal]
   before_action :set_order, only: %i[ show edit update destroy ]
-  before_action :set_cart, only: %i[ new create ]
+  before_action :set_cart, only: %i[ new create create_paypal]
   before_action :load_orders
 
   def index
@@ -13,8 +13,69 @@ class OrdersController < ApplicationController
 
   def new
     @order = Order.new
+    gon.client_token = generate_client_token
   end
 
+  def create_paypal
+    @order = Order.new(order_params)
+    # Add paintings from cart to order
+    @cart.each do |painting|
+      @order.paintings << painting
+    end
+
+    # Payment logic, amount in cents
+    @amount = @cart.sum(&:price)
+    whole_amount = sprintf('%.2f', @amount/100.0)
+
+    puts ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
+
+    gateway = Braintree::Gateway.new(
+      :environment => :sandbox,
+      :merchant_id => ENV["BRAINTREE_MERCHANT_ID"],
+      :public_key => ENV["BRAINTREE_PUBLIC_KEY"],
+      :private_key => ENV["BRAINTREE_PRIVATE_KEY"],
+    )
+
+    nonce_from_the_client = params[:payment_method_nonce]
+
+    puts ">>>>>>>>>>>>>>> NONCE: #{nonce_from_the_client}<<<<<<<<<<<<<<<<<<<"
+
+    result = gateway.transaction.sale(
+      :amount => whole_amount,
+      :payment_method_nonce => nonce_from_the_client,
+      options: { submit_for_settlement: true }
+    )
+
+    puts ">>>>>>>>>>>>>>> RESULT: #{result}<<<<<<<<<<<<<<<<<<<"
+
+    if result.success?
+      puts "success!: #{result.transaction.id}"
+
+      respond_to do |format|
+        byebug
+        if @order.save
+          @cart.each do |painting|
+            painting.update(status: "sold")
+          end
+          session[:cart] = []
+          OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+          format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+        end
+      end
+
+    elsif result.transaction
+      puts "Error processing transaction:"
+      puts "  code: #{result.transaction.processor_response_code}"
+      puts "  text: #{result.transaction.processor_response_text}"
+      redirect_to new_order_path
+    else
+      puts " >>>>>>>>> ERROR: #{result.errors} <<<<<<<<<<<<<"
+      redirect_to new_order_path
+    end
+
+  end
 
   def create
     @order = Order.new(order_params)
@@ -25,34 +86,121 @@ class OrdersController < ApplicationController
 
     # Payment logic, amount in cents
     @amount = @cart.sum(&:price)
-    customer = Stripe::Customer.create({
-      email: params[:stripeEmail],
-      source: params[:stripeToken],
-    })
 
-    charge = Stripe::Charge.create({
-      customer: customer.id,
-      amount: @amount,
-      description: "Rails Stripe customer",
-      currency: "eur",
-    })
+    if params[:payment_method_nonce]
+      # Braintree
+      whole_amount = sprintf('%.2f', @amount/100.0)
 
-    respond_to do |format|
-      byebug
-      if @order.save
-        @cart.each do |painting|
-          painting.update(status: "sold")
+      puts ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
+
+      gateway = Braintree::Gateway.new(
+        :environment => :sandbox,
+        :merchant_id => ENV["BRAINTREE_MERCHANT_ID"],
+        :public_key => ENV["BRAINTREE_PUBLIC_KEY"],
+        :private_key => ENV["BRAINTREE_PRIVATE_KEY"],
+      )
+
+      nonce_from_the_client = params[:payment_method_nonce]
+
+      puts ">>>>>>>>>>>>>>> NONCE: #{nonce_from_the_client}<<<<<<<<<<<<<<<<<<<"
+
+      result = gateway.transaction.sale(
+        :amount => whole_amount,
+        :payment_method_nonce => nonce_from_the_client,
+        options: { submit_for_settlement: true }
+      )
+
+      puts ">>>>>>>>>>>>>>> RESULT: #{result}<<<<<<<<<<<<<<<<<<<"
+
+      if result.success?
+        puts "success!: #{result.transaction.id}"
+
+        respond_to do |format|
+          byebug
+          if @order.save
+            @cart.each do |painting|
+              painting.update(status: "sold")
+            end
+            session[:cart] = []
+            OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+            format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+          else
+            format.html { render :new, status: :unprocessable_entity }
+          end
         end
-        session[:cart] = []
-        OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
-        format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+
+      elsif result.transaction
+        puts "Error processing transaction:"
+        puts "  code: #{result.transaction.processor_response_code}"
+        puts "  text: #{result.transaction.processor_response_text}"
+        redirect_to new_order_path
       else
-        format.html { render :new, status: :unprocessable_entity }
+        puts " >>>>>>>>> ERROR: #{result.errors} <<<<<<<<<<<<<"
+        redirect_to new_order_path
       end
+
+    elsif params[:stripeToken]
+      # Stripe
+      customer = Stripe::Customer.create({
+        email: params[:stripeEmail],
+        source: params[:stripeToken],
+      })
+
+      charge = Stripe::Charge.create({
+        customer: customer.id,
+        amount: @amount,
+        description: "Rails Stripe customer",
+        currency: "eur",
+      })
+
+        respond_to do |format|
+          byebug
+          if @order.save
+            @cart.each do |painting|
+              painting.update(status: "sold")
+            end
+            session[:cart] = []
+            OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+            format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+          else
+            format.html { render :new, status: :unprocessable_entity }
+          end
+        end
+
+    else
+      # Crypto
+      # TODO
+      puts "Crypto"
     end
 
-    # flash[:notice] = "Thank you for your purchase!"
-    # redirect_to paintings_path
+  #   customer = Stripe::Customer.create({
+  #     email: params[:stripeEmail],
+  #     source: params[:stripeToken],
+  #   })
+
+  #   charge = Stripe::Charge.create({
+  #     customer: customer.id,
+  #     amount: @amount,
+  #     description: "Rails Stripe customer",
+  #     currency: "eur",
+  #   })
+
+  #   respond_to do |format|
+  #     byebug
+  #     if @order.save
+  #       @cart.each do |painting|
+  #         painting.update(status: "sold")
+  #       end
+  #       session[:cart] = []
+  #       OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+  #       format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+  #     else
+  #       format.html { render :new, status: :unprocessable_entity }
+  #     end
+  #   end
+
+  #   # flash[:notice] = "Thank you for your purchase!"
+  #   # redirect_to paintings_path
 
   rescue Stripe::CardError => e
     flash[:error] = e.message
@@ -77,6 +225,10 @@ class OrdersController < ApplicationController
   end
 
   def destroy
+    @order.paintings.each do |painting|
+      painting.update(order_id: nil)
+    end
+    
     @order.destroy
     respond_to do |format|
       format.html { redirect_to admin_url, notice: "Order was successfully destroyed." }
@@ -110,5 +262,9 @@ class OrdersController < ApplicationController
 
   def set_cart
     @cart = Painting.find(session[:cart])
+  end
+
+  def generate_client_token
+    Braintree::ClientToken.generate
   end
 end

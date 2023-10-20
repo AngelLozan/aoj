@@ -64,6 +64,10 @@ gem 'ruby_audit', require: false
 gem "brakeman"
 gem "sidekiq", "< 7"
 gem "sidekiq-failures", "~> 1.0"
+# Needed for paypal
+gem 'gon', '~> 6.4'
+gem 'figaro', '~> 1.2'
+gem "braintree", "~> 4.14.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

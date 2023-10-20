@@ -1,4 +1,4 @@
-<div class="navbar navbar-expand-sm navbar-light navbar-lewagon">
+<div class="navbar navbar-expand-sm navbar-light navbar-lewagon p-3">
   <div class="container-fluid">
     <%= link_to "/", class: "navbar-brand" do %>
       <%= image_tag 'AOJ.png', class: "avatar" %>
@@ -19,8 +19,8 @@
             <%= link_to "Admin", "/admin", class: "nav-link" %>
           </li>
           <% if @orders.count > 0 && @orders.find_by(status: 0) != nil %>
-             <%= link_to orders_path, class: "btn btn-primary rounded" do %>
-                📬 <span class="badge bg-secondary"><%= @orders.count %></span>
+             <%= link_to orders_path, class: "btn btn-success rounded position-relative me-3 mb-3" do %>
+                <i class="fa-solid fa-truck-fast"></i> <span class="position-absolute top-0 start-100 translate-middle badge bg-secondary rounded-pill"><%= @orders.count %></span>
               <% end %>
           <% end %>
           <li class="nav-item dropdown">
@@ -39,7 +39,7 @@
           <% if @cart && @cart.count > 0 %>
             <li class="nav-item">
               <%= link_to new_order_path, class: "btn btn-primary rounded" do %>
-                Cart 🛒 <span class="badge bg-secondary"><%= @cart.count %></span>
+                <i class="fa-solid fa-cart-shopping me-3"></i><span class="badge bg-secondary"><%= @cart.count %></span>
               <% end %>
             </li>
           <% end %>

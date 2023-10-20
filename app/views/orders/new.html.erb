@@ -1,24 +1,86 @@
 
-<div class="container mt-3">
-  <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
-    <div class="form-inputs">
-      <label class="amount">
-        Your total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %>
-      </label>
+<div class="tabDiv">
 
-      <%= f.input :address, label: 'Shipping Address', input_html: { class: 'form-control' } %>
-      <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
-      <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
+
+  <div class="tabs">
+    <input class="tabInput" name="tabs" type="radio" id="tab-1" checked="checked"/>
+    <label class="tabLabel" for="tab-1">Pay With <i class="fa-brands fa-stripe fa-2xl"></i></label>
+    <div class="panel">
+      <h1 class="tabH1"><i class="fa-brands fa-stripe fa-2xl"></i></h1>
+      <p class="tabP mb-3">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
+      <div>
+        <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
+          <div class="form-inputs">
+            <label class="amount mb-3">
+              <strong>Your total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %></strong>
+            </label>
+
+            <%= f.input :address, label: 'Shipping Address', input_html: { class: 'form-control' } %>
+            <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
+            <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
+          </div>
+
+          <% amount = @cart.sum(&:price) %>
+          <script
+            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+            data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
+            data-description="Your art is on the way!"
+            data-amount="<%= amount %>"
+            data-locale="auto">
+          </script>
+        <% end %>
+      </div>
     </div>
+    <input class="tabInput" name="tabs" type="radio" id="tab-2"/>
+    <label class="tabLabel" for="tab-2">Pay With PayPal <i class="fa-brands fa-paypal fa-lg"></i></label>
+    <div class="panel">
+      <h1 class="tabH1"><i class="fa-brands fa-paypal fa-2xl"></i> PayPal</h1>
+      <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
+      <div>
+        <% amount = @cart.sum(&:price) %>
+        <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
+          <div class="form-inputs">
+            <label class="amount mb-3">
+              <strong>Your total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %></strong>
+            </label>
 
-    <% amount = @cart.sum(&:price) %>
-    <script
-      src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-      data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
-      data-description="Your art is on the way!"
-      data-amount="<%= amount %>"
-      data-locale="auto">
-    </script>
+            <%= f.input :address, label: 'Shipping Address', input_html: { class: 'form-control' } %>
+            <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
+            <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
+          </div>
+          <div id="payment-form"></div>
+          <input type="submit" value="Pay with card" class="btn btn-primary">
+        <% end %>
 
-  <% end %>
+        <script src="https://js.braintreegateway.com/js/braintree-2.32.1.min.js"></script>
+        <script>
+          var clientToken = "<%= Braintree::ClientToken.generate %>"; // Generated server-side instead
+          braintree.setup(
+              // gon.client_token, "dropin", {
+              clientToken, "dropin", {
+              container: "payment-form",
+              paypal: {
+                singleUse: true,
+                currency: 'EUR',
+                locale: 'en_us'
+              },
+              dataCollector: {
+                paypal: true
+              },
+            }
+          );
+        </script>
+       </div>
+    </div>
+    <input class="tabInput" name="tabs" type="radio" id="tab-3"/>
+    <label class="tabLabel" for="tab-3">Pay With Crypto <i class="fa-brands fa-bitcoin fa-lg"></i></label>
+    <div class="panel">
+      <h1 class="tabH1">Crypto Payments <i class="fa-brands fa-bitcoin fa-lg"></i><i class="fa-brands fa-ethereum fa-lg"></i></h1>
+      <p class="tabP">Coming soon!</p>
+      <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
+    </div>
+  </div>
+
+
+
 </div>
