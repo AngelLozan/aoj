@@ -7,7 +7,7 @@
     <label class="tabLabel" for="tab-1">Pay With <i class="fa-brands fa-stripe fa-2xl"></i></label>
     <div class="panel">
       <h1 class="tabH1"><i class="fa-brands fa-stripe fa-2xl"></i></h1>
-      <p class="tabP mb-3">Idntheme (Citrus tangerina) is an orange-colored citrus fruit that is closely related to, or possibly a type of, mandarin orange (Citrus reticulata).</p>
+      <p class="tabP mb-3">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
       <div>
         <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
           <div class="form-inputs">
@@ -35,10 +35,10 @@
     <label class="tabLabel" for="tab-2">Pay With PayPal <i class="fa-brands fa-paypal fa-lg"></i></label>
     <div class="panel">
       <h1 class="tabH1"><i class="fa-brands fa-paypal fa-2xl"></i> PayPal</h1>
-      <p class="tabP">Idntheme (Citrus tangerina) is an orange-colored citrus fruit that is closely related to, or possibly a type of, mandarin orange (Citrus reticulata).</p>
+      <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
       <div>
         <% amount = @cart.sum(&:price) %>
-        <%= simple_form_for @order, url: create_order_paypal_path, method: :post do |f| %>
+        <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
           <div class="form-inputs">
             <label class="amount mb-3">
               <strong>Your total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %></strong>
@@ -77,7 +77,7 @@
     <div class="panel">
       <h1 class="tabH1">Crypto Payments <i class="fa-brands fa-bitcoin fa-lg"></i><i class="fa-brands fa-ethereum fa-lg"></i></h1>
       <p class="tabP">Coming soon!</p>
-      <p class="tabP">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac felis eget libero ultrices venenatis. Sed tincidunt, elit at luctus vestibulum, libero turpis vulputate elit, nec pharetra purus neque id nunc.</p>
+      <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
     </div>
   </div>
 
