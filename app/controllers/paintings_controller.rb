@@ -6,7 +6,7 @@ class PaintingsController < ApplicationController
   before_action :load_orders
 
   def index
-    @paintings = Painting.all
+    @paintings = Painting.all.order(created_at: :desc).page params[:page]
   end
 
   def show

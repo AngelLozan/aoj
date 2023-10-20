@@ -54,9 +54,10 @@
 
         <script src="https://js.braintreegateway.com/js/braintree-2.32.1.min.js"></script>
         <script>
-          // var clientToken = "<%= Braintree::ClientToken.generate %>"; // Generated server-side instead
+          var clientToken = "<%= Braintree::ClientToken.generate %>"; // Generated server-side instead
           braintree.setup(
-              gon.client_token, "dropin", {
+              // gon.client_token, "dropin", {
+              clientToken, "dropin", {
               container: "payment-form",
               paypal: {
                 singleUse: true,
