@@ -173,35 +173,6 @@ class OrdersController < ApplicationController
       puts "Crypto"
     end
 
-  #   customer = Stripe::Customer.create({
-  #     email: params[:stripeEmail],
-  #     source: params[:stripeToken],
-  #   })
-
-  #   charge = Stripe::Charge.create({
-  #     customer: customer.id,
-  #     amount: @amount,
-  #     description: "Rails Stripe customer",
-  #     currency: "eur",
-  #   })
-
-  #   respond_to do |format|
-  #     byebug
-  #     if @order.save
-  #       @cart.each do |painting|
-  #         painting.update(status: "sold")
-  #       end
-  #       session[:cart] = []
-  #       OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
-  #       format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
-  #     else
-  #       format.html { render :new, status: :unprocessable_entity }
-  #     end
-  #   end
-
-  #   # flash[:notice] = "Thank you for your purchase!"
-  #   # redirect_to paintings_path
-
   rescue Stripe::CardError => e
     flash[:error] = e.message
     redirect_to new_order_path
@@ -228,7 +199,7 @@ class OrdersController < ApplicationController
     @order.paintings.each do |painting|
       painting.update(order_id: nil)
     end
-    
+
     @order.destroy
     respond_to do |format|
       format.html { redirect_to admin_url, notice: "Order was successfully destroyed." }
