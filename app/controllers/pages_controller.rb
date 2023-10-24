@@ -1,5 +1,5 @@
 class PagesController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[ home about cv photography]
+  skip_before_action :authenticate_user!, only: %i[ home about cv photography comissions]
   before_action :load_cart
   before_action :load_orders
 
@@ -13,6 +13,9 @@ class PagesController < ApplicationController
   end
 
   def photography
+  end
+
+  def comissions
   end
 
   def load_cart

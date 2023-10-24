@@ -1,9 +1,9 @@
 <div class="banner" style="background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url(https://jsadravi.files.wordpress.com/2021/06/img_4803.jpg);">
   <div class="container">
     <h1><strong>Hi! I'm Jaleh</strong></h1>
-    <h2>Multi-media Artist</h2>
+    <h1>Multi-media Artist</h1>
     <p>Inspiration through transformation</p>
-     <%= link_to "Own an original work", "/paintings", class: "btn btn-lg btn-ghost" %>
+      <a class="btn btn-primary btn-lg" href="/paintings">View works</a>
   </div>
 </div>
 <div class="container-fluid mt-3">
@@ -16,25 +16,13 @@
     </h1>
   </div>
 
-  <div class="d-flex justify-content-center mb-3 p-5">
-    <%= link_to "Own an original work", "/paintings", class: "btn btn-ghost" %>
-  </div>
-
-  <div class="row justify-content-center">
-    <div class="col-11 col-lg-6 text-center mt-3">
-    <h3>Abstract Art</h3>
-      <%= link_to paintings_path do %>
-        <%= image_tag "abstractart.png", alt: "Abstract art", class: "img_landing_lnk img-fluid" %>
-      <% end %>
-    </div>
-
-    <div class="col-11 col-lg-6 mt-3 text-center">
-      <h3>Photography</h3>
-      <%= link_to photography_path do %>
-        <%= image_tag "jsadravi-mexican-american-.png", alt: "Photography art", class: "img_landing_lnk img-fluid" %>
-      <% end %>
-    </div>
-  </div>
+<div class="d-grid gap-2">
+  <a class="btn btn-lg btn-primary" href="https://www.etsy.com/shop/TheArtofJaleh" target="_blank" type="button">Etsy Shop</a>
+  <a class="btn btn-lg btn-primary" href="/paintings" type="button">Own an Original Work</a>
+  <a class="btn btn-lg btn-primary" href="https://www.patreon.com/jalehsart" target="_blank" type="button">Join my Patreon</a>
+  <a class="btn btn-lg btn-primary" href="/comissions" type="button">Comission a Painting</a>
+  <a class="btn btn-lg btn-primary" href="/paintings" type="button">Sign Up for Newsletter</a>
+</div>
 
   <hr style="height:2px;border-width:0;color:gray;background-color:gray;margin-top:150px">
 

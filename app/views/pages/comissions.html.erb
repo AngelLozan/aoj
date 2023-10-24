@@ -1,0 +1,67 @@
+<div class="container-fluid pb-5">
+  <div class="text-center my-3">
+    <h1>Abstract Painting Comissions</h1>
+  </div>
+
+  <div class="d-flex justify-content-center mt-5">
+    <%= image_tag "dresser.webp", alt: "Art in the room", class: "img-fluid shadow rounded-pill" %>
+  </div>
+
+  <div class="d-flex justify-content-center p-3">
+    <h4 class="col-10">
+      I accept a limited number of abstract commissions each year. If you are interested in owning one of my paintings in a particular color, size, mood, etc., I would love to discuss a commissioned painting/paintings with you.
+      <br>
+      <br>
+      Each painting will be completed in acrylic paints on gallery-wrapped canvas. They will be sealed with varnish to help protect against UV damage. The sides will be painted so that the painting is ready to hang. I will sign the painting on the front and back.
+    </h4>
+  </div>
+
+  <div class="d-flex justify-content-center my-3">
+    <h2>Sizing & Pricing</h2>
+  </div>
+  <div class="text-center mb-3">
+    <%= link_to "Commission Your Painting Today", "mailto:art@jsadravi.com", class: "btn btn-ghost mb-3" %>
+  </div>
+<div class="container my-3">
+  <div class="row align-items-center">
+    <div class="col-12 col-lg-4">
+      <div class="d-flex justify-content-center">
+        <%= image_tag "photo2.jpeg", alt: "Art in the room", width: 300, class: "img-fluid shadow rounded-pill" %>
+      </div>
+    </div>
+    <div class="col-12 col-lg-8 mt-3">
+      <div class="d-flex justify-content-center">
+        <ul class="list-unstyled">
+          <li class="nobullet">30”x40” – $1,500</li>
+          <li class="nobullet">25″x35″ – $850</li>
+          <li class="nobullet">16”x20”- $650</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+  <div class="text-center mb-3">
+    <%= link_to "Commission Your Painting Today", "mailto:art@jsadravi.com", class: "btn btn-ghost mb-3" %>
+  </div>
+
+    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel" data-controller="photography">
+      <div class="carousel-inner text-center">
+        <div data-photography-target="myModal" class="modal" data-action="click->photography#closeModal">
+            <span class="close" data-action="click->photography#closeModal">&times;</span>
+            <img class="modal-content" data-photography-target="img01">
+            <div data-photography-target="caption">Test</div>
+        </div>
+
+      <div class="carousel-item active">
+        <%= image_tag "couch.jpg", alt: "Art above couch", class: "d-block img-fluid mx-auto shadow rounded-pill", "data-action" => "click->photography#openModal", "data-url" => image_path("couch.jpg") %>
+        <div class="carousel-caption d-none d-md-block">
+          <h5>Beautiful Raindow: 30”x40”</h5>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
