@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   root to: "pages#home"
   get '/cv', to: "pages#cv", as: 'cv'
   get '/about', to: "pages#about", as: 'about'
+  get '/comissions', to: "pages#comissions", as: 'comissions'
+  get '/privacy', to: "pages#privacy", as: 'privacy'
+  get '/terms', to: "pages#terms", as: 'terms'
   get '/photography', to: "pages#photography", as: 'photography'
   post '/add_to_cart/:id', to: "paintings#add_to_cart", as: 'add_to_cart'
   delete '/remove_from_cart/:id', to: "paintings#remove_from_cart", as: 'remove_from_cart'

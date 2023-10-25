@@ -1,8 +1,9 @@
 <div class="banner" style="background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url(https://jsadravi.files.wordpress.com/2021/06/img_4803.jpg);">
   <div class="container">
-    <h1>The <strong>Art</strong> of <strong>Jaleh</strong></h1>
+    <h1><strong>Hi! I'm Jaleh</strong></h1>
+    <h1>Multi-media Artist</h1>
     <p>Inspiration through transformation</p>
-    <a class="btn btn-primary btn-lg rounded" href="/paintings">View works</a>
+      <a class="btn btn-primary btn-lg tree" href="/paintings">View works</a>
   </div>
 </div>
 <div class="container-fluid mt-3">
@@ -15,27 +16,13 @@
     </h1>
   </div>
 
-  <div class="d-flex justify-content-center mb-3 p-5">
-    <%= link_to "Own an original work", "/paintings", class: "btn btn-ghost" %>
-  </div>
+<div class="d-grid gap-2">
+  <a class="btn btn-lg btn-primary tree" href="https://www.etsy.com/shop/TheArtofJaleh" target="_blank" type="button">Etsy Shop</a>
+  <a class="btn btn-lg btn-primary tree" href="/paintings" type="button">Own an Original Work</a>
+  <a class="btn btn-lg btn-primary tree" href="https://mailchi.mp/13422bf1ccd6/welcome" target="_blank" type="button">Sign Up for Newsletter</a>
+</div>
 
-  <div class="row justify-content-center">
-    <div class="col-11 col-lg-6 text-center mt-3">
-    <h3>Abstract Art</h3>
-      <%= link_to paintings_path do %>
-        <%= image_tag "abstractart.png", alt: "Abstract art", class: "img_landing_lnk img-fluid" %>
-      <% end %>
-    </div>
-
-    <div class="col-11 col-lg-6 mt-3 text-center">
-      <h3>Photography</h3>
-      <%= link_to photography_path do %>
-        <%= image_tag "jsadravi-mexican-american-.png", alt: "Photography art", class: "img_landing_lnk img-fluid" %>
-      <% end %>
-    </div>
-  </div>
-
-  <hr style="height:2px;border-width:0;color:gray;background-color:gray;margin-top:150px">
+ 
 
   <div class="d-flex justify-content-center mt-5">
     <%= image_tag "minibio.png", alt: "The artist", class: "img-fluid shadow rounded-pill" %>
@@ -48,6 +35,29 @@
   </div>
 
   <div class="text-center mb-3">
+    <h2><strong>Join my mailing list</strong></h2>
+    <p>Receive updates and special offers</p>
+
+    <div class="d-flex justify-content-center" id="mc_embed_shell">
+        <form class="form-inline" action="https://jsadravi.us7.list-manage.com/subscribe/post?u=986ea8046b29fee65e34eda26&amp;id=c5725164da&amp;f_id=0096d2e4f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" target="_blank">
+
+            <input type="text" name="FNAME" id="mce-FNAME" value="" placeholder="First Name" aria-label="Recipient's first name">
+
+            <input type="email" id="mce-EMAIL" name="EMAIL"  placeholder="Your Email" aria-label="Recipient's Email" value="">
+
+            <button id="mc-embedded-subscribe" class="btn btn-outline-secondary px-3 rounded-pill" type="submit" name="subscribe" value="Subscribe">Subscribe</button>
+
+          <div aria-hidden="true" style="position: absolute; left: -5000px;">
+              /* real people should not fill this in and expect good things - do not remove this or risk form bot signups */
+              <input type="text" name="b_986ea8046b29fee65e34eda26_c5725164da" tabindex="-1" value="">
+          </div>
+        </form>
+
+      <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script>
+      <script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+    </div>
+
+  <div class="text-center mt-3">
     <h2><strong>Get in Touch</strong></h2>
     <p>For inquiries, commissions, or partnerships, please email me.</p>
     <%= link_to "Contact Me", "mailto:art@jsadravi.com", class: "btn btn-ghost mb-3" %>

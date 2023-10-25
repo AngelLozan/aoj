@@ -1,14 +1,30 @@
   <% unless current_page?(root_path) %>
-    <div class="footer">
-      <div class="footer-links">
-        <a href="https://www.patreon.com/jalehsart"><i class="fa-brands fa-patreon"></i></a>
-        <a href="https://www.instagram.com/theartofjaleh/"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.facebook.com/theartofjaleh"><i class="fab fa-facebook"></i></a>
-        <a href="https://twitter.com/TheArtofJaleh"><i class="fab fa-twitter"></i></a>
-        <a href="https://www.linkedin.com/in/jalehsadravi/"><i class="fab fa-linkedin"></i></a>
-      </div>
-      <div class="footer-copyright">
-        <p>Copyright © 2021-2023 Jaleh Sadravi. All rights reserved. The content of this website, including but not limited to paintings, images, and text, is protected by copyright law. Any unauthorized use or reproduction of the content without the written permission of the artist is prohibited.</p>
-      </div>
+    <div class="footer mt-5">
+
+        <div class="footer-links">
+          <a href="https://www.patreon.com/jalehsart"><i class="fa-brands fa-patreon"></i></a>
+          <a href="https://www.instagram.com/theartofjaleh/"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.facebook.com/theartofjaleh"><i class="fab fa-facebook"></i></a>
+          <a href="https://twitter.com/TheArtofJaleh"><i class="fab fa-twitter"></i></a>
+          <a href="https://www.linkedin.com/in/jalehsadravi/"><i class="fab fa-linkedin"></i></a>
+        </div>
+
+
+        <div class="ms-5">
+          <p class="fp">
+            Copyright © 2021-2023 Jaleh Sadravi. All rights reserved. The content of this website, including but not limited to paintings, images, and text, is protected by copyright law. Any unauthorized use or reproduction of the content without the written permission of the artist is prohibited.
+          </p>
+
+          <div class="d-flex justify-content-end">
+            <p class="footer-copyright me-3">
+              <%= link_to 'Terms & Conditions', terms_path %>
+            </p>
+            <p class="footer-copyright">
+              <%= link_to 'Privacy Policy', privacy_path %>
+            </p>
+          </div>
+        </div>
+
     </div>
+
   <% end %>
