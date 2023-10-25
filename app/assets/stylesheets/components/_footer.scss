@@ -7,9 +7,11 @@
   align-items: center;
   justify-content: space-between;
   // height: 100px;
-  padding: 0px 50px;
+  margin-left:10px;
+  margin-right:10px;
   color: rgba(0,0,0,0.3);
-  margin-top: 10px;
+  padding-top: 25px;
+  width: 92vw;
 }
 .footer-links {
   display: flex;
@@ -29,7 +31,39 @@
   color: #D23333;
 }
 
-.footer-copyright {
-  font-size: .5vw;
-  right: 0;
+.footer-copyright a {
+  text-decoration: none;
+  color: rgba(0,0,0,0.3);
+}
+
+.footer-copyright a:hover {
+  text-decoration: none;
+  color: black;
+}
+
+@media screen and (min-width: 601px) {
+  .footer-copyright {
+    font-size: .8vw;
+    text-decoration: none;
+    color: rgba(0,0,0,0.3);
+  }
+
+  .fp{
+    font-size: .5vw;
+  }
+
+}
+
+/* If the screen size is 600px wide or less, set the font-size of <div> to 30px */
+@media screen and (max-width: 600px) {
+  .footer-copyright {
+    font-size: 5px;
+    text-decoration: none;
+    color: rgba(0,0,0,0.3);
+  }
+
+
+  .fp{
+    font-size: .5vw;
+  }
 }
