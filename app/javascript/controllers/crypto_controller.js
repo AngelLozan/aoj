@@ -7,16 +7,15 @@ export default class extends Controller {
     price: Number,
   };
 
-  static targets = ["connect", "pay", "address", "form"];
+  static targets = ["connect", "pay", "address", "form", "loader"];
 
   web3 = new Web3(
     "https://eth-sepolia.g.alchemy.com/v2/w8AWYp_cLcfuGKs0fz9oIZb1YJdKQGvC"
   );
 
   connect() {
+    this.loaderTarget.style.display = "none";
     console.log("Crypto controller connected");
-    document.getElementsByClassName("stripe-button-el")[0].style.display =
-      "none";
     this.payTarget.disabled = true;
     if (typeof window.ethereum !== "undefined") {
       console.log("Metamask Detected");
@@ -56,8 +55,6 @@ export default class extends Controller {
   }
 
   async getWallet() {
-    // e.preventDefault();
-    // const id = e.currentTarget.getAttribute("data-id");
 
     try {
       let res = await fetch(`/wallet/`, {
@@ -77,9 +74,7 @@ export default class extends Controller {
   }
 
   async postPayment(e) {
-    // e.preventDefault();
-    // const id = e.currentTarget.getAttribute('data-id');
-    // const url = e.currentTarget.getAttribute('data-url');
+
     try {
       // window.open(url, "_blank");
       let submitPayment = await fetch(`/orders/`, {
@@ -116,24 +111,30 @@ export default class extends Controller {
   }
 
   async #sendEth() {
+    this.loaderTarget.style.display = "inline-block";
     const price = await this.calculatePrice();
     console.log("PRICE", price);
     const address = await this.getWallet();
     const convertPrice = this.web3.utils.toWei(price, "ether");
-    console.log("CONVERTED PRICE", convertPrice);
+    console.log("CONVERTED PRICE in WEI", convertPrice);
+
     const limit = await this.web3.eth.estimateGas({
       from: this.accounts[0],
       to: address,
+      // value: this.web3.utils.toHex(convertPrice),
+      // @dev Test value
       value: this.web3.utils.toWei(0.001, "ether"),
     });
+    console.log("LIMIT", limit);
 
-    const maxPriorityFeePerGas = this.web3.utils.toWei("2", "gwei");
-    const baseFee = await this.web3.eth.getGasPrice(); // Get the current base fee
+    const maxPriorityFeePerGas = this.web3.utils.toWei(2, "gwei");
+    console.log("MAX PRIORITY FEE PER GAS", maxPriorityFeePerGas);
+    const maxFeePerGas = this.web3.utils.toWei(8, "gwei");
+    console.log("MAX FEE PER GAS", maxFeePerGas);
 
-    // Calculate maxFeePerGas as the sum of maxPriorityFeePerGas and baseFee
-    const maxFeePerGas = this.web3.utils
-      .toBN(maxPriorityFeePerGas)
-      .add(this.web3.utils.toBN(baseFee));
+    // const baseFee = await this.web3.eth.getGasPrice(); // Get the current base fee
+    // // Calculate maxFeePerGas as the sum of maxPriorityFeePerGas and baseFee
+    // const maxFeePerGas = (BigInt(maxPriorityFeePerGas) + BigInt(baseFee)).toString();
 
     try {
       const txHash = await ethereum.request({
@@ -142,27 +143,28 @@ export default class extends Controller {
           {
             from: this.accounts[0],
             to: address,
-            data: "0x",
+            // data: this.web3.utils.toHex("AOJ"),
             // value: this.web3.utils.numberToHex(convertPrice),
-
-            value: this.web3.utils.toHex(100),
+            // @dev Test value
+            value: this.web3.utils.toHex(1),
+            // gas: '21000',
             gas: this.web3.utils.numberToHex(limit),
             maxPriorityFeePerGas: this.web3.utils.toHex(maxPriorityFeePerGas),
-            maxFeePerGas: this.web3.utils.toHex(maxFeePerGas), // Set maxFeePerGas
-            // maxPriorityFeePerGas: this.web3.utils.toHex(
-            //   this.web3.utils.fromWei(2, "gwei")
-            // ),
+            maxFeePerGas: this.web3.utils.toHex(maxFeePerGas)
           },
         ],
       });
       console.log(txHash);
-      // Set load spinner here
+
       if (txHash) {
         this.payTarget.innerText = "Paid";
         await this.postPayment(); // Goes to create order
+        this.loaderTarget.style.display = "none";
       }
     } catch (error) {
       console.log(error.message);
+      this.loaderTarget.style.display = "none";
+      alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
 
