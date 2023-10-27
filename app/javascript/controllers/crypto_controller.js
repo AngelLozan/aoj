@@ -5,15 +5,16 @@ import Web3 from "web3";
 export default class extends Controller {
 
   static values = {
-    price: Number
+    price: String
   };
 
-  static targets = ["connect", "pay", "address"];
+  static targets = ["connect", "pay", "address", "form"];
 
   web3 = new Web3('https://eth-sepolia.g.alchemy.com/v2/w8AWYp_cLcfuGKs0fz9oIZb1YJdKQGvC');
 
   connect() {
     console.log("Crypto controller connected");
+    this.payTarget.disabled = true;
     if (typeof window.ethereum !== "undefined") {
       console.log("Metamask Detected");
     } else {
@@ -26,19 +27,10 @@ export default class extends Controller {
     return csrfMetaTag ? csrfMetaTag.content : "";
   }
 
-  connectWallet(e) {
-    console.log("connectWallet");
-    this.#permissions();
-  }
 
-  pay(e) {
-    e.preventDefault();
-    this.#sendEth();
-  }
-
-  async getWallet(e) {
-    e.preventDefault();
-    const id = e.currentTarget.getAttribute("data-id");
+  async getWallet() {
+    // e.preventDefault();
+    // const id = e.currentTarget.getAttribute("data-id");
 
     try {
       let res = await fetch(`/wallet/`, {
@@ -58,18 +50,19 @@ export default class extends Controller {
   }
 
   async postPayment(e) {
-    e.preventDefault();
-    const id = e.currentTarget.getAttribute('data-id');
-    const url = e.currentTarget.getAttribute('data-url');
+    // e.preventDefault();
+    // const id = e.currentTarget.getAttribute('data-id');
+    // const url = e.currentTarget.getAttribute('data-url');
     try {
-        window.open(url, "_blank");
-        let setStatus = await fetch(`/orders/`, {
+        // window.open(url, "_blank");
+        let submitPayment = await fetch(`/orders/`, {
             method: 'POST',
             headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": this.csrfToken },
-            body: JSON.stringify({ 'status': 1 }) // 1 = successful payment
+            // body: JSON.stringify({ 'name': , 'address': , 'phone':  }) // submitting the form data
+            body: new FormData(this.formTarget)
         })
-        console.log(setStatus);
-        let response = await setStatus.json();
+        console.log(submitPayment);
+        let response = await submitPayment.json();
         console.log(response);
         if (response.pt_status === 'submitted') {
             console.log("Successful payment");
@@ -83,6 +76,7 @@ export default class extends Controller {
     const reg = /\b(\w{6})\w+(\w{4})\b/g;
     this.accounts = await ethereum.request({ method: "eth_requestAccounts" });
     this.connectTarget.innerText = "Connected";
+    this.payTarget.disabled = false;
     this.addressTarget.innerText = ethereum.selectedAddress.replace(
       reg,
       "$1****$2"
@@ -127,5 +121,15 @@ export default class extends Controller {
     } catch (error) {
       console.log(error.message);
     }
+  }
+
+  connectWallet(e) {
+    console.log("connectWallet");
+    this.#permissions();
+  }
+
+  pay(e) {
+    e.preventDefault();
+    this.#sendEth();
   }
 }

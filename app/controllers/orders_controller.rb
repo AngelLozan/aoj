@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[new create create_paypal]
+  skip_before_action :authenticate_user!, only: %i[new create create_paypal, wallet]
   before_action :set_order, only: %i[ show edit update destroy ]
   before_action :set_cart, only: %i[ new create create_paypal]
   before_action :load_orders
