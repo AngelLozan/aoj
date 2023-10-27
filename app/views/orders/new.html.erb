@@ -1,5 +1,5 @@
 
-<div class="tabDiv" data-controller="crypto" >
+<div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= @cart.sum(&:price) / 100.00 %>">
 
 
   <div class="tabs">
@@ -28,9 +28,7 @@
             data-amount="<%= amount %>"
             data-locale="auto">
           </script>
-          <script>
-            document.getElementsByClassName("stripe-button-el")[0].style.display = 'none';
-          </script>
+
           <input type="submit" value="Pay with card" class="btn btn-primary">
         <% end %>
       </div>
@@ -87,10 +85,10 @@
       <div class="d-flex flex-column mx-auto text-center">
           <p data-crypto-target="address"></p>
       </div>
-      <p class="tabP" data-crypto-price-value="<%= @cart.sum(&:price) / 100.00 %>">
+      <p class="tabP" >
         Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!
       </p>
-      <div>
+      <div>orders/new
         <% amount = @cart.sum(&:price) %>
         <%= simple_form_for @order, data: { crypto_target: "form"} do |f| %>
           <div class="form-inputs">

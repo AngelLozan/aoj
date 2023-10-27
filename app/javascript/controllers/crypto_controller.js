@@ -5,7 +5,7 @@ import Web3 from "web3";
 export default class extends Controller {
 
   static values = {
-    price: String
+    price: Number,
   };
 
   static targets = ["connect", "pay", "address", "form"];
@@ -14,6 +14,7 @@ export default class extends Controller {
 
   connect() {
     console.log("Crypto controller connected");
+    document.getElementsByClassName("stripe-button-el")[0].style.display = 'none';
     this.payTarget.disabled = true;
     if (typeof window.ethereum !== "undefined") {
       console.log("Metamask Detected");
@@ -27,6 +28,28 @@ export default class extends Controller {
     return csrfMetaTag ? csrfMetaTag.content : "";
   }
 
+  async calculatePrice() {
+    const price = this.priceValue;
+    try {
+      let res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-CSRF-Token": this.csrfToken,
+        },
+      });
+      let data = await res.json();
+      console.log(data["ethereum"]["eur"]);
+      const ethPrice = data["ethereum"]["eur"];
+      const calculatedPrice = price / ethPrice;
+      console.log(calculatedPrice);
+      return calculatedPrice;
+
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
   async getWallet() {
     // e.preventDefault();
@@ -41,7 +64,7 @@ export default class extends Controller {
           "X-CSRF-Token": this.csrfToken,
         },
       });
-      let data = res.json();
+      let data = await res.json();
       console.log(data); // address: address
       return data.address;
     } catch (error) {
@@ -85,13 +108,16 @@ export default class extends Controller {
   }
 
   async #sendEth() {
-    const price = this.priceValue;
+    const price = await this.calculatePrice();
+    console.log(price);
     const address = await this.getWallet();
+    const convertPrice = this.web3.utils.toWei(price, "ether");
+    console.log(convertPrice);
     const limit = await this.web3.eth.estimateGas({
       from: this.accounts[0],
       to: address,
       // to: "0x2f318C334780961FB129D2a6c30D0763d9a5C970",
-      value: this.web3.utils.fromWei(0.001, "ether"),
+      value: this.web3.utils.toWei(0.001, "ether"),
     });
     try {
       const txHash = await ethereum.request({
@@ -100,11 +126,13 @@ export default class extends Controller {
           {
             from: this.accounts[0],
             to: address,
+            data: "0x",
+            value: this.web3.utils.numberToHex(convertPrice),
             // to: "0x2f318C334780961FB129D2a6c30D0763d9a5C970",
-            value: this.web3.utils.numberToHex(
-              // this.web3.utils.fromWei(0.000001, "ether")
-              this.web3.utils.fromWei(price, "ether")
-            ),
+            // value: this.web3.utils.toHex(
+            //   // this.web3.utils.fromWei(0.000001, "ether")
+            //   this.web3.utils.toWei(price, "ether")
+            // ),
             gas: this.web3.utils.numberToHex(limit),
             maxPriorityFeePerGas: this.web3.utils.toHex(
               this.web3.utils.fromWei(2, "gwei")

@@ -195,7 +195,7 @@ class OrdersController < ApplicationController
 
   def wallet
     # Update to the address of the artist
-    address = '0xfC56840235489Fd43Aca8A310929610E82E8b044'
+    address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
     puts ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
