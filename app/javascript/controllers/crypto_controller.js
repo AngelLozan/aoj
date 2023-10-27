@@ -109,14 +109,13 @@ export default class extends Controller {
 
   async #sendEth() {
     const price = await this.calculatePrice();
-    console.log(price);
+    console.log("PRICE", price);
     const address = await this.getWallet();
     const convertPrice = this.web3.utils.toWei(price, "ether");
-    console.log(convertPrice);
+    console.log("CONVERTED PRICE", convertPrice);
     const limit = await this.web3.eth.estimateGas({
       from: this.accounts[0],
       to: address,
-      // to: "0x2f318C334780961FB129D2a6c30D0763d9a5C970",
       value: this.web3.utils.toWei(0.001, "ether"),
     });
     try {
@@ -126,12 +125,11 @@ export default class extends Controller {
           {
             from: this.accounts[0],
             to: address,
-            data: "0x",
+            data: "Purchase from the Art of Jaleh",
             value: this.web3.utils.numberToHex(convertPrice),
-            // to: "0x2f318C334780961FB129D2a6c30D0763d9a5C970",
+
             // value: this.web3.utils.toHex(
-            //   // this.web3.utils.fromWei(0.000001, "ether")
-            //   this.web3.utils.toWei(price, "ether")
+            //   this.web3.utils.toWei(0.000000000001, "ether")
             // ),
             gas: this.web3.utils.numberToHex(limit),
             maxPriorityFeePerGas: this.web3.utils.toHex(
