@@ -3,18 +3,20 @@ import Web3 from "web3";
 
 // Connects to data-controller="crypto"
 export default class extends Controller {
-
   static values = {
     price: Number,
   };
 
   static targets = ["connect", "pay", "address", "form"];
 
-  web3 = new Web3('https://eth-sepolia.g.alchemy.com/v2/w8AWYp_cLcfuGKs0fz9oIZb1YJdKQGvC');
+  web3 = new Web3(
+    "https://eth-sepolia.g.alchemy.com/v2/w8AWYp_cLcfuGKs0fz9oIZb1YJdKQGvC"
+  );
 
   connect() {
     console.log("Crypto controller connected");
-    document.getElementsByClassName("stripe-button-el")[0].style.display = 'none';
+    document.getElementsByClassName("stripe-button-el")[0].style.display =
+      "none";
     this.payTarget.disabled = true;
     if (typeof window.ethereum !== "undefined") {
       console.log("Metamask Detected");
@@ -31,21 +33,23 @@ export default class extends Controller {
   async calculatePrice() {
     const price = this.priceValue;
     try {
-      let res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRF-Token": this.csrfToken,
-        },
-      });
+      let res = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-Token": this.csrfToken,
+          },
+        }
+      );
       let data = await res.json();
       console.log(data["ethereum"]["eur"]);
       const ethPrice = data["ethereum"]["eur"];
       const calculatedPrice = price / ethPrice;
       console.log(calculatedPrice);
       return calculatedPrice;
-
     } catch (error) {
       console.log(error.message);
     }
@@ -77,23 +81,27 @@ export default class extends Controller {
     // const id = e.currentTarget.getAttribute('data-id');
     // const url = e.currentTarget.getAttribute('data-url');
     try {
-        // window.open(url, "_blank");
-        let submitPayment = await fetch(`/orders/`, {
-            method: 'POST',
-            headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": this.csrfToken },
-            // body: JSON.stringify({ 'name': , 'address': , 'phone':  }) // submitting the form data
-            body: new FormData(this.formTarget)
-        })
-        console.log(submitPayment);
-        let response = await submitPayment.json();
-        console.log(response);
-        if (response.pt_status === 'submitted') {
-            console.log("Successful payment");
-        }
+      // window.open(url, "_blank");
+      let submitPayment = await fetch(`/orders/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-CSRF-Token": this.csrfToken,
+        },
+        // body: JSON.stringify({ 'name': , 'address': , 'phone':  }) // submitting the form data
+        body: new FormData(this.formTarget),
+      });
+      console.log(submitPayment);
+      let response = await submitPayment.json();
+      console.log(response);
+      if (response.pt_status === "submitted") {
+        console.log("Successful payment");
+      }
     } catch (error) {
-        console.log(error.message);
+      console.log(error.message);
     }
-}
+  }
 
   async #permissions() {
     const reg = /\b(\w{6})\w+(\w{4})\b/g;
@@ -118,6 +126,15 @@ export default class extends Controller {
       to: address,
       value: this.web3.utils.toWei(0.001, "ether"),
     });
+
+    const maxPriorityFeePerGas = this.web3.utils.toWei("2", "gwei");
+    const baseFee = await this.web3.eth.getGasPrice(); // Get the current base fee
+
+    // Calculate maxFeePerGas as the sum of maxPriorityFeePerGas and baseFee
+    const maxFeePerGas = this.web3.utils
+      .toBN(maxPriorityFeePerGas)
+      .add(this.web3.utils.toBN(baseFee));
+
     try {
       const txHash = await ethereum.request({
         method: "eth_sendTransaction",
@@ -125,16 +142,16 @@ export default class extends Controller {
           {
             from: this.accounts[0],
             to: address,
-            data: "Purchase from the Art of Jaleh",
-            value: this.web3.utils.numberToHex(convertPrice),
+            data: "0x",
+            // value: this.web3.utils.numberToHex(convertPrice),
 
-            // value: this.web3.utils.toHex(
-            //   this.web3.utils.toWei(0.000000000001, "ether")
-            // ),
+            value: this.web3.utils.toHex(100),
             gas: this.web3.utils.numberToHex(limit),
-            maxPriorityFeePerGas: this.web3.utils.toHex(
-              this.web3.utils.fromWei(2, "gwei")
-            ),
+            maxPriorityFeePerGas: this.web3.utils.toHex(maxPriorityFeePerGas),
+            maxFeePerGas: this.web3.utils.toHex(maxFeePerGas), // Set maxFeePerGas
+            // maxPriorityFeePerGas: this.web3.utils.toHex(
+            //   this.web3.utils.fromWei(2, "gwei")
+            // ),
           },
         ],
       });
