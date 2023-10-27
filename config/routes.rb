@@ -25,4 +25,5 @@ Rails.application.routes.draw do
   patch '/orders/:id', to: "orders#update", as: 'update_order'
   delete '/orders/:id', to: "orders#destroy", as: 'destroy_order'
 
+  get '/wallet', to: "orders#wallet", as: 'wallet'
 end

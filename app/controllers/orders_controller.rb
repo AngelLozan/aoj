@@ -169,8 +169,21 @@ class OrdersController < ApplicationController
 
     else
       # Crypto
-      # TODO
       puts "Crypto"
+
+      respond_to do |format|
+        byebug
+        if @order.save
+          @cart.each do |painting|
+            painting.update(status: "sold")
+          end
+          session[:cart] = []
+          OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+          format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+        end
+      end
     end
 
   rescue Stripe::CardError => e
@@ -179,6 +192,13 @@ class OrdersController < ApplicationController
 
   end
 
+
+  def wallet
+    # Update to the address of the artist
+    address = '0xfC56840235489Fd43Aca8A310929610E82E8b044'
+    puts ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
+    render json: { address: address }
+  end
 
   def edit
   end
