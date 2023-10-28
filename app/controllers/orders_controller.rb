@@ -1,8 +1,9 @@
 class OrdersController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[new create create_paypal]
+  skip_before_action :authenticate_user!, only: %i[new create wallet]
   before_action :set_order, only: %i[ show edit update destroy ]
-  before_action :set_cart, only: %i[ new create create_paypal]
+  before_action :set_cart, only: %i[ new create]
   before_action :load_orders
+  before_action :load_cart
 
   def index
     @orders = Order.all
@@ -16,66 +17,6 @@ class OrdersController < ApplicationController
     gon.client_token = generate_client_token
   end
 
-  def create_paypal
-    @order = Order.new(order_params)
-    # Add paintings from cart to order
-    @cart.each do |painting|
-      @order.paintings << painting
-    end
-
-    # Payment logic, amount in cents
-    @amount = @cart.sum(&:price)
-    whole_amount = sprintf('%.2f', @amount/100.0)
-
-    puts ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
-
-    gateway = Braintree::Gateway.new(
-      :environment => :sandbox,
-      :merchant_id => ENV["BRAINTREE_MERCHANT_ID"],
-      :public_key => ENV["BRAINTREE_PUBLIC_KEY"],
-      :private_key => ENV["BRAINTREE_PRIVATE_KEY"],
-    )
-
-    nonce_from_the_client = params[:payment_method_nonce]
-
-    puts ">>>>>>>>>>>>>>> NONCE: #{nonce_from_the_client}<<<<<<<<<<<<<<<<<<<"
-
-    result = gateway.transaction.sale(
-      :amount => whole_amount,
-      :payment_method_nonce => nonce_from_the_client,
-      options: { submit_for_settlement: true }
-    )
-
-    puts ">>>>>>>>>>>>>>> RESULT: #{result}<<<<<<<<<<<<<<<<<<<"
-
-    if result.success?
-      puts "success!: #{result.transaction.id}"
-
-      respond_to do |format|
-        byebug
-        if @order.save
-          @cart.each do |painting|
-            painting.update(status: "sold")
-          end
-          session[:cart] = []
-          OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
-          format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
-        else
-          format.html { render :new, status: :unprocessable_entity }
-        end
-      end
-
-    elsif result.transaction
-      puts "Error processing transaction:"
-      puts "  code: #{result.transaction.processor_response_code}"
-      puts "  text: #{result.transaction.processor_response_text}"
-      redirect_to new_order_path
-    else
-      puts " >>>>>>>>> ERROR: #{result.errors} <<<<<<<<<<<<<"
-      redirect_to new_order_path
-    end
-
-  end
 
   def create
     @order = Order.new(order_params)
@@ -169,8 +110,22 @@ class OrdersController < ApplicationController
 
     else
       # Crypto
-      # TODO
       puts "Crypto"
+
+      respond_to do |format|
+        if @order.save
+          @cart.each do |painting|
+            painting.update(status: "sold")
+          end
+          session[:cart] = []
+          OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+          flash[:notice] = "Thank you for your order! It will arrive soon."
+          format.html { redirect_to paintings_url }
+          format.text { render plain: "submitted" }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+        end
+      end
     end
 
   rescue Stripe::CardError => e
@@ -179,6 +134,13 @@ class OrdersController < ApplicationController
 
   end
 
+
+  def wallet
+    # Update to the address of the artist
+    address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
+    puts ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
+    render json: { address: address }
+  end
 
   def edit
   end
@@ -198,6 +160,7 @@ class OrdersController < ApplicationController
   def destroy
     @order.paintings.each do |painting|
       painting.update(order_id: nil)
+      painting.update(status: "available")
     end
 
     @order.destroy

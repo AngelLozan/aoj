@@ -3,6 +3,11 @@
 * {
   box-sizing: border-box;
 }
+
+.stripe-button-el {
+  display: none !important;
+}
+
 .tabDiv {
   display: flex;
   justify-content: center;
