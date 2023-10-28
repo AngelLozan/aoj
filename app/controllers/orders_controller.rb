@@ -113,14 +113,15 @@ class OrdersController < ApplicationController
       puts "Crypto"
 
       respond_to do |format|
-        byebug
         if @order.save
           @cart.each do |painting|
             painting.update(status: "sold")
           end
           session[:cart] = []
           OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
-          format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+          flash[:notice] = "Thank you for your order! It will arrive soon."
+          format.html { redirect_to paintings_url }
+          format.text { render plain: "submitted" }
         else
           format.html { render :new, status: :unprocessable_entity }
         end
@@ -159,6 +160,7 @@ class OrdersController < ApplicationController
   def destroy
     @order.paintings.each do |painting|
       painting.update(order_id: nil)
+      painting.update(status: "available")
     end
 
     @order.destroy

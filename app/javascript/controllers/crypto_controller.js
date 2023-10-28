@@ -76,7 +76,6 @@ export default class extends Controller {
   async postPayment(e) {
 
     try {
-      // window.open(url, "_blank");
       let submitPayment = await fetch(`/orders/`, {
         method: "POST",
         headers: {
@@ -85,10 +84,13 @@ export default class extends Controller {
         body: new FormData(this.formTarget),
       });
       console.log(submitPayment);
-      let response = await submitPayment.json();
-      console.log(response);
-      if (response.pt_status === "submitted") {
+      let response = await submitPayment.text();
+      console.log("RESPONSE:", response);
+
+      if (response === "submitted") {
         console.log("Successful payment");
+        window.location.href = "/paintings";
+        // alert("Payment successful! You will receive an email with the details of your order.");
       }
     } catch (error) {
       console.log(error.message);
