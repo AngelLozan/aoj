@@ -80,11 +80,8 @@ export default class extends Controller {
       let submitPayment = await fetch(`/orders/`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRF-Token": this.csrfToken,
+          Accept: "text/plain"
         },
-        // body: JSON.stringify({ 'name': , 'address': , 'phone':  }) // submitting the form data
         body: new FormData(this.formTarget),
       });
       console.log(submitPayment);
@@ -123,14 +120,15 @@ export default class extends Controller {
       to: address,
       // value: this.web3.utils.toHex(convertPrice),
       // @dev Test value
-      value: this.web3.utils.toWei(0.001, "ether"),
+      value: this.web3.utils.toWei(0.0001, "ether"),
     });
     console.log("LIMIT", limit);
 
-    const maxPriorityFeePerGas = this.web3.utils.toWei(2, "gwei");
-    console.log("MAX PRIORITY FEE PER GAS", maxPriorityFeePerGas);
-    const maxFeePerGas = this.web3.utils.toWei(8, "gwei");
-    console.log("MAX FEE PER GAS", maxFeePerGas);
+    // @dev Test values
+    // const maxPriorityFeePerGas = this.web3.utils.toWei(3, "gwei");
+    // console.log("MAX PRIORITY FEE PER GAS", maxPriorityFeePerGas);
+    // const maxFeePerGas = this.web3.utils.toWei(3, "gwei");
+    // console.log("MAX FEE PER GAS", maxFeePerGas);
 
     // const baseFee = await this.web3.eth.getGasPrice(); // Get the current base fee
     // // Calculate maxFeePerGas as the sum of maxPriorityFeePerGas and baseFee
@@ -146,11 +144,10 @@ export default class extends Controller {
             // data: this.web3.utils.toHex("AOJ"),
             // value: this.web3.utils.numberToHex(convertPrice),
             // @dev Test value
-            value: this.web3.utils.toHex(1),
-            // gas: '21000',
+            value: this.web3.utils.toWei(0.0001, "ether"),
             gas: this.web3.utils.numberToHex(limit),
-            maxPriorityFeePerGas: this.web3.utils.toHex(maxPriorityFeePerGas),
-            maxFeePerGas: this.web3.utils.toHex(maxFeePerGas)
+            maxPriorityFeePerGas: this.web3.utils.toWei(3, "gwei"),
+            maxFeePerGas: this.web3.utils.toWei(3, "gwei")
           },
         ],
       });
