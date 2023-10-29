@@ -1,13 +1,27 @@
 import { Controller } from "@hotwired/stimulus";
 import Web3 from "web3";
+import { Web3ModalAuth } from "@web3modal/auth-html";
 
 // Connects to data-controller="crypto"
 export default class extends Controller {
+  static targets = [
+    "modal",
+    "buttonClose",
+    "overlay",
+    "buttonOpen",
+    "wc",
+    "xdefi",
+    "pay",
+    "address",
+    "form",
+    "loader"
+  ];
   static values = {
     price: Number,
   };
 
-  static targets = ["connect", "pay", "address", "form", "loader"];
+  web3Modal;
+  // static targets = ["connect", "pay", "address", "form", "loader"];
 
   web3 = new Web3(
     "https://eth-sepolia.g.alchemy.com/v2/w8AWYp_cLcfuGKs0fz9oIZb1YJdKQGvC"
@@ -17,10 +31,57 @@ export default class extends Controller {
     this.loaderTarget.style.display = "none";
     console.log("Crypto controller connected");
     this.payTarget.disabled = true;
+    this.web3Modal = await this.getWalletConnect();
     if (typeof window.ethereum !== "undefined") {
       console.log("Metamask Detected");
     } else {
       console.log("Metamask not found");
+    }
+  }
+
+  openModal() {
+    this.modalTarget.classList.remove("hidden");
+    this.overlayTarget.classList.remove("hidden");
+  }
+
+  closeModal() {
+    this.modalTarget.classList.add("hidden");
+    this.overlayTarget.classList.add("hidden");
+  }
+
+  async walletConnect() {
+    try {
+      const data = await this.web3Modal.signIn({
+        statement: "Connect to Web3Modal",
+      });
+      console.info(data);
+      this.addressTarget.value = await data.address;
+      this.buttonOpenTarget.innerText = "Connected!";
+      this.closeModal();
+      console.log
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+  async xdefiConnect() {
+    try {
+      let memo = "AOJ"
+      if (window.xfi) {
+        window.xfi.bitcoin.request(
+          { method: "request_accounts", params: [{memo}] },
+          (error, accounts) => {
+          if(!error) {
+            this.addressTarget.value = accounts;
+            this.buttonOpenTarget.innerText = "Connected!";
+          }
+          this.closeModal();
+          });
+      } else {
+        this.xdefiTarget.innerText = "Please install!"
+      }
+    } catch (error) {
+      console.log(error.message);
     }
   }
 
@@ -97,17 +158,17 @@ export default class extends Controller {
     }
   }
 
-  async #permissions() {
-    const reg = /\b(\w{6})\w+(\w{4})\b/g;
-    this.accounts = await ethereum.request({ method: "eth_requestAccounts" });
-    this.connectTarget.innerText = "Connected";
-    this.payTarget.disabled = false;
-    this.addressTarget.innerText = ethereum.selectedAddress.replace(
-      reg,
-      "$1****$2"
-    );
-    console.log("Eth Accounts: ", this.accounts);
-  }
+  // async #permissions() {
+  //   const reg = /\b(\w{6})\w+(\w{4})\b/g;
+  //   this.accounts = await ethereum.request({ method: "eth_requestAccounts" });
+  //   this.connectTarget.innerText = "Connected";
+  //   this.payTarget.disabled = false;
+  //   this.addressTarget.innerText = ethereum.selectedAddress.replace(
+  //     reg,
+  //     "$1****$2"
+  //   );
+  //   console.log("Eth Accounts: ", this.accounts);
+  // }
 
   async #sendEth() {
     this.loaderTarget.style.display = "inline-block";
@@ -175,5 +236,20 @@ export default class extends Controller {
   pay(e) {
     e.preventDefault();
     this.#sendEth();
+  }
+
+  async getWalletConnect() {
+    const web3Modal = await new Web3ModalAuth({
+      projectId: this.projectIdValue,
+      metadata: {
+        name: "Web3Modal",
+        description: "Web3Modal",
+        url: "web3modal.com",
+        icons: [
+          "https://walletconnect.com/_next/static/media/logo_mark.84dd8525.svg",
+        ],
+      },
+    });
+    return web3Modal;
   }
 }
