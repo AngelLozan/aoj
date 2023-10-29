@@ -13,8 +13,14 @@ class OrdersController < ApplicationController
   end
 
   def new
-    @order = Order.new
-    gon.client_token = generate_client_token
+    # if @cart.nil?
+    #   redirect_to paintings_url, notice: "Your cart is empty."
+    # else
+      @order = Order.new
+    # end
+
+    # @dev Another way to generate a client side token
+    # gon.client_token = generate_client_token
   end
 
 
