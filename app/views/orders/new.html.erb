@@ -1,5 +1,5 @@
 
-<div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= @cart.sum(&:price) / 100.00 %>">
+<div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= @cart.sum(&:price) / 100.00 %>" data-crypto-project-id-value="<%= ENV['PROJECT_ID'] %>">
 
   <div class="tabs">
     <input class="tabInput" name="tabs" type="radio" id="tab-1" checked="checked"/>
@@ -87,17 +87,22 @@
 
 <div class="d-flex align-items-center justify-content-center  my-3">
 
-  <section data-crypto-target="modal" class="modal hidden">
+  <section data-crypto-target="modal" class="cryptomodal hidden">
     <div class="flex">
       <button data-crypto-target="buttonClose" data-action="click->crypto#closeModal" class="btn-close"></button>
     </div>
 
-
+       <button data-action="click->crypto#connectWallet" class="btn btn-primary">
+        <div class="d-flex flex-column justify-content-center align-items-center">
+          <div><img height="30px" size="24" src="https://opensea.io/static/images/logos/metamask-fox.svg" alt="Metamaks Fox"></div>
+          <div data-wallet-target="metamask" class="mx-5">Metamask</div>
+        </div>
+      </button>
 
       <button data-action="click->crypto#walletConnect" class="btn btn-primary">
         <div class="d-flex flex-column justify-content-center align-items-center">
-          <div><img height="30px" size="24" src="https://static.opensea.io/logos/cryptoconnect-alternative.png" alt="crypto Connect"></div>
-          <div data-crypto-target="wc" class="mx-3">crypto Connect</div>
+          <div><img height="30px" size="24" src="https://static.opensea.io/logos/walletconnect-alternative.png" alt="Wallet Connect"></div>
+          <div data-crypto-target="wc" class="mx-3">Wallet Connect</div>
         </div>
       </button>
 

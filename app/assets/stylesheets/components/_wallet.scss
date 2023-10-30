@@ -1,6 +1,6 @@
 
 
-.modal {
+.cryptomodal {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -15,20 +15,20 @@
   z-index: 2;
 }
 
-.modal .flex {
+.cryptomodal .flex {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.modal input {
+.cryptomodal input {
   padding: 0.7rem 1rem;
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 0.9em;
 }
 
-.modal p {
+.cryptomodal p {
   font-size: 0.9rem;
   color: #777;
   margin: 0.4rem 0 0.2rem;

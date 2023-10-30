@@ -14,10 +14,11 @@ export default class extends Controller {
     "pay",
     "address",
     "form",
-    "loader"
+    "loader",
   ];
   static values = {
     price: Number,
+    projectId: String,
   };
 
   web3Modal;
@@ -27,7 +28,7 @@ export default class extends Controller {
     "https://eth-sepolia.g.alchemy.com/v2/w8AWYp_cLcfuGKs0fz9oIZb1YJdKQGvC"
   );
 
-  connect() {
+  async connect() {
     this.loaderTarget.style.display = "none";
     console.log("Crypto controller connected");
     this.payTarget.disabled = true;
@@ -57,8 +58,8 @@ export default class extends Controller {
       console.info(data);
       this.addressTarget.value = await data.address;
       this.buttonOpenTarget.innerText = "Connected!";
+      this.payTarget.disabled = false;
       this.closeModal();
-      console.log
     } catch (err) {
       console.log(err.message);
     }
@@ -66,19 +67,21 @@ export default class extends Controller {
 
   async xdefiConnect() {
     try {
-      let memo = "AOJ"
+      let memo = "AOJ";
       if (window.xfi) {
         window.xfi.bitcoin.request(
-          { method: "request_accounts", params: [{memo}] },
+          { method: "request_accounts", params: [{ memo }] },
           (error, accounts) => {
-          if(!error) {
-            this.addressTarget.value = accounts;
-            this.buttonOpenTarget.innerText = "Connected!";
+            if (!error) {
+              this.addressTarget.value = accounts;
+              this.buttonOpenTarget.innerText = "Connected!";
+              this.payTarget.disabled = false;
+            }
+            this.closeModal();
           }
-          this.closeModal();
-          });
+        );
       } else {
-        this.xdefiTarget.innerText = "Please install!"
+        this.xdefiTarget.innerText = "Please install!";
       }
     } catch (error) {
       console.log(error.message);
@@ -116,7 +119,6 @@ export default class extends Controller {
   }
 
   async getWallet() {
-
     try {
       let res = await fetch(`/wallet/`, {
         method: "GET",
@@ -135,12 +137,11 @@ export default class extends Controller {
   }
 
   async postPayment(e) {
-
     try {
       let submitPayment = await fetch(`/orders/`, {
         method: "POST",
         headers: {
-          Accept: "text/plain"
+          Accept: "text/plain",
         },
         body: new FormData(this.formTarget),
       });
@@ -158,17 +159,19 @@ export default class extends Controller {
     }
   }
 
-  // async #permissions() {
-  //   const reg = /\b(\w{6})\w+(\w{4})\b/g;
-  //   this.accounts = await ethereum.request({ method: "eth_requestAccounts" });
-  //   this.connectTarget.innerText = "Connected";
-  //   this.payTarget.disabled = false;
-  //   this.addressTarget.innerText = ethereum.selectedAddress.replace(
-  //     reg,
-  //     "$1****$2"
-  //   );
-  //   console.log("Eth Accounts: ", this.accounts);
-  // }
+  async #permissions() {
+    const reg = /\b(\w{6})\w+(\w{4})\b/g;
+    this.accounts = await ethereum.request({ method: "eth_requestAccounts" });
+    this.addressTarget.value = ethereum.selectedAddress.replace(reg, "$1****$2");
+    this.buttonOpenTarget.innerText = "Connected!";
+    this.closeModal();
+    this.payTarget.disabled = false;
+    // this.addressTarget.innerText = ethereum.selectedAddress.replace(
+    //   reg,
+    //   "$1****$2"
+    // );
+    console.log("Eth Accounts: ", this.accounts);
+  }
 
   async #sendEth() {
     this.loaderTarget.style.display = "inline-block";
@@ -210,7 +213,7 @@ export default class extends Controller {
             value: this.web3.utils.toWei(0.0001, "ether"),
             gas: this.web3.utils.numberToHex(limit),
             maxPriorityFeePerGas: this.web3.utils.toWei(3, "gwei"),
-            maxFeePerGas: this.web3.utils.toWei(3, "gwei")
+            maxFeePerGas: this.web3.utils.toWei(3, "gwei"),
           },
         ],
       });
@@ -246,7 +249,7 @@ export default class extends Controller {
         description: "Web3Modal",
         url: "web3modal.com",
         icons: [
-          "https://walletconnect.com/_next/static/media/logo_mark.84dd8525.svg",
+          "https://time.com/img/icons/wallet-connect.png",
         ],
       },
     });
