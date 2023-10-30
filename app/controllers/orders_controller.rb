@@ -26,7 +26,7 @@ class OrdersController < ApplicationController
 
   def create
     @order = Order.new(order_params)
-    # Add paintings from cart to order
+    # Add paintings from car <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %> to order
     @cart.each do |painting|
       @order.paintings << painting
     end
@@ -70,6 +70,7 @@ class OrdersController < ApplicationController
             end
             session[:cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+            OrderMailer.customer(@order).deliver_later # Email customer
             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
           else
             format.html { render :new, status: :unprocessable_entity }
@@ -108,6 +109,7 @@ class OrdersController < ApplicationController
             end
             session[:cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+            OrderMailer.customer(@order).deliver_later # Email customer
             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
           else
             format.html { render :new, status: :unprocessable_entity }
@@ -125,6 +127,7 @@ class OrdersController < ApplicationController
           end
           session[:cart] = []
           OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+          OrderMailer.customer(@order).deliver_later # Email customer
           flash[:notice] = "Thank you for your order! It will arrive soon."
           format.html { redirect_to paintings_url }
           format.text { render plain: "submitted" }
@@ -180,7 +183,7 @@ class OrdersController < ApplicationController
 
   def order_params
     # order_paintings: [] is an array of painting ids to set from the cart before save
-    params.require(:order).permit(:name, :address, :phone, :status, paintings: [])
+    params.require(:order).permit(:name, :address, :phone, :status, :email, paintings: [])
   end
 
   def set_order

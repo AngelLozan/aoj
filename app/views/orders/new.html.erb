@@ -17,6 +17,7 @@
             <%= f.input :address, label: 'Shipping Address', input_html: { class: 'form-control' } %>
             <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
             <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
+             <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
           </div>
 
           <% amount = @cart.sum(&:price) %>
@@ -48,6 +49,7 @@
             <%= f.input :address, label: 'Shipping Address', input_html: { class: 'form-control' } %>
             <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
             <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
+            <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
           </div>
           <div id="payment-form"></div>
           <input type="submit" value="Pay with card" class="btn btn-primary">
@@ -147,6 +149,7 @@
             <%= f.input :address, label: 'Shipping Address', input_html: { class: 'form-control' }%>
             <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' }%>
             <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
+             <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
           </div>
           <input type="submit" value="Pay with crypto" class="btn btn-primary" data-action="click->crypto#pay" data-crypto-target="pay">
         <% end %>

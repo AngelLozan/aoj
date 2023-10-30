@@ -11,4 +11,9 @@ class OrderMailer < ApplicationMailer
     @order = _order
     mail( to: @email, subject: "You have a new order on your site!")
   end
+
+  def customer(_order)
+    @order = _order
+    mail( to: @order.email, subject: "Thank you for your order!" )
+  end
 end
