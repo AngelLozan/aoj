@@ -1,5 +1,5 @@
 
-<div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= @cart.sum(&:price) / 100.00 %>">
+<div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= @cart.sum(&:price) / 100.00 %>" data-crypto-project-id-value="<%= ENV['PROJECT_ID'] %>">
 
   <div class="tabs">
     <input class="tabInput" name="tabs" type="radio" id="tab-1" checked="checked"/>
@@ -78,11 +78,48 @@
     <div class="panel">
       <h1 class="tabH1">Crypto Payments <i class="fa-brands fa-ethereum fa-lg"></i></h1>
       <p class="tabP">Connect your preferred wallet, to pay <i class="fa-regular fa-hand-point-down"></i></p>
-      <div class="d-flex justify-content-center" >
-        <button class="btn btn-primary mt-3"  id="connect-button" data-action="click->crypto#connectWallet" data-crypto-target="connect">
+      <div class="d-flex justify-content-center my-3">
+        <button data-crypto-target="buttonOpen" data-action="click->crypto#openModal" class="btn btn-primary mt-3">
           Connect Wallet
         </button>
       </div>
+
+
+<div class="d-flex align-items-center justify-content-center  my-3">
+
+  <section data-crypto-target="modal" class="cryptomodal hidden">
+    <div class="flex">
+      <button data-crypto-target="buttonClose" data-action="click->crypto#closeModal" class="btn-close"></button>
+    </div>
+
+       <button data-action="click->crypto#connectWallet" class="btn btn-primary">
+        <div class="d-flex flex-column justify-content-center align-items-center">
+          <div><img height="30px" size="24" src="https://opensea.io/static/images/logos/metamask-fox.svg" alt="Metamaks Fox"></div>
+          <div data-wallet-target="metamask" class="mx-5">Metamask</div>
+        </div>
+      </button>
+
+      <button data-action="click->crypto#walletConnect" class="btn btn-primary">
+        <div class="d-flex flex-column justify-content-center align-items-center">
+          <div><img height="30px" size="24" src="https://static.opensea.io/logos/walletconnect-alternative.png" alt="Wallet Connect"></div>
+          <div data-crypto-target="wc" class="mx-3">Wallet Connect</div>
+        </div>
+      </button>
+
+      <button data-action="click->crypto#xdefiConnect" class="btn btn-primary">
+        <div class="d-flex flex-column justify-content-center align-items-center">
+          <div><img height="30px" size="24" src="https://www.gitbook.com/cdn-cgi/image/width=256,dpr=2,height=40,fit=contain,format=auto/https%3A%2F%2F4266502175-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FV16jazlRl57seHanahS6%252Flogo%252FioIrYN9TYWHNeHKcyuhj%252Fimage%2520(2).jpg%3Falt%3Dmedia%26token%3D8c5b33e0-7098-47ae-b59c-f43945b753cb" alt="xdefi Logo"></div>
+          <div data-crypto-target="xdefi" class="mx-5">Xdefi crypto</div>
+        </div>
+      </button>
+  </section>
+
+  <div data-crypto-target="overlay" data-action="click->crypto#closeModal" class="overlay hidden"></div>
+
+</div>
+
+
+
       <div class="d-flex justify-content-center flex-column mx-auto text-center">
           <p data-crypto-target="address"></p>
       </div>

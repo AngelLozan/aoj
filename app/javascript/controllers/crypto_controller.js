@@ -1,26 +1,90 @@
 import { Controller } from "@hotwired/stimulus";
 import Web3 from "web3";
+import { Web3ModalAuth } from "@web3modal/auth-html";
 
 // Connects to data-controller="crypto"
 export default class extends Controller {
+  static targets = [
+    "modal",
+    "buttonClose",
+    "overlay",
+    "buttonOpen",
+    "wc",
+    "xdefi",
+    "pay",
+    "address",
+    "form",
+    "loader",
+  ];
   static values = {
     price: Number,
+    projectId: String,
   };
 
-  static targets = ["connect", "pay", "address", "form", "loader"];
+  web3Modal;
+  // static targets = ["connect", "pay", "address", "form", "loader"];
 
   web3 = new Web3(
     "https://eth-sepolia.g.alchemy.com/v2/w8AWYp_cLcfuGKs0fz9oIZb1YJdKQGvC"
   );
 
-  connect() {
+  async connect() {
     this.loaderTarget.style.display = "none";
     console.log("Crypto controller connected");
     this.payTarget.disabled = true;
+    this.web3Modal = await this.getWalletConnect();
     if (typeof window.ethereum !== "undefined") {
       console.log("Metamask Detected");
     } else {
       console.log("Metamask not found");
+    }
+  }
+
+  openModal() {
+    this.modalTarget.classList.remove("hidden");
+    this.overlayTarget.classList.remove("hidden");
+  }
+
+  closeModal() {
+    this.modalTarget.classList.add("hidden");
+    this.overlayTarget.classList.add("hidden");
+  }
+
+  async walletConnect() {
+    try {
+      const data = await this.web3Modal.signIn({
+        statement: "Connect to Web3Modal",
+      });
+      console.info(data);
+      this.addressTarget.value = await data.address;
+      this.buttonOpenTarget.innerText = "Connected!";
+      this.payTarget.disabled = false;
+      this.closeModal();
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+  async xdefiConnect() {
+    try {
+      let memo = "AOJ";
+      if (window.xfi) {
+        window.xfi.bitcoin.request(
+          { method: "request_accounts", params: [{ memo }] },
+          (error, accounts) => {
+            if (!error) {
+              this.addressTarget.value = accounts;
+              this.buttonOpenTarget.innerText = "Connected!";
+              this.payTarget.disabled = false;
+            }
+            this.closeModal();
+          }
+        );
+      } else {
+        this.xdefiTarget.innerText = "Please install!";
+      }
+    } catch (error) {
+      console.log(error.message);
     }
   }
 
@@ -55,7 +119,6 @@ export default class extends Controller {
   }
 
   async getWallet() {
-
     try {
       let res = await fetch(`/wallet/`, {
         method: "GET",
@@ -74,12 +137,11 @@ export default class extends Controller {
   }
 
   async postPayment(e) {
-
     try {
       let submitPayment = await fetch(`/orders/`, {
         method: "POST",
         headers: {
-          Accept: "text/plain"
+          Accept: "text/plain",
         },
         body: new FormData(this.formTarget),
       });
@@ -100,12 +162,14 @@ export default class extends Controller {
   async #permissions() {
     const reg = /\b(\w{6})\w+(\w{4})\b/g;
     this.accounts = await ethereum.request({ method: "eth_requestAccounts" });
-    this.connectTarget.innerText = "Connected";
+    this.addressTarget.value = ethereum.selectedAddress.replace(reg, "$1****$2");
+    this.buttonOpenTarget.innerText = "Connected!";
+    this.closeModal();
     this.payTarget.disabled = false;
-    this.addressTarget.innerText = ethereum.selectedAddress.replace(
-      reg,
-      "$1****$2"
-    );
+    // this.addressTarget.innerText = ethereum.selectedAddress.replace(
+    //   reg,
+    //   "$1****$2"
+    // );
     console.log("Eth Accounts: ", this.accounts);
   }
 
@@ -149,7 +213,7 @@ export default class extends Controller {
             value: this.web3.utils.toWei(0.0001, "ether"),
             gas: this.web3.utils.numberToHex(limit),
             maxPriorityFeePerGas: this.web3.utils.toWei(3, "gwei"),
-            maxFeePerGas: this.web3.utils.toWei(3, "gwei")
+            maxFeePerGas: this.web3.utils.toWei(3, "gwei"),
           },
         ],
       });
@@ -175,5 +239,20 @@ export default class extends Controller {
   pay(e) {
     e.preventDefault();
     this.#sendEth();
+  }
+
+  async getWalletConnect() {
+    const web3Modal = await new Web3ModalAuth({
+      projectId: this.projectIdValue,
+      metadata: {
+        name: "Web3Modal",
+        description: "Web3Modal",
+        url: "web3modal.com",
+        icons: [
+          "https://time.com/img/icons/wallet-connect.png",
+        ],
+      },
+    });
+    return web3Modal;
   }
 }
