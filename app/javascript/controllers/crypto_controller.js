@@ -79,10 +79,11 @@ export default class extends Controller {
           (error, accounts) => {
             if (!error) {
               this.addressTarget.value = accounts;
-              this.addressTarget.innerText = accounts.replace(
-                reg,
-                "$1****$2"
-              );
+              this.addressTarget.innerText = accounts;
+              // this.addressTarget.innerText = accounts.replace(
+              //   reg,
+              //   "$1****$2"
+              // );
               this.buttonOpenTarget.innerText = "Connected!";
               this.payTarget.disabled = false;
             }
@@ -318,7 +319,7 @@ export default class extends Controller {
     console.log("AMOUNT", amount);
     console.log("RECIPIENT", recipient);
     console.log("FROM", from);
-    
+
     try {
       window.xfi.bitcoin.request(
         {
