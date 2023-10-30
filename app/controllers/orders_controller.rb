@@ -1,7 +1,7 @@
 class OrdersController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[new create wallet]
+  skip_before_action :authenticate_user!, only: %i[ new create wallet btcwallet ]
   before_action :set_order, only: %i[ show edit update destroy ]
-  before_action :set_cart, only: %i[ new create]
+  before_action :set_cart, only: %i[ new create ]
   before_action :load_orders
   before_action :load_cart
 
@@ -147,6 +147,13 @@ class OrdersController < ApplicationController
   def wallet
     # Update to the address of the artist
     address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
+    puts ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
+    render json: { address: address }
+  end
+
+  def btcwallet
+    # Update to the address of the artist
+    address = 'tb1qn50cajady0d86wttx65w20kz4gweuw74n7m5rg'
     puts ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end

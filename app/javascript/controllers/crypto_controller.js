@@ -51,12 +51,16 @@ export default class extends Controller {
   }
 
   async walletConnect() {
+    const reg = /\b(\w{6})\w+(\w{4})\b/g;
     try {
       const data = await this.web3Modal.signIn({
         statement: "Connect to Web3Modal",
       });
       console.info(data);
-      this.addressTarget.value = await data.address;
+      this.addressTarget.innerText = await data.address.replace(
+        reg,
+        "$1****$2"
+      );
       this.buttonOpenTarget.innerText = "Connected!";
       this.payTarget.disabled = false;
       this.closeModal();
@@ -66,6 +70,7 @@ export default class extends Controller {
   }
 
   async xdefiConnect() {
+    const reg = /\b(\w{6})\w+(\w{4})\b/g;
     try {
       let memo = "AOJ";
       if (window.xfi) {
@@ -74,6 +79,10 @@ export default class extends Controller {
           (error, accounts) => {
             if (!error) {
               this.addressTarget.value = accounts;
+              this.addressTarget.innerText = accounts.replace(
+                reg,
+                "$1****$2"
+              );
               this.buttonOpenTarget.innerText = "Connected!";
               this.payTarget.disabled = false;
             }
@@ -118,9 +127,74 @@ export default class extends Controller {
     }
   }
 
+  async calculateBtcPrice() {
+    const price = this.priceValue;
+    try {
+      let res = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-Token": this.csrfToken,
+          },
+        }
+      );
+      let data = await res.json();
+      console.log(data["bitcoin"]["eur"]);
+      const btcPrice = data["bitcoin"]["eur"];
+      const calculatedPrice = price / btcPrice;
+      console.log(calculatedPrice);
+      return calculatedPrice;
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  async calculateBTCFee() {
+    try {
+      let res = await fetch(
+        `https://api.blockcypher.com/v1/btc/main`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-Token": this.csrfToken,
+          },
+        }
+      );
+      let data = await res.json();
+      console.log(data["high_fee_per_kb"]);
+      const btcFee = data["high_fee_per_kb"];
+      return btcFee;
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   async getWallet() {
     try {
       let res = await fetch(`/wallet/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-CSRF-Token": this.csrfToken,
+        },
+      });
+      let data = await res.json();
+      console.log(data); // address: address
+      return data.address;
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  async getBtcWallet() {
+    try {
+      let res = await fetch(`/btcwallet/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -161,16 +235,19 @@ export default class extends Controller {
 
   async #permissions() {
     const reg = /\b(\w{6})\w+(\w{4})\b/g;
-    this.accounts = await ethereum.request({ method: "eth_requestAccounts" });
-    this.addressTarget.value = ethereum.selectedAddress.replace(reg, "$1****$2");
-    this.buttonOpenTarget.innerText = "Connected!";
-    this.closeModal();
-    this.payTarget.disabled = false;
-    // this.addressTarget.innerText = ethereum.selectedAddress.replace(
-    //   reg,
-    //   "$1****$2"
-    // );
-    console.log("Eth Accounts: ", this.accounts);
+    try {
+      this.accounts = await ethereum.request({ method: "eth_requestAccounts" });
+      this.buttonOpenTarget.innerText = "Connected!";
+      this.closeModal();
+      this.payTarget.disabled = false;
+      this.addressTarget.innerText = ethereum.selectedAddress.replace(
+        reg,
+        "$1****$2"
+      );
+      console.log("Eth Accounts: ", this.accounts);
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   async #sendEth() {
@@ -231,6 +308,42 @@ export default class extends Controller {
     }
   }
 
+  async #sendBTC() {
+    const feeRate = await this.calculateBTCFee();
+    const amount = await this.calculateBtcPrice();
+    const recipient = await this.getBtcWallet();
+    const from = await this.addressTarget.value;
+    const memo = "AOJ";
+    console.log("FEE RATE", feeRate);
+    console.log("AMOUNT", amount);
+    console.log("RECIPIENT", recipient);
+    console.log("FROM", from);
+    
+    try {
+      window.xfi.bitcoin.request(
+        {
+          method: "transfer",
+          params: [
+            {
+              feeRate,
+              from,
+              recipient,
+              amount,
+              memo,
+            },
+          ],
+        },
+        (error, result) => {
+          console.debug(error, result);
+          this.lastResult = { error, result };
+        }
+      );
+    } catch (error) {
+      console.log(error.message);
+      alert("Transaction didn't go through 🤔. Please try again.");
+    }
+  }
+
   connectWallet(e) {
     console.log("connectWallet");
     this.#permissions();
@@ -238,7 +351,12 @@ export default class extends Controller {
 
   pay(e) {
     e.preventDefault();
-    this.#sendEth();
+    if (ethereum.selectedAddress) {
+      this.#sendEth();
+    } else {
+      this.#sendBTC();
+    }
+
   }
 
   async getWalletConnect() {
