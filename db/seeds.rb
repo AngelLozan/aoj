@@ -4,6 +4,7 @@ puts "cleaning database..."
 
 Painting.destroy_all
 User.destroy_all
+Order.destroy_all
 
 puts "creating artist user"
 email = ENV['EMAIL']

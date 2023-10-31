@@ -126,6 +126,7 @@ class OrdersController < ApplicationController
             painting.update(status: "sold")
           end
           session[:cart] = []
+          byebug
           OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
           OrderMailer.customer(@order).deliver_later # Email customer
           flash[:notice] = "Thank you for your order! It will arrive soon."
