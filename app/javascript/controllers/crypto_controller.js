@@ -310,40 +310,99 @@ export default class extends Controller {
   }
 
   async #sendBTC() {
-    const feeRate = await this.calculateBTCFee();
-    const amount = await this.calculateBtcPrice();
-    const recipient = await this.getBtcWallet();
-    const from = await this.addressTarget.value;
-    const memo = "AOJ";
-    console.log("FEE RATE", feeRate);
-    console.log("AMOUNT", amount);
-    console.log("RECIPIENT", recipient);
-    console.log("FROM", from);
+    this.loaderTarget.style.display = "inline-block";
 
     try {
-      window.xfi.bitcoin.request(
-        {
-          method: "transfer",
-          params: [
-            {
-              feeRate,
-              from,
-              recipient,
-              amount,
-              memo,
-            },
-          ],
-        },
-        (error, result) => {
-          console.debug(error, result);
-          this.lastResult = { error, result };
-        }
-      );
+      const feeRate = await this.calculateBTCFee();
+      const amount = await this.calculateBtcPrice();
+      const recipient = await this.getBtcWallet();
+      const from = this.addressTarget.value; // This one doesn't return a promise
+      const memo = "AOJ";
+      console.log("FEE RATE", feeRate);
+      console.log("AMOUNT", amount);
+      console.log("RECIPIENT", recipient);
+      console.log("FROM", from);
+
+      const result = await new Promise((resolve, reject) => {
+        window.xfi.bitcoin.request(
+          {
+            method: "transfer",
+            params: [
+              {
+                feeRate,
+                from,
+                recipient,
+                amount,
+                memo,
+              },
+            ],
+          },
+          (error, result) => {
+            console.debug(error, result);
+            if (result) {
+              resolve(result);
+            } else {
+              reject(error || new Error("Transaction failed"));
+            }
+          }
+        );
+      });
+
+      this.lastResult = result;
+      console.log("RESULT", result);
+      this.payTarget.innerText = "Paid";
+      this.postPayment(); // You can await this if it's asynchronous
+      this.loaderTarget.style.display = "none";
     } catch (error) {
       console.log(error.message);
+      this.loaderTarget.style.display = "none";
       alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
+
+  // async #sendBTC() {
+  //   this.loaderTarget.style.display = "inline-block";
+  //   const feeRate = await this.calculateBTCFee();
+  //   const amount = await this.calculateBtcPrice();
+  //   const recipient = await this.getBtcWallet();
+  //   const from = await this.addressTarget.value;
+  //   const memo = "AOJ";
+  //   console.log("FEE RATE", feeRate);
+  //   console.log("AMOUNT", amount);
+  //   console.log("RECIPIENT", recipient);
+  //   console.log("FROM", from);
+
+  //   try {
+  //     window.xfi.bitcoin.request(
+  //       {
+  //         method: "transfer",
+  //         params: [
+  //           {
+  //             feeRate,
+  //             from,
+  //             recipient,
+  //             amount,
+  //             memo,
+  //           },
+  //         ],
+  //       },
+  //       (error, result) => {
+  //         console.debug(error, result);
+  //         this.lastResult = { error, result };
+  //         console.log("RESULT", result);
+  //         if (result) {
+  //           this.payTarget.innerText = "Paid";
+  //           this.postPayment(); // Goes to create order
+  //           this.loaderTarget.style.display = "none";
+  //         }
+  //       }
+  //     );
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     this.loaderTarget.style.display = "none";
+  //     alert("Transaction didn't go through 🤔. Please try again.");
+  //   }
+  // }
 
   connectWallet(e) {
     console.log("connectWallet");
