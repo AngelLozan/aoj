@@ -411,10 +411,12 @@ export default class extends Controller {
 
   pay(e) {
     e.preventDefault();
-    if (ethereum.selectedAddress) {
-      this.#sendEth();
-    } else {
+    const btcRegex = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
+    const from = this.addressTarget.value;
+    if (from.match(btcRegex)) {
       this.#sendBTC();
+    } else {
+      this.#sendEth();
     }
 
   }
