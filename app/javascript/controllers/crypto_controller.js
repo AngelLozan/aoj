@@ -70,11 +70,11 @@ export default class extends Controller {
   }
 
   async xdefiConnect() {
-    const reg = /\b(\w{6})\w+(\w{4})\b/g;
+    // const reg = /\b(\w{6})\w+(\w{4})\b/g;
     try {
       let memo = "AOJ";
       if (window.xfi) {
-        window.xfi.bitcoin.request(
+        await window.xfi.bitcoin.request(
           { method: "request_accounts", params: [{ memo }] },
           (error, accounts) => {
             if (!error) {
@@ -241,6 +241,7 @@ export default class extends Controller {
       this.buttonOpenTarget.innerText = "Connected!";
       this.closeModal();
       this.payTarget.disabled = false;
+      this.addressTarget.value = ethereum.selectedAddress;
       this.addressTarget.innerText = ethereum.selectedAddress.replace(
         reg,
         "$1****$2"
@@ -316,7 +317,7 @@ export default class extends Controller {
       const feeRate = await this.calculateBTCFee();
       const amount = await this.calculateBtcPrice();
       const recipient = await this.getBtcWallet();
-      const from = this.addressTarget.value; // This one doesn't return a promise
+      const from = this.addressTarget.value;
       const memo = "AOJ";
       console.log("FEE RATE", feeRate);
       console.log("AMOUNT", amount);
@@ -351,7 +352,7 @@ export default class extends Controller {
       this.lastResult = result;
       console.log("RESULT", result);
       this.payTarget.innerText = "Paid";
-      this.postPayment(); // You can await this if it's asynchronous
+      await this.postPayment();
       this.loaderTarget.style.display = "none";
     } catch (error) {
       console.log(error.message);
@@ -411,9 +412,11 @@ export default class extends Controller {
 
   pay(e) {
     e.preventDefault();
-    const btcRegex = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
+    // @dev Mainnet only
+    // const btcRegex = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
+    const btcRegex = /\b((bc|tb)(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[ac-hj-np-z02-9]{8,87})|([13]|[mn2])[a-km-zA-HJ-NP-Z1-9]{25,39})\b/g;
     const from = this.addressTarget.value;
-    if (from.match(btcRegex)) {
+    if (btcRegex.test(from)) {
       this.#sendBTC();
     } else {
       this.#sendEth();
