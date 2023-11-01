@@ -25,4 +25,5 @@ Rails.application.routes.draw do
   delete '/orders/:id', to: "orders#destroy", as: 'destroy_order'
 
   get '/wallet', to: "orders#wallet", as: 'wallet'
+  get '/btcwallet', to: "orders#btcwallet", as: 'btcwallet'
 end
