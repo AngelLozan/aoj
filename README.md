@@ -12,3 +12,9 @@ In this case, I'm using simple account administration restricted to one user. Th
 
 ## GHA workflows
 - Currently not used as unable to simulate reliably a cloudinary connection. Tests pass and display images locally, but not in GHA. Move worflows from ./test to ./github/ to enable.
+
+## Artwork
+All artwork is some of the original mockups used by the artist to give them more of a feeling of what the site will look like.
+
+## Testing
+Due to the nature of the active storage of the paintings in the test, you will need to run `rails db:test:purge` before running `rails test` to ensure that the tests run properly.

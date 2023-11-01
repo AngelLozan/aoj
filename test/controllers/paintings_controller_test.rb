@@ -95,7 +95,7 @@ class PaintingsControllerTest < ActionDispatch::IntegrationTest
     #   # @controller.session[:cart] = []
     #   post add_to_cart_url(@painting)
     # end
-    assert_redirected_to paintings_url
+    assert_redirected_to new_order_url
     puts "\n9- Successfully adds items to cart \n".green
   end
 
