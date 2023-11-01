@@ -342,7 +342,7 @@ export default class extends Controller {
     try {
       const balance = await this.checkBTCBalance(this.addressTarget.value);
       // const amount = await this.calculateBtcPrice();
-      const amount = 100000000; // @dev test amount of Satoshis
+      const amount = 10000; // @dev test amount of Satoshis
       console.log("BALANCE", balance);
       if (amount > balance) {
         this.loaderTarget.style.display = "none";
