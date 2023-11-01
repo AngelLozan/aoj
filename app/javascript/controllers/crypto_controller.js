@@ -342,18 +342,20 @@ export default class extends Controller {
     try {
       const balance = await this.checkBTCBalance(this.addressTarget.value);
       // const amount = await this.calculateBtcPrice();
+      const feeRate = await this.calculateBTCFee();
+      console.log("FEE RATE", feeRate);
       const amount = 10000; // @dev test amount of Satoshis
       console.log("BALANCE", balance);
-      if (amount > balance) {
+      if ((amount + feeRate) > balance) {
         this.loaderTarget.style.display = "none";
         alert("Not enough funds in your wallet. Please try again.");
         return;
       }
-      const feeRate = await this.calculateBTCFee();
+
       const recipient = await this.getBtcWallet();
       const from = this.addressTarget.value;
       const memo = "AOJ";
-      console.log("FEE RATE", feeRate);
+
       console.log("AMOUNT", amount);
       console.log("RECIPIENT", recipient);
       console.log("FROM", from);
