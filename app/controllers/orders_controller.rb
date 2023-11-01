@@ -1,7 +1,7 @@
 class OrdersController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[ new create wallet btcwallet ]
   before_action :set_order, only: %i[ show edit update destroy ]
-  before_action :set_cart, only: %i[ new create ]
+  # before_action :set_cart, only: %i[ new create ]
   before_action :load_orders
   before_action :load_cart
 

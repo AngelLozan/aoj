@@ -5,7 +5,7 @@ class OrderMailerTest < ActionMailer::TestCase
   Blob = ActiveStorage::Blob.create!(
     id: 2,
     key: "v1698786960/development/dvi5xiwkmrnelcucmlgaa1jdz08r.jpg",
-    filename: "photo1.jpeg",
+    filename: "photo2.jpeg",
     content_type: "image/jpeg",
     metadata: {"identified"=>true},
     service_name: "cloudinary",
