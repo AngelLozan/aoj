@@ -1,0 +1,6 @@
+one:
+  address: '1234 Kentucky Ave.'
+  phone: '1234567891'
+  name: 'Larry'
+  email: 'scottloz@protonmail.com'
+  status: 'open'
