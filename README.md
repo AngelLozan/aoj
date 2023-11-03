@@ -18,3 +18,37 @@ All artwork is some of the original mockups used by the artist to give them more
 
 ## Testing
 Due to the nature of the active storage of the paintings in the test, you will need to run `rails db:test:purge` before running `rails test` to ensure that the tests run properly.
+
+## Deployment to Digital Ocean:
+- Create a droplet with rails marketplace app
+- SSH into droplet
+- Optional: touch config in .ssh local machine with the below so you can `ssh <app name>`
+```
+Host <name>
+  User root
+  HostName <ip of droplet>
+  IdentityFile ~/.ssh/<name>
+```
+- Change default rails project folder:
+
+`nano /etc/nginx/sites-available/rails`
+
+- change `root /home/rails/rails_app/public;` to `root /home/<app name>/public;`
+
+Change working dir similarly:
+`nano /etc/systemd/system/rails.service`
+
+- change `WorkingDirectory=/home/rails/rails_app` to `WorkingDirectory=/home/<app name>`
+
+- Give priviledges to rails user: `gpasswd -a rails sudo`
+- Change into user in drop cli: `sudo -i -u rails`
+
+- GO to home directory `cd ..`
+- Clone your repo: `git clone <repo url>`
+- `sudo chmod 777 -R app`
+- `cd app`
+- Use rvm or ensure ruby installed
+- `bundle install`
+- yarn
+TG continued
+
