@@ -35,10 +35,10 @@ Host <name>
 
 - change `root /home/rails/rails_app/public;` to `root /home/<app name>/public;`
 
-Change working dir similarly:
+- Change working dir similarly:
 `nano /etc/systemd/system/rails.service`
 
-- change `WorkingDirectory=/home/rails/rails_app` to `WorkingDirectory=/home/<app name>`
+- Change `WorkingDirectory=/home/rails/rails_app` to `WorkingDirectory=/home/<app name>`
 
 - Give priviledges to rails user: `gpasswd -a rails sudo`
 - Change into user in drop cli: `sudo -i -u rails`
@@ -50,5 +50,9 @@ Change working dir similarly:
 - Use rvm or ensure ruby installed
 - `bundle install`
 - yarn
-TG continued
-
+- Install figaro and use `bundle exec figaro install` to generate a `config/application.yml` file where you can store ENV variables previously hosted in a .env. This will manage environment variables for you in production.
+- `rails db:create`
+-`rails db:migrate`
+- `rails db:seed`
+- Restart nginx: `sudo systemctl restart nginx`
+- Then restart the server: `sudo systemctl restart rails.service`
