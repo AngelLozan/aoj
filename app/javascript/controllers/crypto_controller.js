@@ -15,6 +15,7 @@ export default class extends Controller {
     "address",
     "form",
     "loader",
+    "metamask",
   ];
   static values = {
     price: Number,
@@ -37,6 +38,7 @@ export default class extends Controller {
       console.log("Metamask Detected");
     } else {
       console.log("Metamask not found");
+      this.metamaskTarget.innerText = "Please install!";
     }
   }
 
