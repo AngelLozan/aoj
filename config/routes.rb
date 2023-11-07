@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-
+  resources :contacts, only: [:new, :create]
 
   resources :paintings
   get '/admin', to: 'paintings#admin', as: 'admin'
@@ -13,6 +13,8 @@ Rails.application.routes.draw do
   get '/privacy', to: "pages#privacy", as: 'privacy'
   get '/terms', to: "pages#terms", as: 'terms'
   get '/photography', to: "pages#photography", as: 'photography'
+
+
   post '/add_to_cart/:id', to: "paintings#add_to_cart", as: 'add_to_cart'
   delete '/remove_from_cart/:id', to: "paintings#remove_from_cart", as: 'remove_from_cart'
 

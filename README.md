@@ -19,6 +19,8 @@ All artwork is some of the original mockups used by the artist to give them more
 ## Testing
 Due to the nature of the active storage of the paintings in the test, you will need to run `rails db:test:purge` before running `rails test` to ensure that the tests run properly.
 
+- Paypal sandbox cards: Use current month and one year in advance ex: 10/24 for the expiration date.
+
 ## Deployment to Digital Ocean:
 - Create a droplet with rails marketplace app
 - SSH into droplet
