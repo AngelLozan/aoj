@@ -7,6 +7,10 @@
         <h6 class="card-text">For: <%= order.name %></h5>
         <h6 class="card-text">Contact: <%= order.phone %></h6>
         <p class="card-text">Address: <%= order.address %></p>
+        <p class="card-text">City: <%= order.city %></p>
+        <p class="card-text">State: <%= order.state %></p>
+        <p class="card-text">Country: <%= order.country %></p>
+        <p class="card-text">Zipcode: <%= order.zip %></p>
         <p>Paintings:
           <% order.paintings.each do |painting| %>
            <li>
