@@ -15,8 +15,9 @@ class ContactsController < ApplicationController
 
     respond_to do |format|
       if @contact.save
-        format.html { redirect_to contact_url(@contact), notice: "Thank you for contacting me, I'll be in touch as soon as possible." }
-        format.json { render :show, status: :created, location: @contact }
+        ContactMailer.contact(@contact).deliver_later
+        format.html { redirect_to new_contact_url, notice: "Thank you for contacting me, I'll be in touch as soon as possible." }
+        format.json { render :new, status: :created }
       else
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @contact.errors, status: :unprocessable_entity }
