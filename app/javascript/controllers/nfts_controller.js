@@ -50,43 +50,57 @@ tokenContract = "0x2562ffA357FbDd56024AeA7D8E2111ad299766c9";
   }
 
   async getNFTMetadata() {
-    const result = await contract.methods.tokenURI(tokenId).call()
+    try {
+      // Need to iterate next line for 15 ID's (15 nfts) Ex. below.
+      // const tokenId = 1 // A token we'd like to retrieve its metadata of
 
-    console.log(result); // ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/101
+      const result = await contract.methods.tokenURI(tokenId).call()
 
-    const ipfsURL = addIPFSProxy(result);
+      console.log(result); // ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/101
 
-    const request = new Request(ipfsURL);
-    const response = await fetch(request);
-    const metadata = await response.json();
-    console.log(metadata); // Metadata in JSON
+      const ipfsURL = addIPFSProxy(result);
 
-    // Example metadata:
-    // {
-    //   image: 'ipfs://QmNdvtT9EmrUc6haJyN7ZanHNrsjd23v1ydG6r8jTGEZvq',
-    //   attributes: [
-    //     { trait_type: 'Clothes', value: 'Navy Striped Tee' },
-    //     { trait_type: 'Hat', value: "Fisherman's Hat" },
-    //     { trait_type: 'Fur', value: 'Gray' },
-    //     { trait_type: 'Background', value: 'Army Green' },
-    //     { trait_type: 'Eyes', value: 'Eyepatch' },
-    //     { trait_type: 'Mouth', value: 'Bored' }
-    //   ]
-    // }
+      const request = new Request(ipfsURL);
+      const response = await fetch(request);
+      const metadata = await response.json();
+      console.log(metadata); // Metadata in JSON
 
-    const image = addIPFSProxy(metadata.image);
-    // Return the IPFS hash combined with our Infura endpoint, after which we can directly access this in our browser to view the NFT!
-    return image;
+      // Example metadata:
+      // {
+      //   image: 'ipfs://QmNdvtT9EmrUc6haJyN7ZanHNrsjd23v1ydG6r8jTGEZvq',
+      //   attributes: [
+      //     { trait_type: 'Clothes', value: 'Navy Striped Tee' },
+      //     { trait_type: 'Hat', value: "Fisherman's Hat" },
+      //     { trait_type: 'Fur', value: 'Gray' },
+      //     { trait_type: 'Background', value: 'Army Green' },
+      //     { trait_type: 'Eyes', value: 'Eyepatch' },
+      //     { trait_type: 'Mouth', value: 'Bored' }
+      //   ]
+      // }
+
+      const image = addIPFSProxy(metadata.image);
+      // Return the IPFS hash combined with our Infura endpoint, after which we can directly access this in our browser to view the NFT!
+      return image;
+    } catch (error) {
+      console.log("Was unable to get NFT metadata: ", error);
+    }
+
 }
 
 
   async addIPFSProxy(ipfsHash) {
-    const URL = "https://<YOUR_SUBDOMAIN>.infura-ipfs.io/ipfs/"
-    const hash = ipfsHash.replace(/^ipfs?:\/\//, '')
-    const ipfsURL = URL + hash
+    try {
+      // const URL = `https://<YOUR_SUBDOMAIN>.infura-ipfs.io/ipfs/`
+      const URL = `https://${this.endpointValue}.infura-ipfs.io/ipfs/`
+      const hash = ipfsHash.replace(/^ipfs?:\/\//, '')
+      const ipfsURL = URL + hash
 
-    console.log(ipfsURL) // https://<subdomain>.infura-ipfs.io/ipfs/<ipfsHash>
-    return ipfsURL
+      console.log(ipfsURL) // https://<subdomain>.infura-ipfs.io/ipfs/<ipfsHash>
+      return ipfsURL
+    } catch (error) {
+      console.log("Was unable to add IPFS proxy: ", error);
+    }
+
 }
 
 
