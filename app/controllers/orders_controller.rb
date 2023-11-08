@@ -191,7 +191,7 @@ class OrdersController < ApplicationController
 
   def order_params
     # order_paintings: [] is an array of painting ids to set from the cart before save
-    params.require(:order).permit(:name, :address, :phone, :status, :email, paintings: [])
+    params.require(:order).permit(:name, :address, :city, :state, :zip, :country, :phone, :status, :email, paintings: [])
   end
 
   def set_order

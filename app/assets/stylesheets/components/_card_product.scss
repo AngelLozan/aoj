@@ -3,6 +3,82 @@
   position: relative;
 }
 
+.card > img {
+  width: 100%;
+  min-width: 390px;
+  height: auto;
+  max-height: 390px;
+  object-fit: cover;
+}
+
+// /* If the screen size is 491px wide or less */
+// @media screen and (max-width: 491px) {
+//   .card > img {
+//     width: 100%;
+//     min-width: 0px;
+//     height: auto;
+//     max-height: 390px;
+//     object-fit: cover;
+//   }
+// }
+
+// /* If the screen size is 575px wide or less */
+// @media screen and (max-width: 575px) {
+//   .card > img {
+//     width: 100%;
+//     min-width: 200px;
+//     height: auto;
+//     max-height: 390px;
+//     object-fit: cover;
+//   }
+// }
+
+/* If the screen size is 767px wide or less */
+@media screen and (max-width: 767px) {
+  .card > img {
+    width: 100%;
+    min-width: 0px;
+    height: auto;
+    max-height: 390px;
+    object-fit: cover;
+  }
+}
+
+/* If the screen size is 992px down to 777px */
+@media screen and (min-width: 768px) and (max-width: 992px) {
+  .card > img {
+    width: 100%;
+    min-width: 200px;
+    height: auto;
+    max-height: 390px;
+    object-fit: cover;
+  }
+}
+
+/* If the screen size is between above and below, sizing is regular above */
+
+/* If the screen size is 1192px wide or greater */
+@media screen and (min-width: 1200px) {
+  .card > img {
+    width: 100%;
+    height: auto;
+    min-width: 480px;
+    max-height: 480px;
+    object-fit: cover;
+  }
+}
+
+/* If the screen size is 1397px wide or greater */
+@media screen and (min-width: 1400px) {
+  .card > img {
+    width: 100%;
+    height: auto;
+    min-width: 570px;
+    max-height: 570px;
+    object-fit: cover;
+  }
+}
+
 .card:hover {
   transform: translateY(-5px);
   transition: transform 0.3s ease;
