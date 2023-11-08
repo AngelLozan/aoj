@@ -6,17 +6,18 @@
 
 
 
-  <div class="row" id="paintings" data-controller="works">
+  <div class="row row-cols-1 row-cols-md-2" id="paintings" data-controller="works">
     <% @paintings.each do |painting| %>
+
       <div class="col-sm-6 d-flex align-items-stretch">
+
         <div class="card my-5 mx-3 p-3 shadow rounded" data-action="click->works#openPainting" data-url="/paintings/<%= painting.id %>">
         <% if painting.status == 'available' %>
           <div class="ribbon"><span>Available</span></div>
         <% else %>
           <div class="ribbon red"><span>Sold</span></div>
         <% end %>
-
-          <%= cl_image_tag painting.photos[0].key if painting.photos.present?%>
+          <%= cl_image_tag painting.photos[0].key if painting.photos.present? %>
           <div class="card-body">
               <h5 class="card-title"><%= painting.title %></h5>
               <p class="card-text"><%= painting.description %></p>
@@ -32,12 +33,13 @@
             <p>Sold</p>
           <% end %>
         </div>
+
       </div>
 
     <% end %>
-    <div class="container pages-list">
-      <%= paginate @paintings %>
-    </div>
+  </div>
+  <div class="container pages-list">
+    <%= paginate @paintings %>
   </div>
 
 </div>
