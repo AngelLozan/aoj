@@ -1,5 +1,5 @@
 class PaintingsController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[index show add_to_cart remove_from_cart]
+  skip_before_action :authenticate_user!, only: %i[index show add_to_cart remove_from_cart nfts]
   before_action :set_painting, only: %i[ show edit update destroy ]
   before_action :initalize_cart, only: %i[load_cart add_to_cart remove_from_cart ]
   before_action :load_cart # Load for all pages since in navbar, only: %i[ index show add_to_cart remove_from_cart ]
@@ -14,6 +14,10 @@ class PaintingsController < ApplicationController
 
   def new
     @painting = Painting.new
+  end
+
+  def nfts
+
   end
 
   def edit
