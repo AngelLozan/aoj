@@ -7,6 +7,9 @@ import { application } from "./application"
 import AdminController from "./admin_controller"
 application.register("admin", AdminController)
 
+import CookiesController from "./cookies_controller"
+application.register("cookies", CookiesController)
+
 import CryptoController from "./crypto_controller"
 application.register("crypto", CryptoController)
 
