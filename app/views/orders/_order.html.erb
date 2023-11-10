@@ -11,6 +11,10 @@
         <p class="card-text">State: <%= order.state %></p>
         <p class="card-text">Country: <%= order.country %></p>
         <p class="card-text">Zipcode: <%= order.zip %></p>
+        <% if order.note != "" %>
+          <p class="card-text">Note: <%= order.note %></p>
+        <% end %>
+
         <p>Paintings:
           <% order.paintings.each do |painting| %>
            <li>
