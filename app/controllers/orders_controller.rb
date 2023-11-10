@@ -164,7 +164,7 @@ class OrdersController < ApplicationController
   def update
     respond_to do |format|
       if @order.update(order_params)
-        if @order.tracking != ""
+        if @order.tracking != "" && @order.status == "complete"
           OrderMailer.tracking(@order).deliver_later # Email customer
         end
         format.html { redirect_to admin_url, notice: "Order was successfully updated." }
