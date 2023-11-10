@@ -19,14 +19,14 @@ export default class extends Controller {
     document.cookie = "cookieBy= AOJ; max-age=" + 60 * 60 * 24 * 30;
   }
 
-  reject() {
-    this.wrapperTarget.classList.add('hidden');
-    this.setCookie('cookie_consent', false, 365);
-  }
+  // reject() {
+  //   this.wrapperTarget.classList.add('hidden');
+  //   this.setCookie('cookie_consent', false, 365);
+  // }
 
-  setCookie(name, value, days) {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-    document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/`;
-  }
+  // setCookie(name, value, days) {
+  //   const expires = new Date();
+  //   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  //   document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/`;
+  // }
 }
