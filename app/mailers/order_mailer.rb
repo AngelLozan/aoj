@@ -16,4 +16,10 @@ class OrderMailer < ApplicationMailer
     @order = _order
     mail( to: @order.email, subject: "Thank you for your order!" )
   end
+
+  def tracking(_order)
+    @order = _order
+    mail(to: @order.email, subject: "Your order has shipped!")
+  end
+  
 end
