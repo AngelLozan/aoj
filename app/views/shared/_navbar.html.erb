@@ -18,9 +18,9 @@
           <li class="nav-item">
             <%= link_to "Admin", "/admin", class: "nav-link" %>
           </li>
-          <% if @orders.count > 0 && @orders.find_by(status: 0) != nil %>
+          <% if @orders.count > 0 && @orders.find_by(status: "open") != nil %>
              <%= link_to orders_path, class: "btn btn-success rounded position-relative me-3 mb-3" do %>
-                <i class="fa-solid fa-truck-fast"></i> <span class="position-absolute top-0 start-100 translate-middle badge bg-secondary rounded-pill"><%= @orders.count %></span>
+                <i class="fa-solid fa-truck-fast"></i> <span class="position-absolute top-0 start-100 translate-middle badge bg-secondary rounded-pill"><%= @orders.where(status: "open").count %></span>
               <% end %>
           <% end %>
           <li class="nav-item dropdown">
