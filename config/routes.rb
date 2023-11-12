@@ -1,8 +1,17 @@
 Rails.application.routes.draw do
+  # resources :nfts, only: [ :index ] do
+  #   collection do
+  #     post 'set_image_urls'
+  #     # get 'nfts'
+  #   end
+  # end
+  post '/set_image_urls', to: 'nfts#set_image_urls', as: 'set_image_urls'
+  get '/nfts', to: 'nfts#nfts', as: 'nfts'
+
+
   resources :contacts, only: [:new, :create]
 
   resources :paintings
-  get '/nfts', to: 'paintings#nfts', as: 'nfts'
   get '/admin', to: 'paintings#admin', as: 'admin'
   devise_for :users, controllers: {
     sessions: 'custom_devise/sessions'
