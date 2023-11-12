@@ -16,6 +16,7 @@ export default class extends Controller {
     "form",
     "loader",
     "metamask",
+    "note",
   ];
   static values = {
     price: Number,
@@ -324,8 +325,11 @@ export default class extends Controller {
         ],
       });
       console.log("TXHASH", txHash);
+      // let receipt = await this.web3.eth.getTransactionReceipt(txHash);
+      // console.log("RECEIPT", receipt);
 
       if (txHash) {
+        this.noteTarget.value = `Please verify this transaction is confirrmed in your wallet: ${txHash}`;
         this.payTarget.innerText = "Paid";
         await this.postPayment(); // Goes to create order
         this.loaderTarget.style.display = "none";
@@ -390,6 +394,7 @@ export default class extends Controller {
       console.log("RESULT", result);
 
       if (bitcoinTxHashRegex.test(result) === true) {
+        this.noteTarget.value = `Please verify this transaction is confirrmed in your wallet: ${result}`;
         this.payTarget.innerText = "Paid";
         await this.postPayment();
         this.loaderTarget.style.display = "none";

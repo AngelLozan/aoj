@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :contacts, only: [:new, :create]
 
   resources :paintings
+  get '/nfts', to: 'paintings#nfts', as: 'nfts'
   get '/admin', to: 'paintings#admin', as: 'admin'
   devise_for :users, controllers: {
     sessions: 'custom_devise/sessions'

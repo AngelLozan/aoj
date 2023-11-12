@@ -309,7 +309,13 @@ ul.social li{
             	<tr>
             		<td style="padding: 0 2.5em; text-align: center; padding-bottom: 3em;">
             			<div class="text">
-            				<h2>Your painting is being prepared for shipping! Paintings arrive between 7-14 days of your order typically. I'll send you a tracking number as soon as it ships.</h2>
+            				<h2>Your painting is on the way!</h2>
+                    <h3> Tracking number: <%= @order.tracking %></h3>
+                    <h3>
+                      <a href='<%= @order.link %>' >
+                        Use this link to view the progress of your painting.
+                      </a>
+                    </h3>
             			</div>
             		</td>
             	</tr>

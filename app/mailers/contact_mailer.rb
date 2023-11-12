@@ -7,5 +7,6 @@ class ContactMailer < ApplicationMailer
     @contact = contact
     mail(to: @email, subject: @contact.subject)
   end
-  
+
+
 end

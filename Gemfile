@@ -69,6 +69,7 @@ gem 'gon', '~> 6.4'
 gem 'figaro', '~> 1.2'
 gem "braintree", "~> 4.14.0"
 gem 'country_select', '~> 8.0', '>= 8.0.1'
+gem "recaptcha"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

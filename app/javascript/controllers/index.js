@@ -7,11 +7,17 @@ import { application } from "./application"
 import AdminController from "./admin_controller"
 application.register("admin", AdminController)
 
+import CookiesController from "./cookies_controller"
+application.register("cookies", CookiesController)
+
 import CryptoController from "./crypto_controller"
 application.register("crypto", CryptoController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import NftsController from "./nfts_controller"
+application.register("nfts", NftsController)
 
 import OrdersController from "./orders_controller"
 application.register("orders", OrdersController)

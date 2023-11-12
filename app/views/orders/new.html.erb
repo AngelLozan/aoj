@@ -22,6 +22,7 @@
             <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
             <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
             <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
+            <%= f.input :note, as: :hidden %>
           </div>
 
           <% amount = @cart.sum(&:price) %>
@@ -58,6 +59,7 @@
             <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
             <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
             <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
+            <%= f.input :note, as: :hidden %>
           </div>
           <div id="payment-form"></div>
           <input type="submit" value="Pay with card" class="btn btn-primary">
@@ -169,6 +171,7 @@
             <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
             <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
             <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
+            <%= f.input :note, as: :hidden, input_html: { data: {crypto_target: "note"} } %>
           </div>
           <input type="submit" value="Pay with crypto" class="btn btn-primary" data-action="click->crypto#pay" data-crypto-target="pay">
         <% end %>
