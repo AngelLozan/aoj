@@ -43,20 +43,20 @@ export default class extends Controller {
 
   tokenContract = "0x2562ffA357FbDd56024AeA7D8E2111ad299766c9";
 
-  async connect() {https://polygon-mainnet.infura.io/
+  async connect() {
     this.cardsTarget.style.display = "none";
     this.loaderTarget.style.display = "inline-block";
     console.log("Connected NFT controller");
     try {
       const contract = await new this.web3.eth.Contract(this.tokenURIABI, this.tokenContract);
       console.log(contract);
-      const images = await this.getNFTMetadata(contract);
-      console.log(images);
+      const data = await this.getNFTMetadata(contract);
+      console.log(data);
       // this.element.dataset.arrayData = JSON.stringify(images);
-      await this.renderCards(images);
+      await this.renderCards(data);
 
       this.loaderTarget.style.display = "none";
-      this.cardsTarget.style.display = "block";
+      this.cardsTarget.style.display = "flex";
     } catch (error) {
       console.log("Was unable to get contract: ", error);
     }
@@ -66,14 +66,15 @@ export default class extends Controller {
     return this.targets.find("cards");
   }
 
-  async renderCards(images) {
+  async renderCards(data) {
     // const dataArray = await JSON.parse(this.element.dataset.arrayData);
 
     // Clear the existing content
-    this.cardsTarget.innerHTML = '';
+    // this.cardsTarget.innerHTML = '';
 
     // Append cards to the element
-    await images.forEach(item => {
+    await data.forEach(item => {
+
       const cardContainer = document.createElement('div');
       cardContainer.classList.add('col-sm-6', 'd-flex', 'align-items-stretch');
 
@@ -81,7 +82,7 @@ export default class extends Controller {
       card.classList.add('card', 'my-5', 'mx-3', 'p-3', 'shadow', 'rounded');
 
       const image = document.createElement('img');
-      image.src = item;
+      image.src = item.image;
       image.alt = 'NFT';
 
       const cardBody = document.createElement('div');
@@ -89,19 +90,16 @@ export default class extends Controller {
 
       const title = document.createElement('h5');
       title.classList.add('card-title');
-      title.textContent = "Title";
-      // title.textContent = item.title;
+      title.textContent = item.title;
 
       const description = document.createElement('p');
       description.classList.add('card-text');
-      description.textContent = "Description";
-      // description.textContent = item.description;
+      description.textContent = item.description;
 
       const price = document.createElement('div');
       price.classList.add('d-flex', 'flex-row');
       const small = document.createElement('small');
-      // small.textContent = item.price;
-      small.textContent = "item.price";
+      small.textContent = item.price;
 
       price.appendChild(small);
       cardBody.appendChild(title);
@@ -116,45 +114,51 @@ export default class extends Controller {
 
   async getNFTMetadata(contract) {
     let images = [];
+    let objectArr = [];
+
     try {
-      // Need to iterate next line for 15 ID's (15 nfts)
-      // const tokenId = 1 // A token we'd like to retrieve its metadata of
       for (let i = 1; i < 15; i++) {
         const tokenId = i;
-        // const tokenId = 1;
         const result = await contract.methods.tokenURI(tokenId).call();
 
-        console.log(result); // https://gateway.pinata.cloud/ipfs/Qme6vLeZuC7CaFUPBBb9KhV6YmkTS14oGrpP4fxv5NQDXc
+        if (!result) {
+          console.log(`No result for tokenId ${tokenId}!`);
+          continue;
+        }
 
-      // @dev Hosted on Pinata:
-      //   {
-      //     "attributes" : [ {
-      //       "canvas" : "Black",
-      //       "size" : "25X35 inches",
-      //       "paint" : "acrylic",
-      //       "pairing" : "Ships with original",
-      //       "original" : "$800.00", <-- Format trailing comma away below
-      //     }],
-      //     "description" : "This painting depicts a vibrant gathering of women coming together.",
-      //     "image" : "https://gateway.pinata.cloud/ipfs/Qme6vLeZuC7CaFUPBBb9KhV6YmkTS14oGrpP4fxv5NQDXc",
-      //     "name" : "Gathering of Women"
-      // }
+        try {
+          const response = await fetch(result, { timeout: 5000 }); // Adjust timeout as needed
+          const fixedJsonString = await response.text();
+          const parsedData = JSON.parse(fixedJsonString.replace(/,\s*([\]}])/g, '$1'));
+          let pic = parsedData.image;
+          let title = parsedData.name;
+          let description = parsedData.description;
+          let price = parsedData.attributes[4].value;
 
-        const response = await fetch(result);
-        console.log(response); // Response object
+          let obj = {
+            title: title,
+            description: description,
+            price: price,
+            image: pic
+          };
 
-        const fixedJsonString = await response.text();
-        const parsedData = JSON.parse(fixedJsonString.replace(/,\s*([\]}])/g, '$1'));
-        console.log(parsedData);
-        let pic = parsedData.image;
-        console.log(pic);
-
-        images.push(pic);
+          if (images.includes(pic)) {
+            console.log(`Duplicate image for tokenId ${tokenId}!`);
+          } else {
+            images.push(pic);
+            objectArr.push(obj);
+          }
+        } catch (error) {
+          console.log(`Error fetching or parsing data for tokenId ${tokenId}:`, error);
+          continue;
+        }
       }
-      return images; //@dev returns array of images
+
+      return objectArr;
     } catch (error) {
       console.log("Was unable to get NFT metadata: ", error);
     }
   }
+
 
 }
