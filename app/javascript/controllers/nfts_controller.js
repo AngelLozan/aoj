@@ -50,8 +50,10 @@ export default class extends Controller {
     try {
       const contract = await new this.web3.eth.Contract(this.tokenURIABI, this.tokenContract);
       console.log(contract);
-      const image = await this.getNFTMetadata(contract);
-      this.imageTarget.src = image;
+      const images = await this.getNFTMetadata(contract);
+      console.log(images);
+      // this.element.dataset.arrayData = JSON.stringify(images);
+      await this.renderCards(images);
 
       this.loaderTarget.style.display = "none";
       this.cardsTarget.style.display = "block";
@@ -60,39 +62,56 @@ export default class extends Controller {
     }
   }
 
-  // sendImages(images) {
-  //   const form = new FormData();
-  //   form.append("images", JSON.stringify(images));
+  get cardsTarget() {
+    return this.targets.find("cards");
+  }
 
-  //   fetch("/nfts", {
-  //     method: "POST",
-  //     body: form,
-  //     headers: {
-  //       "X-CSRF-Token": document.querySelector("meta[name=csrf-token]").content,
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
-  // }
+  async renderCards(images) {
+    // const dataArray = await JSON.parse(this.element.dataset.arrayData);
 
-  async submitImages(data) {
-    try {
-      const response = await fetch("/set_image_urls", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": document.querySelector("meta[name=csrf-token]").content,
-        },
-        body: JSON.stringify({ images: data }),
-      });
+    // Clear the existing content
+    this.cardsTarget.innerHTML = '';
 
-      if (response.ok) {
-        console.log("Successfully updated image URLs");
-      } else {
-        console.error("Failed to update image URLs");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    // Append cards to the element
+    await images.forEach(item => {
+      const cardContainer = document.createElement('div');
+      cardContainer.classList.add('col-sm-6', 'd-flex', 'align-items-stretch');
+
+      const card = document.createElement('div');
+      card.classList.add('card', 'my-5', 'mx-3', 'p-3', 'shadow', 'rounded');
+
+      const image = document.createElement('img');
+      image.src = item;
+      image.alt = 'NFT';
+
+      const cardBody = document.createElement('div');
+      cardBody.classList.add('card-body');
+
+      const title = document.createElement('h5');
+      title.classList.add('card-title');
+      title.textContent = "Title";
+      // title.textContent = item.title;
+
+      const description = document.createElement('p');
+      description.classList.add('card-text');
+      description.textContent = "Description";
+      // description.textContent = item.description;
+
+      const price = document.createElement('div');
+      price.classList.add('d-flex', 'flex-row');
+      const small = document.createElement('small');
+      // small.textContent = item.price;
+      small.textContent = "item.price";
+
+      price.appendChild(small);
+      cardBody.appendChild(title);
+      cardBody.appendChild(description);
+      cardBody.appendChild(price);
+      card.appendChild(image);
+      card.appendChild(cardBody);
+      cardContainer.appendChild(card);
+      this.cardsTarget.appendChild(cardContainer);
+    });
   }
 
   async getNFTMetadata(contract) {
@@ -100,16 +119,14 @@ export default class extends Controller {
     try {
       // Need to iterate next line for 15 ID's (15 nfts)
       // const tokenId = 1 // A token we'd like to retrieve its metadata of
-      // for (let i = 0; i < 15; i++) {
-        // const tokenId = i;
-        const tokenId = 1;
+      for (let i = 1; i < 15; i++) {
+        const tokenId = i;
+        // const tokenId = 1;
         const result = await contract.methods.tokenURI(tokenId).call();
 
         console.log(result); // https://gateway.pinata.cloud/ipfs/Qme6vLeZuC7CaFUPBBb9KhV6YmkTS14oGrpP4fxv5NQDXc
 
-        // const ipfsURL = this.addIPFSProxy(result);
-
-      // Hosted on Pinata:
+      // @dev Hosted on Pinata:
       //   {
       //     "attributes" : [ {
       //       "canvas" : "Black",
@@ -123,55 +140,21 @@ export default class extends Controller {
       //     "name" : "Gathering of Women"
       // }
 
-
-        // const request = new Request(ipfsURL);
         const response = await fetch(result);
         console.log(response); // Response object
 
         const fixedJsonString = await response.text();
         const parsedData = JSON.parse(fixedJsonString.replace(/,\s*([\]}])/g, '$1'));
-        console.log(parsedData); // Metadata in JSON
-        const pic = parsedData.image;
-        // const metadata = await response.json();
-        // console.log(metadata); // Metadata in JSON
-        // const pic = metadata.image
+        console.log(parsedData);
+        let pic = parsedData.image;
         console.log(pic);
 
-        // Example metadata:
-        // {
-        //   image: 'ipfs://QmNdvtT9EmrUc6haJyN7ZanHNrsjd23v1ydG6r8jTGEZvq',
-        //   attributes: [
-        //     { trait_type: 'Clothes', value: 'Navy Striped Tee' },
-        //     { trait_type: 'Hat', value: "Fisherman's Hat" },
-        //     { trait_type: 'Fur', value: 'Gray' },
-        //     { trait_type: 'Background', value: 'Army Green' },
-        //     { trait_type: 'Eyes', value: 'Eyepatch' },
-        //     { trait_type: 'Mouth', value: 'Bored' }
-        //   ]
-        // }
-
-        // const image = this.addIPFSProxy(metadata.image);
-        // Return the IPFS hash combined with our Infura endpoint, after which we can directly access this in our browser to view the NFT!
         images.push(pic);
-      // }
-      // return images; //@dev returns array of images
-      return pic
+      }
+      return images; //@dev returns array of images
     } catch (error) {
       console.log("Was unable to get NFT metadata: ", error);
     }
   }
 
-  async addIPFSProxy(ipfsHash) {
-    try {
-      const URL = `https://${this.endpoint}.infura-ipfs.io/ipfs/`
-      // const URL = `https://${this.endpointValue}.infura-ipfs.io/ipfs/`;
-      const hash = ipfsHash.replace(/^https?:\/\//, "");
-      const ipfsURL = URL + hash;
-
-      console.log(ipfsURL); // https://<subdomain>.infura-ipfs.io/ipfs/<ipfsHash>
-      return ipfsURL;
-    } catch (error) {
-      console.log("Was unable to add IPFS proxy: ", error);
-    }
-  }
 }
