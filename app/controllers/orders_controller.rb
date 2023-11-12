@@ -164,7 +164,7 @@ class OrdersController < ApplicationController
   def update
     respond_to do |format|
       if @order.update(order_params)
-        if @order.tracking != "" && @order.status == "complete"
+        if @order.tracking != "" && @order.link != "" && @order.status == "complete"
           OrderMailer.tracking(@order).deliver_later # Email customer
         end
         format.html { redirect_to admin_url, notice: "Order was successfully updated." }
@@ -193,7 +193,7 @@ class OrdersController < ApplicationController
 
   def order_params
     # order_paintings: [] is an array of painting ids to set from the cart before save
-    params.require(:order).permit(:name, :address, :city, :state, :zip, :country, :phone, :status, :email, :note, :tracking, paintings: [])
+    params.require(:order).permit(:name, :address, :city, :state, :zip, :country, :phone, :status, :email, :note, :tracking, :link, paintings: [])
   end
 
   def set_order

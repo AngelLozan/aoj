@@ -256,6 +256,7 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
+    recaptcha (5.16.0)
     redis (4.8.1)
     regexp_parser (2.8.1)
     reline (0.3.8)
@@ -366,6 +367,7 @@ DEPENDENCIES
   pg_search
   puma (~> 6.3.1)
   rails (~> 7.0.6)
+  recaptcha
   redis (~> 4.0)
   ruby_audit
   sassc-rails
