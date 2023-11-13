@@ -4,7 +4,7 @@ import Web3 from "web3";
 // Connects to data-controller="nfts"
 export default class extends Controller {
 
-  static targets = ["loader", "image", "cards"]
+  static targets = ["loader", "image", "cards", "message"]
 
   static values = {
     endpoint: String,
@@ -44,17 +44,22 @@ export default class extends Controller {
   tokenContract = "0x2562ffA357FbDd56024AeA7D8E2111ad299766c9";
 
   async connect() {
+    this.messageTarget.style.visibility="visible";
+    this.messageTarget.style.display="flex";
     this.cardsTarget.style.display = "none";
-    this.loaderTarget.style.display = "inline-block";
+    this.loaderTarget.style.display = "flex";
+
     console.log("Connected NFT controller");
     try {
       const contract = await new this.web3.eth.Contract(this.tokenURIABI, this.tokenContract);
       console.log(contract);
       const data = await this.getNFTMetadata(contract);
       console.log(data);
-      // this.element.dataset.arrayData = JSON.stringify(images);
+
       await this.renderCards(data);
 
+      this.messageTarget.style.visibility="hidden";
+      this.messageTarget.style.display="none";
       this.loaderTarget.style.display = "none";
       this.cardsTarget.style.display = "flex";
     } catch (error) {
@@ -66,20 +71,22 @@ export default class extends Controller {
     return this.targets.find("cards");
   }
 
+  get csrfToken() {
+    const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
+    return csrfMetaTag ? csrfMetaTag.content : "";
+  }
+
   async renderCards(data) {
-    // const dataArray = await JSON.parse(this.element.dataset.arrayData);
 
-    // Clear the existing content
-    // this.cardsTarget.innerHTML = '';
-
-    // Append cards to the element
     await data.forEach(item => {
 
       const cardContainer = document.createElement('div');
-      cardContainer.classList.add('col-sm-6', 'd-flex', 'align-items-stretch');
+      cardContainer.classList.add('d-flex', 'align-items-stretch');
 
       const card = document.createElement('div');
-      card.classList.add('card', 'my-5', 'mx-3', 'p-3', 'shadow', 'rounded');
+      card.classList.add('nft-card', 'my-5', 'mx-3', 'p-3', 'shadow', 'rounded');
+      cardContainer.setAttribute("data-url", `https://opensea.io/assets/matic/0x2562ffa357fbdd56024aea7d8e2111ad299766c9/${item.id}`);
+      cardContainer.setAttribute("data-action", "click->nfts#openNFT");
 
       const image = document.createElement('img');
       image.src = item.image;
@@ -89,18 +96,21 @@ export default class extends Controller {
       cardBody.classList.add('card-body');
 
       const title = document.createElement('h5');
-      title.classList.add('card-title');
+      title.classList.add('card-title', 'mt-3');
       title.textContent = item.title;
 
       const description = document.createElement('p');
-      description.classList.add('card-text');
+      description.classList.add('card-text', 'mt-1');
       description.textContent = item.description;
 
       const price = document.createElement('div');
       price.classList.add('d-flex', 'flex-row');
+      const icon = document.createElement('i');
+      icon.classList.add('fa-brands', 'fa-ethereum', 'fa-xs', 'mt-2', 'mx-3');
       const small = document.createElement('small');
-      small.textContent = item.price;
+      small.textContent = `${item.price} MATIC`;
 
+      price.appendChild(icon);
       price.appendChild(small);
       cardBody.appendChild(title);
       cardBody.appendChild(description);
@@ -112,11 +122,44 @@ export default class extends Controller {
     });
   }
 
+  openNFT(e) {
+    console.log("Open NFT");
+    const nft = e.currentTarget;
+    const url = nft.getAttribute("data-url");
+    console.log(url);
+    window.open(url, '_blank');
+  }
+
+  async getMaticPrice(_price) {
+    try {
+      let res = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-Token": this.csrfToken,
+          },
+        }
+      );
+      let data = await res.json();
+      const maticPrice = data["matic-network"]["usd"];
+      console.log("MATIC PRICE IS: ", maticPrice);
+      return maticPrice;
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+
   async getNFTMetadata(contract) {
     let images = [];
     let objectArr = [];
 
     try {
+      let maticPrice = await this.getMaticPrice();
+
       for (let i = 1; i < 15; i++) {
         const tokenId = i;
         const result = await contract.methods.tokenURI(tokenId).call();
@@ -127,18 +170,25 @@ export default class extends Controller {
         }
 
         try {
-          const response = await fetch(result, { timeout: 5000 }); // Adjust timeout as needed
+          const response = await fetch(result, { timeout: 5000 });
           const fixedJsonString = await response.text();
-          const parsedData = JSON.parse(fixedJsonString.replace(/,\s*([\]}])/g, '$1'));
+          const parsedData = JSON.parse(fixedJsonString.replace(/,\s*([\]}])/g, '$1')); // remove trailing comma
+          // @dev Sample response: https://gateway.pinata.cloud/ipfs/QmV8ZcFPvEDxZDQowAGmqag1QCHg3SmevrpyDyUxGazEGA
+
+
           let pic = parsedData.image;
           let title = parsedData.name;
           let description = parsedData.description;
           let price = parsedData.attributes[4].value;
+          let formattedPrice = price.replace('$', '');
+
+          let calculatedPrice = (formattedPrice * maticPrice).toFixed(2);
 
           let obj = {
+            id: tokenId,
             title: title,
             description: description,
-            price: price,
+            price: calculatedPrice,
             image: pic
           };
 
