@@ -1,5 +1,5 @@
 class OrdersController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[ new create wallet btcwallet ]
+  skip_before_action :authenticate_user!, only: %i[ new create wallet btcwallet alchemy ]
   before_action :set_order, only: %i[ show edit update destroy ]
   # before_action :set_cart, only: %i[ new create ]
   before_action :load_orders
@@ -143,6 +143,9 @@ class OrdersController < ApplicationController
 
   end
 
+  def alchemy
+    render json: { endpoint: ENV['ALCHEMY_ENDPOINT'], projectID: ENV['PROJECT_ID'] }, status: :ok
+  end
 
   def wallet
     # Update to the address of the artist

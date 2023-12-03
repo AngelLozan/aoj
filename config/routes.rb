@@ -41,6 +41,7 @@ Rails.application.routes.draw do
   get '/orders/:id/edit', to: "orders#edit", as: 'edit_order'
   patch '/orders/:id', to: "orders#update", as: 'update_order'
   delete '/orders/:id', to: "orders#destroy", as: 'destroy_order'
+  get '/alchemy', to: "orders#alchemy", as: 'alchemy'
 
   get '/wallet', to: "orders#wallet", as: 'wallet'
   get '/btcwallet', to: "orders#btcwallet", as: 'btcwallet'

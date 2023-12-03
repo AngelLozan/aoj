@@ -1,7 +1,7 @@
 require 'json'
 
 class NftsController < ApplicationController
-  skip_before_action :authenticate_user!, only: [ :nfts ]
+  skip_before_action :authenticate_user!, only: [ :nfts, :endpoint ]
   # after_action :set_image_urls, only: [ :nfts  ]
   before_action :load_cart
   before_action :load_orders
