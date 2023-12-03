@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   root to: "pages#home"
   get '/cv', to: "pages#cv", as: 'cv'
   get '/about', to: "pages#about", as: 'about'
-  get '/comissions', to: "pages#comissions", as: 'comissions'
+  get '/commissions', to: "pages#commissions", as: 'commissions'
   get '/privacy', to: "pages#privacy", as: 'privacy'
   get '/terms', to: "pages#terms", as: 'terms'
   get '/photography', to: "pages#photography", as: 'photography'

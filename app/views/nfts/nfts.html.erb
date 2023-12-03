@@ -7,14 +7,77 @@
 
 
    <div id="nfts" data-nfts-target="cards" class="row row-cols-1 row-cols-md-2" >
-  </div>
+   </div>
 
 
   <div class="d-flex justify-content-center">
-    <div data-nfts-target="loader" class="lds-ellipsis">
+
+    <% if false %>
+      <div data-nfts-target="loader" class="lds-ellipsis">
       <div></div><div></div><div></div><div></div>
     </div>
+    <% end %>
+
+    <div data-nfts-target="loader">
+    <svg class="pl1" viewBox="0 0 128 128" width="128px" height="128px">
+        <defs>
+            <linearGradient id="pl-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#000" />
+                <stop offset="100%" stop-color="#fff" />
+            </linearGradient>
+            <mask id="pl-mask">
+                <rect x="0" y="0" width="128" height="128" fill="url(#pl-grad)" />
+            </mask>
+        </defs>
+        <g fill="#36A9AE"> <!-- Change the fill color here -->
+            <g class="pl1__g">
+                <g transform="translate(20,20) rotate(0,44,44)">
+                    <g class="pl1__rect-g">
+                        <rect class="pl1__rect" rx="8" ry="8" width="40" height="40" />
+                        <rect class="pl1__rect" rx="8" ry="8" width="40" height="40" transform="translate(0,48)" />
+                    </g>
+                    <g class="pl1__rect-g" transform="rotate(180,44,44)">
+                        <rect class="pl1__rect" rx="8" ry="8" width="40" height="40" />
+                        <rect class="pl1__rect" rx="8" ry="8" width="40" height="40" transform="translate(0,48)" />
+                    </g>
+                </g>
+            </g>
+        </g>
+        <g fill="#36A9AE" mask="url(#pl-mask)"> <!-- Change the fill color here -->
+            <g class="pl1__g">
+                <g transform="translate(20,20) rotate(0,44,44)">
+                    <g class="pl1__rect-g">
+                        <rect class="pl1__rect" rx="8" ry="8" width="40" height="40" />
+                        <rect class="pl1__rect" rx="8" ry="8" width="40" height="40" transform="translate(0,48)" />
+                    </g>
+                    <g class="pl1__rect-g" transform="rotate(180,44,44)">
+                        <rect class="pl1__rect" rx="8" ry="8" width="40" height="40" />
+                        <rect class="pl1__rect" rx="8" ry="8" width="40" height="40" transform="translate(0,48)" />
+                    </g>
+                </g>
+            </g>
+        </g>
+    </svg>
+</div>
+
   </div>
+
+  <div class="message" data-nfts-target="message">
+  <div class="message_container">
+    <span>L</span>
+    <span>o</span>
+    <span>a</span>
+    <span>d</span>
+    <span>i</span>
+    <span>n</span>
+    <span>g</span>
+    <span></span>
+    <span>N</span>
+    <span>F</span>
+    <span>T</span>
+    <span>s</span>
+  </div>
+</div>
 
 
 
