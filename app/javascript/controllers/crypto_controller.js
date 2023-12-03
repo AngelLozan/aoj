@@ -20,27 +20,52 @@ export default class extends Controller {
   ];
   static values = {
     price: Number,
-    projectId: String,
+    // projectId: String,
   };
 
   web3Modal;
   // static targets = ["connect", "pay", "address", "form", "loader"];
 
-  web3 = new Web3(
-    "https://eth-sepolia.g.alchemy.com/v2/w8AWYp_cLcfuGKs0fz9oIZb1YJdKQGvC"
-  );
+  web3;
 
   async connect() {
     this.loaderTarget.style.display = "none";
     console.log("Crypto controller connected");
     this.payTarget.disabled = true;
-    this.web3Modal = await this.getWalletConnect();
-    if (typeof window.ethereum !== "undefined") {
-      console.log("Metamask Detected");
-    } else {
-      console.log("Metamask not found");
-      this.metamaskTarget.innerText = "Please install!";
+    try {
+      this.web3 = await this.getWeb3Value();
+      this.web3Modal = await this.getWalletConnect();
+      if (typeof window.ethereum !== "undefined") {
+        console.log("Metamask Detected");
+      } else {
+        console.log("Metamask not found");
+        this.metamaskTarget.innerText = "Please install!";
+      }
+    } catch (error) {
+      console.log("Something went wrong in connecting: ", error);
     }
+
+  }
+
+  async getWeb3Value() {
+    let data;
+    let web3;
+    try {
+      let res = await fetch("/alchemy");
+      if (!res.ok) throw new Error("Could not get web3 value");
+
+      data = await res.json();
+      console.log("DATA ENDPOINT FOR WEB3: ", data.endpoint);
+      web3 = new Web3(
+        new Web3.providers.HttpProvider(
+          data.endpoint
+        )
+      );
+
+    } catch (error) {
+      console.log("Something went wrong grabbing endpoint web3: ", error);
+    }
+    return web3;
   }
 
   openModal() {
@@ -437,8 +462,22 @@ export default class extends Controller {
   }
 
   async getWalletConnect() {
+
+      let data;
+      let id;
+      try {
+        let res = await fetch("/alchemy");
+        if (!res.ok) throw new Error("Could not get alchemy endpoint");
+
+        data = await res.json();
+        console.log("PROJECT ID: ", data.projectID);
+        id = data.projectID;
+      } catch (error) {
+        console.log("Something went wrong grabbing endpoint wallet connect: ", error);
+      }
+
     const web3Modal = await new Web3ModalAuth({
-      projectId: this.projectIdValue,
+      projectId: id,
       metadata: {
         name: "Web3Modal",
         description: "Web3Modal",

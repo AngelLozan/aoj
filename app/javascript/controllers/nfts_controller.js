@@ -5,18 +5,14 @@ import Web3 from "web3";
 export default class extends Controller {
   static targets = ["loader", "image", "cards", "message"];
 
-  static values = {
-    endpoint: String,
-  };
   // to do: Put the endpoint env var in the data controller logic. Add static targets to view
-  web3 = new Web3(
-    new Web3.providers.HttpProvider(
-      // this.endpointValue
-      "https://polygon-mainnet.infura.io/v3/a981c2c6b5444a6b88acab192eae092d"
-    )
-  );
+  // web3 = new Web3(
+  //   new Web3.providers.HttpProvider(
+  //     "https://polygon-mainnet.infura.io/v3/a981c2c6b5444a6b88acab192eae092d"
+  //   )
+  // );
+web3;
 
-  endpoint = "polygon-mainnet.infura.io/v3/a981c2c6b5444a6b88acab192eae092d";
 
   tokenURIABI = [
     {
@@ -62,17 +58,24 @@ export default class extends Controller {
   tokenContract = "0x2562ffA357FbDd56024AeA7D8E2111ad299766c9";
 
   async connect() {
+
     this.messageTarget.style.visibility = "visible";
     this.messageTarget.style.display = "flex";
+
     this.cardsTarget.style.display = "none";
     this.loaderTarget.style.display = "flex";
 
     console.log("Connected NFT controller");
+
     try {
+
+      this.web3 = await this.getWeb3Value();
+
       const contract = await new this.web3.eth.Contract(
         this.tokenURIABI,
         this.tokenContract
       );
+
       console.log(contract);
       const data = await this.getNFTMetadata(contract);
       console.log(data);
@@ -92,10 +95,34 @@ export default class extends Controller {
     return this.targets.find("cards");
   }
 
+  async getWeb3Value() {
+    let data;
+    let web3;
+    try {
+      let res = await fetch("/endpoint");
+      if (!res.ok) throw new Error("Could not get web3 value");
+
+      data = await res.json();
+      console.log(data.endpoint);
+      web3 = new Web3(
+        new Web3.providers.HttpProvider(
+          data.endpoint
+          // "https://polygon-mainnet.infura.io/v3/a981c2c6b5444a6b88acab192eae092d"
+        )
+      );
+
+    } catch (error) {
+      console.log("Something went wrong grabbing endpoint: ", error);
+    }
+    return web3;
+  }
+
+
   get csrfToken() {
     const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
     return csrfMetaTag ? csrfMetaTag.content : "";
   }
+
 
   async renderCards(data) {
     await data.forEach((item) => {
