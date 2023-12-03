@@ -69,12 +69,16 @@ export default class extends Controller {
   }
 
   openModal() {
-    this.modalTarget.classList.remove("hidden");
     this.overlayTarget.classList.remove("hidden");
+    this.overlayTarget.classList.add("showModal");
+    this.modalTarget.classList.remove("hidden");
+    this.modalTarget.classList.add("showModal");
   }
 
   closeModal() {
+    this.modalTarget.classList.remove("showModal");
     this.modalTarget.classList.add("hidden");
+    this.overlayTarget.classList.remove("showModal");
     this.overlayTarget.classList.add("hidden");
   }
 
