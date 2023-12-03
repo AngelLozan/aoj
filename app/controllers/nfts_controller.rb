@@ -9,6 +9,10 @@ class NftsController < ApplicationController
   def nfts
   end
 
+  def endpoint
+    render json: { endpoint: ENV['POLYGON_API'] }, status: :ok
+  end
+
 
   def set_image_urls
     render json: { message: "Image URLs updated successfully" }
