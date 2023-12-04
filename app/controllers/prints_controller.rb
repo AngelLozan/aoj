@@ -7,7 +7,7 @@ class PrintsController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :index , :show ]
   before_action :initalize_cart_prints, only: %i[load_cart_prints add_to_cart_print remove_from_cart_print ]
   before_action :load_products, only: :load_cart_prints
-  before_action :load_prints_cart
+  before_action :load_cart_prints
   before_action :load_orders
 
   def index
@@ -28,17 +28,35 @@ class PrintsController < ApplicationController
     raw_data = JSON.parse(response.read_body)
 
     products = raw_data["data"]
+    # puts "=========================================="
+    # puts products.first.images[0].
+    # puts "=========================================="
 
-
+    # byebug
 
     @products = products.map do |product|
-      {
-        'id' => product['id'],
-        'title' => product['title'],
-        'description' => product['description'],
-        'image' => product['images'][0]['src'],
-        'price' => product['variants'][0]['price']
-      }
+      p "=========================================="
+      p "Product is: #{product["id"]}"
+      p "=========================================="
+
+      if product["images"].empty?
+        {
+          'id' => product['id'],
+          'title' => product['title'],
+          'description' => product['description'],
+          'image' => 'abstractart.png',
+          'price' => product['variants'].first['price']
+        }
+      else
+        {
+          'id' => product['id'],
+          'title' => product['title'],
+          'description' => product['description'],
+          'image' => product["images"].first["src"],
+          'price' => product['variants'].first['price']
+        }
+      end
+
     end
 
   end
@@ -85,13 +103,13 @@ class PrintsController < ApplicationController
 
   def add_to_cart_print
     id = params[:id].to_i
-    session[:cart] << id unless session[:cart].include?(id)
+    session[:prints_cart] << id unless session[:prints_cart].include?(id)
     redirect_to new_order_path
   end
 
   def remove_from_cart_print
     id = params[:id].to_i
-    session[:cart].delete(id)
+    session[:prints_cart].delete(id)
     redirect_to prints_path
   end
 

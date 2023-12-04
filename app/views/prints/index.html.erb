@@ -11,21 +11,21 @@
 
       <div class="col-sm-6 d-flex align-items-stretch">
 
-        <div class="card my-5 mx-3 p-3 shadow rounded" data-action="click->prints#openproduct" data-id="<%= product.id %>" data-url="/products/<%= product.id %>">
+        <div class="card my-5 mx-3 p-3 shadow rounded" data-action="click->prints#openproduct" data-id="<%= product["id"] %>" data-url="/products/<%= product["id"] %>">
 
           <div class="ribbon"><span>Available</span></div>
 
-          <%= image_tag product.image %>
+          <%= image_tag product["image"] %>
           <div class="card-body">
-              <h5 class="card-title"><%= product.title %></h5>
-              <p class="card-text"><%= product.description %></p>
+              <h5 class="card-title"><%= product["title"] %></h5>
+              <p class="card-text"><%= product["description"] %></p>
               <div class="d-flex flex-row">
                   <small>
-                    <%= number_to_currency(product.price / 100.00, :unit=> '€') %>
+                    <%= number_to_currency(product["price"] / 100.00, :unit=> '€') %>
                   </small>
               </div>
             </div>
-          <% if @cart.include?(product) %>
+          <% if @prints_cart.include?(product) %>
             <p>In your cart <i class="fa-solid fa-cart-shopping"></i></p>
           <% end %>
         </div>
@@ -34,8 +34,11 @@
 
     <% end %>
   </div>
-  <div class="container pages-list">
-    <%= paginate @products %>
-  </div>
+  <% if false %>
+    <div class="container pages-list">
+      <%= paginate @products %>
+    </div>
+  <% end %>
+
 
 </div>
