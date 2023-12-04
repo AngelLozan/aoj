@@ -1,0 +1,22 @@
+<div class="container-fluid mt-3 text-center">
+  <div id="<%= dom_id print %>">
+
+    <div class="prod-card my-3">
+      <% if Rails.env.test? %>
+          <%= image_tag "photo1.jpeg", alt: "test image" %>
+        <% else %>
+          <%=image_tag print["image"] %>
+        <% end %>
+      <h1 class="mt-3"><%= print["title"] %></h1>
+      <p class="prod-price"> <%= number_to_currency(print["price"] / 100.00, :unit=> '€') %></p>
+      <p><%= print["description"] %></p>
+        <% if @prints_cart.include?(print) %>
+          <%= button_to 'Remove from cart', remove_from_cart_print_path(print), method: :delete, class: 'btn btn-danger' %>
+        <% else %>
+          <p>
+            <%= button_to "Purchase Original", add_to_cart_print_path(print), method: :post, class: "btn btn-primary mt-3" %>
+          </p>
+        <% end %>
+    </div>
+  </div>
+</div>

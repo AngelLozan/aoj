@@ -80,16 +80,25 @@ class PrintsController < ApplicationController
     # products = response.read_body
     raw_data = JSON.parse(response.read_body)
 
-    product = raw_data["data"]
+    print = raw_data
 
-
-    @product = {
-      'id' => product['id'],
-      'title' => product['title'],
-      'description' => product['description'],
-      'image' => product['images'][0]['src'],
-      'price' => product['variants'][0]['price']
-    }
+    if print["images"].empty?
+      @print = {
+        'id' => print['id'],
+        'title' => print['title'],
+        'description' => print['description'],
+        'image' => 'abstractart.png',
+        'price' => print['variants'].first['price']
+      }
+    else
+      @print = {
+        'id' => print['id'],
+        'title' => print['title'],
+        'description' => print['description'],
+        'image' => print["images"].first["src"],
+        'price' => print['variants'].first['price'],
+      }
+    end
 
     # @variants = product['variants'].map do |variant|
     #   {
@@ -99,6 +108,7 @@ class PrintsController < ApplicationController
     #     'variant_image' => variant['image']['src']
     #   }
     # end
+    @print = @print
   end
 
   def add_to_cart_print

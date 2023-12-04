@@ -28,6 +28,9 @@ application.register("photography", PhotographyController)
 import PriceController from "./price_controller"
 application.register("price", PriceController)
 
+import PrintsController from "./prints_controller"
+application.register("prints", PrintsController)
+
 import TopController from "./top_controller"
 application.register("top", TopController)
 
