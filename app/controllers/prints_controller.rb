@@ -4,62 +4,113 @@ require 'uri'
 require 'net/http'
 
 class PrintsController < ApplicationController
-  skip_before_action :authenticate_user!, only: [ :index , :show ]
-  before_action :initalize_cart_prints, only: %i[load_cart_prints add_to_cart_print remove_from_cart_print ]
+  skip_before_action :authenticate_user!, only: [ :index , :show, :add_to_cart_prints, :remove_from_cart_prints ]
+  before_action :initalize_cart_prints, only: %i[ load_cart_prints add_to_cart_prints remove_from_cart_prints ]
   before_action :load_products, only: :load_cart_prints
+  before_action :load_cart
   before_action :load_cart_prints
   before_action :load_orders
 
+  # def index
+  #   shop_id = ENV['PRINTIFY_SHOP_ID']
+  #   url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json");
+  #   http = Net::HTTP.new(url.host, url.port)
+  #   http.use_ssl = true;
+
+  #   request = Net::HTTP::Get.new(url)
+  #   request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
+  #   request["Content-Type"] = "application/json"
+  #   request["Accept"] = "application/json"
+  #   request["User-Agent"] = "RUBY"
+  #   request["Cache-Control"] = "private, max-age=3600, no-revalidate"
+  #   # request.body = JSON.dump({}) # if you need to send a body with the request...
+
+  #   response = http.request(request)
+  #   # products = response.read_body
+  #   raw_data = JSON.parse(response.read_body)
+
+  #   products = raw_data["data"]
+
+  #   products = products.map do |product|
+  #     p "=========================================="
+  #     p "Product is: #{product["id"]}"
+  #     p "=========================================="
+
+  #     if product["images"].empty?
+  #       {
+  #         'id' => product['id'],
+  #         'title' => product['title'],
+  #         'description' => product['description'],
+  #         'image' => 'abstractart.png',
+  #         'price' => product['variants'].first['price']
+  #       }
+  #     else
+  #       {
+  #         'id' => product['id'],
+  #         'title' => product['title'],
+  #         'description' => product['description'],
+  #         'image' => product["images"].first["src"],
+  #         'price' => product['variants'].first['price']
+  #       }
+  #     end
+
+  #   end
+
+  #   @products = Kaminari.paginate_array(products).page(params[:page]).per(10)
+
+  # end
+
   def index
-    shop_id = ENV['PRINTIFY_SHOP_ID']
-    url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json");
-    http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true;
+    # Try to fetch @products from the cache
+    @products = Rails.cache.fetch('products', expires_in: 1.hour) do
+      # If not found in the cache, make the API call and set @products
+      shop_id = ENV['PRINTIFY_SHOP_ID']
+      url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json")
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
 
-    request = Net::HTTP::Get.new(url)
-    request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
-    request["Content-Type"] = "application/json"
-    request["Accept"] = "application/json"
-    request["User-Agent"] = "RUBY"
-    # request.body = JSON.dump({}) # if you need to send a body with the request...
+      request = Net::HTTP::Get.new(url)
+      request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
+      request["Content-Type"] = "application/json"
+      request["Accept"] = "application/json"
+      request["User-Agent"] = "RUBY"
 
-    response = http.request(request)
-    # products = response.read_body
-    raw_data = JSON.parse(response.read_body)
+      response = http.request(request)
+      raw_data = JSON.parse(response.read_body)
 
-    products = raw_data["data"]
-    # puts "=========================================="
-    # puts products.first.images[0].
-    # puts "=========================================="
+      products = raw_data["data"]
 
-    # byebug
+      products = products.map do |product|
+        p "=========================================="
+        p "Product is: #{product["id"]}"
+        p "=========================================="
 
-    @products = products.map do |product|
-      p "=========================================="
-      p "Product is: #{product["id"]}"
-      p "=========================================="
+        if product["images"].empty?
+          {
+            'id' => product['id'],
+            'title' => product['title'],
+            'description' => product['description'],
+            'image' => 'abstractart.png',
+            'price' => product['variants'].first['price']
+          }
+        else
+          {
+            'id' => product['id'],
+            'title' => product['title'],
+            'description' => product['description'],
+            'image' => product["images"].first["src"],
+            'price' => product['variants'].first['price']
+          }
+        end
 
-      if product["images"].empty?
-        {
-          'id' => product['id'],
-          'title' => product['title'],
-          'description' => product['description'],
-          'image' => 'abstractart.png',
-          'price' => product['variants'].first['price']
-        }
-      else
-        {
-          'id' => product['id'],
-          'title' => product['title'],
-          'description' => product['description'],
-          'image' => product["images"].first["src"],
-          'price' => product['variants'].first['price']
-        }
       end
 
     end
 
+    @products = Kaminari.paginate_array(@products).page(params[:page]).per(10)
+
   end
+
 
   def show
     # Pass the product id as a param from the index page? Or JS controller
@@ -109,15 +160,16 @@ class PrintsController < ApplicationController
     #   }
     # end
     @print = @print
+
   end
 
-  def add_to_cart_print
+  def add_to_cart_prints
     id = params[:id].to_i
     session[:prints_cart] << id unless session[:prints_cart].include?(id)
     redirect_to new_order_path
   end
 
-  def remove_from_cart_print
+  def remove_from_cart_prints
     id = params[:id].to_i
     session[:prints_cart].delete(id)
     redirect_to prints_path
@@ -125,37 +177,61 @@ class PrintsController < ApplicationController
 
   private
 
-  def load_products
-    shop_id = ENV['PRINTIFY_SHOP_ID']
-    url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json");
-    http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true;
-
-    request = Net::HTTP::Get.new(url)
-    request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
-    request["Content-Type"] = "application/json"
-    request["Accept"] = "application/json"
-    request["User-Agent"] = "RUBY"
-    # request.body = JSON.dump({}) # if you need to send a body with the request...
-
-    response = http.request(request)
-    # products = response.read_body
-    raw_data = JSON.parse(response.read_body)
-
-    products = raw_data["data"]
-
-    @products = products.map do |product|
-      {
-        'id' => product['id'],
-        'title' => product['title'],
-        'description' => product['description'],
-        'image' => product['images'][0]['src'],
-        'price' => product['variants'][0]['price']
-      }
+  def load_cart
+    if session[:cart].nil?
+      session[:cart] = []
+      @cart = session[:cart]
+    else
+      @cart = Painting.find(session[:cart])
     end
   end
 
   def load_cart_prints
+
+    @products = Rails.cache.fetch('products', expires_in: 1.hour) do
+      # If not found in the cache, make the API call and set @products
+      shop_id = ENV['PRINTIFY_SHOP_ID']
+      url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json")
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+
+      request = Net::HTTP::Get.new(url)
+      request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
+      request["Content-Type"] = "application/json"
+      request["Accept"] = "application/json"
+      request["User-Agent"] = "RUBY"
+
+      response = http.request(request)
+      raw_data = JSON.parse(response.read_body)
+
+      products = raw_data["data"]
+
+      products = products.map do |product|
+        p "=========================================="
+        p "Product is: #{product["id"]}"
+        p "=========================================="
+
+        if product["images"].empty?
+          {
+            'id' => product['id'],
+            'title' => product['title'],
+            'description' => product['description'],
+            'image' => 'abstractart.png',
+            'price' => product['variants'].first['price']
+          }
+        else
+          {
+            'id' => product['id'],
+            'title' => product['title'],
+            'description' => product['description'],
+            'image' => product["images"].first["src"],
+            'price' => product['variants'].first['price']
+          }
+        end
+
+      end
+    end
+
     if session[:prints_cart].nil?
       session[:prints_cart] = []
       @prints_cart = session[:prints_cart]
@@ -167,11 +243,12 @@ class PrintsController < ApplicationController
     end
   end
 
+  def initalize_cart_prints
+    session[:prints_cart] ||= []
+  end
+
   def load_orders
     @orders = Order.all
   end
 
-  def initalize_cart_prints
-    session[:prints_cart] ||= []
-  end
 end

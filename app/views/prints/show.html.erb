@@ -13,10 +13,10 @@
       <p class="prod-price"> <%= number_to_currency(@print["price"] / 100.00, :unit=> '€') %></p>
       <p class="px-5"><%= @print["description"] %></p>
         <% if @prints_cart.include?(@print) %>
-          <%= button_to 'Remove from cart', remove_from_cart_print_path(@print), method: :delete, class: 'btn btn-danger' %>
+          <%= button_to 'Remove from cart', remove_from_cart_prints_path(@print["id"]), method: :delete, class: 'btn btn-danger' %>
         <% else %>
           <p>
-            <%= button_to "Purchase Print", add_to_cart_print_path(@print), method: :post, class: "btn btn-primary mt-3" %>
+            <%= button_to "Purchase Print", add_to_cart_prints_path(@print["id"]), method: :post, class: "btn btn-primary mt-3" %>
           </p>
         <% end %>
     </div>

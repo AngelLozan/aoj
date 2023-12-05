@@ -40,10 +40,10 @@
             </div>
           </li>
         <% else %>
-          <% if @cart && @cart.count > 0 %>
+          <% if @cart && @cart.count > 0 || @prints_cart && @cart.count > 0 || @cart && @prints_cart.count > 0 || @prints_cart && @prints_cart.count > 0%>
             <li class="nav-item">
               <%= link_to new_order_path, class: "btn btn-primary rounded" do %>
-                <i class="fa-solid fa-cart-shopping me-3"></i><span class="badge bg-secondary"><%= @cart.count %></span>
+                <i class="fa-solid fa-cart-shopping me-3"></i><span class="badge bg-secondary"><%= @cart.count + @prints_cart.count %></span>
               <% end %>
             </li>
           <% end %>
