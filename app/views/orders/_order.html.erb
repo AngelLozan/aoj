@@ -17,10 +17,17 @@
 
         <p>Paintings:
           <% order.paintings.each do |painting| %>
-           <li>
-            <%= painting.title %>
-            <%=cl_image_tag( painting.photos[0].key, width: 200, height:150, crop: :thumb) if painting.photos.present? %>
-           </li> <br>
+            <% if painting.class != Hash %>
+              <li>
+                <%= painting.title %>
+                <%=cl_image_tag( painting.photos[0].key, width: 200, height:150, crop: :thumb) if painting.photos.present? %>
+              </li> <br>
+            <% else %>
+              <li>
+                <%= painting["title"] %>
+                <%= image_tag painting["image"], width: 200, height:150, crop: :thumb %>
+              </li> <br>
+            <% end %>
           <% end %>
         </p>
       </div>

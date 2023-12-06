@@ -1,5 +1,5 @@
 
-<div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= @cart.sum(&:price) / 100.00 %>">
+<div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= (@cart.sum(&:price) + @prints_total) / 100.00 %>">
 
   <div class="tabs">
     <input class="tabInput" name="tabs" type="radio" id="tab-1" checked="checked"/>
@@ -11,7 +11,7 @@
         <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
           <div class="form-inputs">
             <label class="amount mb-3">
-              <strong>Your total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %></strong>
+              <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
             </label>
 
             <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
@@ -25,7 +25,7 @@
             <%= f.input :note, as: :hidden %>
           </div>
 
-          <% amount = @cart.sum(&:price) %>
+          <% amount = (@cart.sum(&:price) + @prints_total) %>
           <script
             src="https://checkout.stripe.com/checkout.js" class="stripe-button"
             data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
@@ -44,11 +44,11 @@
       <h1 class="tabH1"><i class="fa-brands fa-paypal fa-2xl"></i> PayPal</h1>
       <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
       <div>
-        <% amount = @cart.sum(&:price) %>
+        <% amount = (@cart.sum(&:price) + @prints_total) %>
         <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
           <div class="form-inputs">
             <label class="amount mb-3">
-              <strong>Your total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %></strong>
+              <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
             </label>
 
             <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
@@ -156,11 +156,11 @@
 
 
       <div>
-        <% amount = @cart.sum(&:price) %>
+        <% amount = (@cart.sum(&:price) + @prints_total) %>
         <%= simple_form_for @order, data: { crypto_target: "form"} do |f| %>
           <div class="form-inputs">
             <label class="amount mb-3">
-              <strong>Your total: <%= number_to_currency(@cart.sum(&:price) / 100.00, :unit=> '€') %></strong>
+              <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
             </label>
 
             <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>

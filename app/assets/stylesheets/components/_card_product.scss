@@ -119,6 +119,14 @@
   }
 }
 
+.card-text {
+  overflow: hidden;
+  width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 10;
+  -webkit-box-orient: vertical;
+}
+
 .card:hover {
   transform: translateY(-5px);
   transition: transform 0.3s ease;
@@ -317,7 +325,7 @@
   outline: 0;
   padding: 12px;
   color: white;
-  background-color: #000;
+  // background-color: #000;
   text-align: center;
   cursor: pointer;
   width: 100%;
