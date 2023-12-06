@@ -231,6 +231,9 @@ web3;
         if (!result) {
           console.log(`No result for tokenId ${tokenId}!`);
           continue;
+        } else if (result === "metadata") {
+          console.log(`Bad result for tokenId ${tokenId}!`);
+          continue;
         }
 
         try {

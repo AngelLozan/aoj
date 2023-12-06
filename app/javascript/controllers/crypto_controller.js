@@ -55,7 +55,7 @@ export default class extends Controller {
       if (!res.ok) throw new Error("Could not get web3 value");
 
       data = await res.json();
-      console.log("DATA ENDPOINT FOR WEB3: ", data.endpoint);
+      // console.log("DATA ENDPOINT FOR WEB3: ", data.endpoint);
       web3 = new Web3(
         new Web3.providers.HttpProvider(
           data.endpoint
@@ -470,7 +470,7 @@ export default class extends Controller {
         if (!res.ok) throw new Error("Could not get alchemy endpoint");
 
         data = await res.json();
-        console.log("PROJECT ID: ", data.projectID);
+        // console.log(" WALLET CONNECT PROJECT ID: ", data.projectID);
         id = data.projectID;
       } catch (error) {
         console.log("Something went wrong grabbing endpoint wallet connect: ", error);

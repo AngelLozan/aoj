@@ -6,57 +6,63 @@ require 'net/http'
 class PrintsController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :index , :show, :add_to_cart_prints, :remove_from_cart_prints ]
   before_action :initalize_cart_prints, only: %i[ load_cart_prints add_to_cart_prints remove_from_cart_prints ]
-  before_action :load_products, only: :load_cart_prints
+  # before_action :load_products, only: :load_cart_prints
   before_action :load_cart
-  before_action :load_cart_prints
+  # before_action :load_cart_prints
   before_action :load_orders
 
   def index
-    shop_id = ENV['PRINTIFY_SHOP_ID']
-    url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json");
-    http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true;
+    time = Time.now.to_i
 
-    request = Net::HTTP::Get.new(url)
-    request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
-    request["Content-Type"] = "application/json"
-    request["Accept"] = "application/json"
-    request["User-Agent"] = "RUBY"
-    request["Cache-Control"] = "private, max-age=3600, no-revalidate"
-    # request.body = JSON.dump({}) # if you need to send a body with the request...
+    @products = Rails.cache.fetch("#{time}_products", expires_in: 1.hour) do
+      shop_id = ENV['PRINTIFY_SHOP_ID']
+      url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json");
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true;
 
-    response = http.request(request)
-    # products = response.read_body
-    raw_data = JSON.parse(response.read_body)
+      request = Net::HTTP::Get.new(url)
+      request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
+      request["Content-Type"] = "application/json"
+      request["Accept"] = "application/json"
+      request["User-Agent"] = "RUBY"
+      request["Cache-Control"] = "private, max-age=3600, no-revalidate"
+      # request.body = JSON.dump({}) # if you need to send a body with the request...
 
-    products = raw_data["data"]
+      response = http.request(request)
+      # products = response.read_body
+      raw_data = JSON.parse(response.read_body)
 
-    products = products.map do |product|
-      p "=========================================="
-      p "Product is: #{product["id"]}"
-      p "=========================================="
+      products = raw_data["data"]
 
-      if product["images"].empty?
-        {
-          'id' => product['id'],
-          'title' => product['title'],
-          'description' => product['description'],
-          'image' => 'abstractart.png',
-          'price' => product['variants'].first['price']
-        }
-      else
-        {
-          'id' => product['id'],
-          'title' => product['title'],
-          'description' => product['description'],
-          'image' => product["images"].first["src"],
-          'price' => product['variants'].first['price']
-        }
+      products = products.map do |product|
+        p "=========================================="
+        p "Product is: #{product["id"]}"
+        p "=========================================="
+
+        if product["images"].empty?
+          {
+            'id' => product['id'],
+            'title' => product['title'],
+            'description' => product['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
+            'image' => 'abstractart.png',
+            'price' => product['variants'].first['price'],
+            'variant' => product['variants'].first['id']
+          }
+        else
+          {
+            'id' => product['id'],
+            'title' => product['title'],
+            'description' => product['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
+            'image' => product["images"].first["src"],
+            'price' => product['variants'].first['price'],
+            'variant' => product['variants'].first['id']
+          }
+        end
+
       end
-
     end
-
-    @products = Kaminari.paginate_array(products).page(params[:page]).per(10)
+    @products = @products
+    @products = Kaminari.paginate_array(@products).page(params[:page]).per(10)
 
   end
 
@@ -112,13 +118,13 @@ class PrintsController < ApplicationController
   end
 
   def add_to_cart_prints
-    id = params[:id].to_i
-    session[:prints_cart] << id unless session[:prints_cart].include?(id)
+    id = params[:id]
+    session[:prints_cart] << id
     redirect_to new_order_path
   end
 
   def remove_from_cart_prints
-    id = params[:id].to_i
+    id = params[:id]
     session[:prints_cart].delete(id)
     redirect_to prints_path
   end
@@ -131,66 +137,6 @@ class PrintsController < ApplicationController
       @cart = session[:cart]
     else
       @cart = Painting.find(session[:cart])
-    end
-  end
-
-  def load_cart_prints
-    shop_id = ENV['PRINTIFY_SHOP_ID']
-    url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json");
-    puts "=========================================="
-    puts url
-    puts "=========================================="
-    http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true;
-
-    request = Net::HTTP::Get.new(url)
-    request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
-    request["Content-Type"] = "application/json"
-    request["Accept"] = "application/json"
-    request["User-Agent"] = "RUBY"
-    request["Cache-Control"] = "private, max-age=3600, no-revalidate"    # request.body = JSON.dump({}) # if you need to send a body with the request...
-
-    response = http.request(request)
-    # products = response.read_body
-    raw_data = JSON.parse(response.read_body)
-
-    products = raw_data["data"]
-
-    products = products.map do |product|
-      p "=========================================="
-      p "Product is: #{product["id"]}"
-      p "=========================================="
-
-      if product["images"].empty?
-        {
-          'id' => product['id'],
-          'title' => product['title'],
-          'description' => product['description'],
-          'image' => 'abstractart.png',
-          'price' => product['variants'].first['price']
-        }
-      else
-        {
-          'id' => product['id'],
-          'title' => product['title'],
-          'description' => product['description'],
-          'image' => product["images"].first["src"],
-          'price' => product['variants'].first['price']
-        }
-      end
-
-    end
-
-    @products = products
-
-    if session[:prints_cart].nil?
-      session[:prints_cart] = []
-      @prints_cart = session[:prints_cart]
-    else
-      # Return array of prints in cart
-      @prints_cart = session[:prints_cart].map do |id|
-        @products.select { |product| product['id'] == id }
-      end
     end
   end
 

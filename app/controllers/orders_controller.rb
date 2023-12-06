@@ -9,7 +9,7 @@ class OrdersController < ApplicationController
   before_action :load_orders
   before_action :load_cart
   # before_action :load_products, only: :load_cart_prints
-  before_action :load_cart_prints
+  # before_action :load_cart_prints
 
   def index
     @orders = Order.all
@@ -23,6 +23,7 @@ class OrdersController < ApplicationController
     #   redirect_to paintings_url, notice: "Your cart is empty."
     # else
       @order = Order.new
+      # raise
     # end
 
     # @dev Another way to generate a client side token
@@ -32,13 +33,18 @@ class OrdersController < ApplicationController
 
   def create
     @order = Order.new(order_params)
-    # Add paintings from car <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %> to order
+    # Add paintings from cart to order
     @cart.each do |painting|
       @order.paintings << painting
     end
 
+    # Add prints from cart to order
+    @flat_cart_arr.each do |print|
+      @order.paintings << print
+    end
+
     # Payment logic, amount in cents
-    @amount = @cart.sum(&:price)
+    @amount = (@cart.sum(&:price) + @prints_total)
 
     if params[:payment_method_nonce]
       # Braintree
@@ -75,6 +81,7 @@ class OrdersController < ApplicationController
               painting.update(status: "sold")
             end
             session[:cart] = []
+            session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
             OrderMailer.customer(@order).deliver_later # Email customer
             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
@@ -114,6 +121,7 @@ class OrdersController < ApplicationController
               painting.update(status: "sold")
             end
             session[:cart] = []
+            session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
             OrderMailer.customer(@order).deliver_later # Email customer
             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
@@ -131,6 +139,7 @@ class OrdersController < ApplicationController
             painting.update(status: "sold")
           end
           session[:cart] = []
+          session[:prints_cart] = []
           # byebug
           OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
           OrderMailer.customer(@order).deliver_later # Email customer
@@ -223,65 +232,60 @@ class OrdersController < ApplicationController
     end
   end
 
-  def load_cart_prints
-    shop_id = ENV['PRINTIFY_SHOP_ID']
-    url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json");
-    http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true;
-
-    request = Net::HTTP::Get.new(url)
-    request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
-    request["Content-Type"] = "application/json"
-    request["Accept"] = "application/json"
-    request["User-Agent"] = "RUBY"
-    # request.body = JSON.dump({}) # if you need to send a body with the request...
-
-    response = http.request(request)
-    # products = response.read_body
-    raw_data = JSON.parse(response.read_body)
-
-    products = raw_data["data"]
-
-    products = products.map do |product|
-      p "=========================================="
-      p "Product is: #{product["id"]}"
-      p "=========================================="
-
-      if product["images"].empty?
-        {
-          'id' => product['id'],
-          'title' => product['title'],
-          'description' => product['description'],
-          'image' => 'abstractart.png',
-          'price' => product['variants'].first['price']
-        }
-      else
-        {
-          'id' => product['id'],
-          'title' => product['title'],
-          'description' => product['description'],
-          'image' => product["images"].first["src"],
-          'price' => product['variants'].first['price']
-        }
-      end
-
-    end
-
-    @products = products
-
-    if session[:prints_cart].nil?
-      session[:prints_cart] = []
-      @prints_cart = session[:prints_cart]
-    else
-      # Return array of prints in cart
-      @prints_cart = session[:prints_cart].map do |id|
-        @products.select { |product| product['id'] == id }
-      end
-    end
+  def generate_client_token
+    Braintree::ClientToken.generate
   end
 
 
-  def generate_client_token
-    Braintree::ClientToken.generate
+  def submit_printify_order
+    request_body = {
+      "external_id": ENV["SALES_CHANNEL_ID"],
+      "label": "00012",
+      "line_items": [
+        {
+          "product_id": "5bfd0b66a342bcc9b5563216",
+          "variant_id": 17887,
+          "quantity": 1
+        }
+      ],
+      "shipping_method": 1,
+      "is_printify_express": false,
+      "send_shipping_notification": false,
+      "address_to": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "email": "example@msn.com",
+        "phone": "0574 69 21 90",
+        "country": "BE",
+        "region": "",
+        "address1": "ExampleBaan 121",
+        "address2": "45",
+        "city": "Retie",
+        "zip": "2470"
+      }
+    }
+
+      url = URI("https://api.printify.com/v1/shops/#{shop_id}/orders.json");
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true;
+
+      request = Net::HTTP::Get.new(url)
+      request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
+      request["Content-Type"] = "application/json"
+      request["Accept"] = "application/json"
+      request["User-Agent"] = "RUBY"
+      request.body = JSON.dump(request_body)
+
+      response = http.request(request)
+      # raw_data = response.read_body
+      raw_data = JSON.parse(response.read_body)
+
+      puts ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+
+      if raw_data["id"]
+        puts ">>>>>>>>>>>>>>> ORDER ID: #{raw_data["id"]}<<<<<<<<<<<<<<<<<<<"
+      else
+        puts ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+      end
   end
 end
