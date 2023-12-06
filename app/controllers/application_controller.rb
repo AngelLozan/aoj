@@ -40,7 +40,8 @@ class ApplicationController < ActionController::Base
             'title' => product['title'],
             'description' => product['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
             'image' => 'abstractart.png',
-            'price' => product['variants'].first['price']
+            'price' => product['variants'].first['price'],
+            'variant' => product['variants'].first['id']
           }
         else
           {
@@ -48,7 +49,8 @@ class ApplicationController < ActionController::Base
             'title' => product['title'],
             'description' => product['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
             'image' => product["images"].first["src"],
-            'price' => product['variants'].first['price']
+            'price' => product['variants'].first['price'],
+            'variant' => product['variants'].first['id']
           }
         end
 

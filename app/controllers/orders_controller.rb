@@ -235,4 +235,57 @@ class OrdersController < ApplicationController
   def generate_client_token
     Braintree::ClientToken.generate
   end
+
+
+  def submit_printify_order
+    request_body = {
+      "external_id": ENV["SALES_CHANNEL_ID"],
+      "label": "00012",
+      "line_items": [
+        {
+          "product_id": "5bfd0b66a342bcc9b5563216",
+          "variant_id": 17887,
+          "quantity": 1
+        }
+      ],
+      "shipping_method": 1,
+      "is_printify_express": false,
+      "send_shipping_notification": false,
+      "address_to": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "email": "example@msn.com",
+        "phone": "0574 69 21 90",
+        "country": "BE",
+        "region": "",
+        "address1": "ExampleBaan 121",
+        "address2": "45",
+        "city": "Retie",
+        "zip": "2470"
+      }
+    }
+
+      url = URI("https://api.printify.com/v1/shops/#{shop_id}/orders.json");
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true;
+
+      request = Net::HTTP::Get.new(url)
+      request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
+      request["Content-Type"] = "application/json"
+      request["Accept"] = "application/json"
+      request["User-Agent"] = "RUBY"
+      request.body = JSON.dump(request_body)
+
+      response = http.request(request)
+      # raw_data = response.read_body
+      raw_data = JSON.parse(response.read_body)
+
+      puts ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+
+      if raw_data["id"]
+        puts ">>>>>>>>>>>>>>> ORDER ID: #{raw_data["id"]}<<<<<<<<<<<<<<<<<<<"
+      else
+        puts ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+      end
+  end
 end
