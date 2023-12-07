@@ -19,17 +19,17 @@ class NftsController < ApplicationController
   end
 
 
-  def set_image_urls
-    render json: { message: "Image URLs updated successfully" }
-  end
+  # def set_image_urls
+  #   render json: { message: "Image URLs updated successfully" }
+  # end
 
   private
 
-  def set_image_urls
-    puts request.body
-    data = JSON.parse(request.body.read)
-    @image_urls = data["images"]
-  end
+  # def set_image_urls
+  #   puts request.body
+  #   data = JSON.parse(request.body.read)
+  #   @image_urls = data["images"]
+  # end
 
   def load_cart
     if session[:cart].nil?

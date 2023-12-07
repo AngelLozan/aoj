@@ -23,7 +23,6 @@ class OrdersController < ApplicationController
     #   redirect_to paintings_url, notice: "Your cart is empty."
     # else
       @order = Order.new
-      # raise
     # end
 
     # @dev Another way to generate a client side token
@@ -33,6 +32,7 @@ class OrdersController < ApplicationController
 
   def create
     @order = Order.new(order_params)
+
     # Add paintings from cart to order
     @cart.each do |painting|
       @order.paintings << painting
@@ -40,11 +40,14 @@ class OrdersController < ApplicationController
 
     # Add prints from cart to order
     @flat_cart_arr.each do |print|
-      @order.paintings << print
+      print_stand_in = Painting.create!(title: print["title"], price: print["price"], status: "sold", discount_code: "PRINT", description: print["description"], photos: [print["image"]])
+      @order.paintings << print_stand_in
     end
 
     # Payment logic, amount in cents
     @amount = (@cart.sum(&:price) + @prints_total)
+
+    raise
 
     if params[:payment_method_nonce]
       # Braintree
@@ -75,7 +78,7 @@ class OrdersController < ApplicationController
         puts "success!: #{result.transaction.id}"
 
         respond_to do |format|
-          byebug
+          # byebug
           if @order.save
             @cart.each do |painting|
               painting.update(status: "sold")
@@ -238,30 +241,46 @@ class OrdersController < ApplicationController
 
 
   def submit_printify_order
-    request_body = {
-      "external_id": ENV["SALES_CHANNEL_ID"],
-      "label": "00012",
-      "line_items": [
-        {
-          "product_id": "5bfd0b66a342bcc9b5563216",
-          "variant_id": 17887,
+    all_items = []
+
+    @flat_cart_arr.each do |print|
+      if all_items.any? { |item| item["id"] == print["id"] }
+        all_items.map do |item|
+          item["quantity"] += 1 if item["id"] == print["id"]
+        end
+      else
+        all_items << {
+          "product_id": print["id"], # string
+          "variant_id": print["variant"], # integer
           "quantity": 1
         }
-      ],
+      end
+    end
+
+    request_body = {
+      "external_id": ENV["SALES_CHANNEL_ID"],
+      "label": "00012",# Optional
+      "line_items": all_items.map do |item|
+        {
+          "product_id": item["id"],
+          "variant_id": item["variant"],
+          "quantity": item["quantity"]
+        }
+      end
       "shipping_method": 1,
       "is_printify_express": false,
       "send_shipping_notification": false,
       "address_to": {
-        "first_name": "John",
-        "last_name": "Smith",
-        "email": "example@msn.com",
-        "phone": "0574 69 21 90",
-        "country": "BE",
+        "first_name": order_params[:name],
+        "last_name": order_params[:name],
+        "email": order_params[:email],
+        "phone": order_params[:phone],
+        "country": order_params[:country],
         "region": "",
-        "address1": "ExampleBaan 121",
-        "address2": "45",
-        "city": "Retie",
-        "zip": "2470"
+        "address1": order_params[:address],
+        "address2": "",
+        "city": order_params[:city],
+        "zip": order_params[:zip]
       }
     }
 
@@ -269,7 +288,7 @@ class OrdersController < ApplicationController
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true;
 
-      request = Net::HTTP::Get.new(url)
+      request = Net::HTTP::Post.new(url)
       request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
       request["Content-Type"] = "application/json"
       request["Accept"] = "application/json"

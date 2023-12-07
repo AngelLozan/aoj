@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   #     # get 'nfts'
   #   end
   # end
-  post '/set_image_urls', to: 'nfts#set_image_urls', as: 'set_image_urls'
+  # post '/set_image_urls', to: 'nfts#set_image_urls', as: 'set_image_urls'
   get '/nfts', to: 'nfts#nfts', as: 'nfts'
   get '/endpoint', to: 'nfts#endpoint', as: 'endpoint'
 
