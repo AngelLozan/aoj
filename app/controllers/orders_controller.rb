@@ -260,15 +260,13 @@ class OrdersController < ApplicationController
     request_body = {
       "external_id": ENV["SALES_CHANNEL_ID"],
       "label": "00012",# Optional
-      "line_items": [
-        all_items.each do |item|
-          {
-            "product_id": item["id"],
-            "variant_id": item["variant"],
-            "quantity": item["quantity"]
-          }
-        end
-      ],
+      "line_items": all_items.map do |item|
+        {
+          "product_id": item["id"],
+          "variant_id": item["variant"],
+          "quantity": item["quantity"]
+        }
+      end
       "shipping_method": 1,
       "is_printify_express": false,
       "send_shipping_notification": false,
@@ -290,7 +288,7 @@ class OrdersController < ApplicationController
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true;
 
-      request = Net::HTTP::Get.new(url)
+      request = Net::HTTP::Post.new(url)
       request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
       request["Content-Type"] = "application/json"
       request["Accept"] = "application/json"
