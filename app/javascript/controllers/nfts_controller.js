@@ -5,12 +5,6 @@ import Web3 from "web3";
 export default class extends Controller {
   static targets = ["loader", "image", "cards", "message"];
 
-  // to do: Put the endpoint env var in the data controller logic. Add static targets to view
-  // web3 = new Web3(
-  //   new Web3.providers.HttpProvider(
-  //     "https://polygon-mainnet.infura.io/v3/a981c2c6b5444a6b88acab192eae092d"
-  //   )
-  // );
 web3;
 
 
