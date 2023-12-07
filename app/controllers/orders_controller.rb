@@ -240,7 +240,7 @@ class OrdersController < ApplicationController
   def submit_printify_order
     request_body = {
       "external_id": ENV["SALES_CHANNEL_ID"],
-      "label": "00012",
+      "label": "00012",# Optional
       "line_items": [
         {
           "product_id": "5bfd0b66a342bcc9b5563216",

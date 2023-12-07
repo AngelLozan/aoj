@@ -12,9 +12,8 @@ class PrintsController < ApplicationController
   before_action :load_orders
 
   def index
-    time = Time.now.to_i
 
-    @products = Rails.cache.fetch("#{time}_products", expires_in: 1.hour) do
+    @products = Rails.cache.fetch("products", expires_in: 1.hour) do
       shop_id = ENV['PRINTIFY_SHOP_ID']
       url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json");
       http = Net::HTTP.new(url.host, url.port)
