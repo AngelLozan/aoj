@@ -40,14 +40,13 @@ class OrdersController < ApplicationController
 
     # Add prints from cart to order
     @flat_cart_arr.each do |print|
-      print_stand_in = Painting.create!(title: print["title"], price: print["price"], status: "sold", discount_code: "PRINT", description: print["description"], photos: [print["image"]])
-      @order.paintings << print_stand_in
+      @order.prints << print
     end
 
     # Payment logic, amount in cents
     @amount = (@cart.sum(&:price) + @prints_total)
 
-    raise
+    # raise
 
     if params[:payment_method_nonce]
       # Braintree
@@ -83,6 +82,9 @@ class OrdersController < ApplicationController
             @cart.each do |painting|
               painting.update(status: "sold")
             end
+          # if @order.prints.any?
+          #   submit_printify_order
+          # end
             session[:cart] = []
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
@@ -97,10 +99,10 @@ class OrdersController < ApplicationController
         puts "Error processing transaction:"
         puts "  code: #{result.transaction.processor_response_code}"
         puts "  text: #{result.transaction.processor_response_text}"
-        redirect_to new_order_path
+        redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
       else
         puts " >>>>>>>>> ERROR: #{result.errors} <<<<<<<<<<<<<"
-        redirect_to new_order_path
+        redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
       end
 
     elsif params[:stripeToken]
@@ -123,6 +125,9 @@ class OrdersController < ApplicationController
             @cart.each do |painting|
               painting.update(status: "sold")
             end
+          # if @order.prints.any?
+          #   submit_printify_order
+          # end
             session[:cart] = []
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
@@ -141,6 +146,9 @@ class OrdersController < ApplicationController
           @cart.each do |painting|
             painting.update(status: "sold")
           end
+          # if @order.prints.any?
+          #   submit_printify_order
+          # end
           session[:cart] = []
           session[:prints_cart] = []
           # byebug
@@ -243,6 +251,8 @@ class OrdersController < ApplicationController
   def submit_printify_order
     all_items = []
 
+    # @dev Add prints from cart to order.
+    # @dev If print already exists in all_items, increment quantity by 1 instead of adding a new line item
     @flat_cart_arr.each do |print|
       if all_items.any? { |item| item["id"] == print["id"] }
         all_items.map do |item|
@@ -257,16 +267,19 @@ class OrdersController < ApplicationController
       end
     end
 
+    # Potentially to fill line items below? Not sure if needed
+    # all_items.map do |item|
+    #   {
+    #     "product_id": item["id"],
+    #     "variant_id": item["variant"],
+    #     "quantity": item["quantity"]
+    #   }
+    # end
+
     request_body = {
       "external_id": ENV["SALES_CHANNEL_ID"],
-      "label": "00012",# Optional
-      "line_items": all_items.map do |item|
-        {
-          "product_id": item["id"],
-          "variant_id": item["variant"],
-          "quantity": item["quantity"]
-        }
-      end
+      "label": "AOJ", # Optional
+      "line_items": all_items,
       "shipping_method": 1,
       "is_printify_express": false,
       "send_shipping_notification": false,
