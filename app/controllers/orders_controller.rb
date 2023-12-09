@@ -82,6 +82,9 @@ class OrdersController < ApplicationController
             @cart.each do |painting|
               painting.update(status: "sold")
             end
+          # if @order.prints.any?
+          #   submit_printify_order
+          # end
             session[:cart] = []
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
@@ -122,6 +125,9 @@ class OrdersController < ApplicationController
             @cart.each do |painting|
               painting.update(status: "sold")
             end
+          # if @order.prints.any?
+          #   submit_printify_order
+          # end
             session[:cart] = []
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
@@ -140,6 +146,9 @@ class OrdersController < ApplicationController
           @cart.each do |painting|
             painting.update(status: "sold")
           end
+          # if @order.prints.any?
+          #   submit_printify_order
+          # end
           session[:cart] = []
           session[:prints_cart] = []
           # byebug
@@ -267,7 +276,7 @@ class OrdersController < ApplicationController
 
     request_body = {
       "external_id": ENV["SALES_CHANNEL_ID"],
-      "label": "00012",# Optional
+      "label": "AOJ", # Optional
       "line_items": all_items,
       "shipping_method": 1,
       "is_printify_express": false,
