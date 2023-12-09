@@ -46,7 +46,7 @@ class OrdersController < ApplicationController
     # Payment logic, amount in cents
     @amount = (@cart.sum(&:price) + @prints_total)
 
-    raise
+    # raise
 
     if params[:payment_method_nonce]
       # Braintree
@@ -99,10 +99,10 @@ class OrdersController < ApplicationController
         puts "Error processing transaction:"
         puts "  code: #{result.transaction.processor_response_code}"
         puts "  text: #{result.transaction.processor_response_text}"
-        redirect_to new_order_path
+        redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
       else
         puts " >>>>>>>>> ERROR: #{result.errors} <<<<<<<<<<<<<"
-        redirect_to new_order_path
+        redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
       end
 
     elsif params[:stripeToken]
@@ -251,6 +251,8 @@ class OrdersController < ApplicationController
   def submit_printify_order
     all_items = []
 
+    # @dev Add prints from cart to order.
+    # @dev If print already exists in all_items, increment quantity by 1 instead of adding a new line item
     @flat_cart_arr.each do |print|
       if all_items.any? { |item| item["id"] == print["id"] }
         all_items.map do |item|
