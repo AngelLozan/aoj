@@ -40,8 +40,7 @@ class OrdersController < ApplicationController
 
     # Add prints from cart to order
     @flat_cart_arr.each do |print|
-      print_stand_in = Painting.create!(title: print["title"], price: print["price"], status: "sold", discount_code: "PRINT", description: print["description"], photos: [print["image"]])
-      @order.paintings << print_stand_in
+      @order.prints << print
     end
 
     # Payment logic, amount in cents
@@ -257,16 +256,19 @@ class OrdersController < ApplicationController
       end
     end
 
+    # Potentially to fill line items below? Not sure if needed
+    # all_items.map do |item|
+    #   {
+    #     "product_id": item["id"],
+    #     "variant_id": item["variant"],
+    #     "quantity": item["quantity"]
+    #   }
+    # end
+
     request_body = {
       "external_id": ENV["SALES_CHANNEL_ID"],
       "label": "00012",# Optional
-      "line_items": all_items.map do |item|
-        {
-          "product_id": item["id"],
-          "variant_id": item["variant"],
-          "quantity": item["quantity"]
-        }
-      end
+      "line_items": all_items,
       "shipping_method": 1,
       "is_printify_express": false,
       "send_shipping_notification": false,
