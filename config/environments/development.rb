@@ -3,7 +3,7 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   config.action_mailer.default_url_options = { host: "http://localhost:3000" }
   # Settings specified here will take precedence over those in config/application.rb.
-
+  config.action_dispatch.signed_cookie_digest = "SHA256"
   # In the development environment your application's code is reloaded any time
   # it changes. This slows down response time but is perfect for development
   # since you don't have to restart the web server when you make code changes.
@@ -43,7 +43,7 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = false
 
   config.action_mailer.perform_caching = false
-
+  config.session_store = :active_record_store #, key: "_devise_session", domain: "localhost:3000"
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 

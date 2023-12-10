@@ -20,7 +20,7 @@
 
               <div class="card-product-infos">
                 <% if painting.status == "sold" %>
-                  <h2><%= painting.title %> - <%= painting.status.capitalize %>!</h2>
+                  <h2 class="text-success fw-bold">🎉<%= painting.title %> - <%= painting.status.capitalize %>🎉</h2>
                 <% else %>
                   <h2><%= painting.title %></h2>
                 <% end %>
