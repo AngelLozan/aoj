@@ -90,7 +90,7 @@ class PrintsController < ApplicationController
       @print = {
         'id' => print['id'],
         'title' => print['title'],
-        'description' => print['description'],
+        'description' => print['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
         'image' => 'abstractart.png',
         'price' => print['variants'].first['price']
       }
@@ -98,7 +98,7 @@ class PrintsController < ApplicationController
       @print = {
         'id' => print['id'],
         'title' => print['title'],
-        'description' => print['description'],
+        'description' => print['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
         'image' => print["images"].first["src"],
         'price' => print['variants'].first['price'],
       }

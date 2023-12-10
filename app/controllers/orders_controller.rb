@@ -82,9 +82,9 @@ class OrdersController < ApplicationController
             @cart.each do |painting|
               painting.update(status: "sold")
             end
-          # if @order.prints.any?
-          #   submit_printify_order
-          # end
+          if @order.prints.any?
+            submit_printify_order
+          end
             session[:cart] = []
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
@@ -125,9 +125,9 @@ class OrdersController < ApplicationController
             @cart.each do |painting|
               painting.update(status: "sold")
             end
-          # if @order.prints.any?
-          #   submit_printify_order
-          # end
+          if @order.prints.any?
+            submit_printify_order
+          end
             session[:cart] = []
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
@@ -146,9 +146,9 @@ class OrdersController < ApplicationController
           @cart.each do |painting|
             painting.update(status: "sold")
           end
-          # if @order.prints.any?
-          #   submit_printify_order
-          # end
+          if @order.prints.any?
+            submit_printify_order
+          end
           session[:cart] = []
           session[:prints_cart] = []
           # byebug
@@ -250,6 +250,7 @@ class OrdersController < ApplicationController
 
   def submit_printify_order
     all_items = []
+    shop_id = ENV["PRINTIFY_SHOP_ID"]
 
     # @dev Add prints from cart to order.
     # @dev If print already exists in all_items, increment quantity by 1 instead of adding a new line item
