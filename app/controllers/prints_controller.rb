@@ -68,7 +68,7 @@ class PrintsController < ApplicationController
   def show
     # Pass the product id as a param from the index page? Or JS controller
     shop_id = ENV['PRINTIFY_SHOP_ID']
-    product_id = params[:id]
+    product_id = sanitize_id(params[:id])
     url = URI("https://api.printify.com/v1/shops/#{shop_id}/products/#{product_id}.json");
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true;
@@ -145,6 +145,10 @@ class PrintsController < ApplicationController
 
   def load_orders
     @orders = Order.all
+  end
+
+  def sanitize_id(id)
+    ActionController::Base.helpers.sanitize(id)
   end
 
 end
