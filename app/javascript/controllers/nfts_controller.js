@@ -216,6 +216,7 @@ web3;
       let maticPrice = await this.getMaticPrice();
 
       for (let i = 1; i < 15; i++) {
+        if(i === 1 || i === 2) continue;
         const tokenId = i;
         const result = await contract.methods.tokenURI(tokenId).call();
         const owner = await contract.methods.ownerOf(tokenId).call();
@@ -231,7 +232,13 @@ web3;
         }
 
         try {
-          const response = await fetch(result, { timeout: 5000 });
+          let response;
+          if (i === 3) {
+            response = await fetch(result, { timeout: 10000 });
+          } else {
+            response = await fetch(result, { timeout: 5000 });
+          }
+
           const fixedJsonString = await response.text();
           const parsedData = JSON.parse(
             fixedJsonString.replace(/,\s*([\]}])/g, "$1")
