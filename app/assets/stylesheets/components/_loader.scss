@@ -148,6 +148,21 @@
 // 	justify-content: center;
 // 	margin: auto;
 // }
+
+/* If the screen size is 491px wide or less */
+@media screen and (max-width: 491px) {
+  .pl1 {
+    display: none;
+  }
+
+  .pl1__g,
+  .pl1__rect,
+  .pl2__rect,
+  .pl2__rect-g,
+  .pl3__rect {
+    display: none;
+  }
+}
 .pl1,
 .pl2,
 .pl3 {

@@ -1,181 +1,253 @@
 
-<div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= (@cart.sum(&:price) + @prints_total) / 100.00 %>">
+<div class="container">
+  <div>
+    <div class="text-center mt-3">
+      <h1>Checkout</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-lg-6 my-5">
+      <div class="bg-light rounded shadow p-5">
+          <h2 class="mb-3">Your Art:</h2>
+          <% @cart.each do |item| %>
+              <%= link_to "/paintings/#{item.id}", style: "text-decoration: none;" do %>
+                <div class="col-12">
+                  <div class="card-product mt-3 p-3">
+                    <%= cl_image_tag item.photos[0].key if item.photos.present? %>
 
-  <div class="tabs">
-    <input class="tabInput" name="tabs" type="radio" id="tab-1" checked="checked"/>
-    <label class="tabLabel" for="tab-1">Pay With <i class="fa-brands fa-stripe fa-2xl"></i></label>
-    <div class="panel">
-      <h1 class="tabH1"><i class="fa-brands fa-stripe fa-2xl"></i></h1>
-      <p class="tabP mb-3">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
-      <div>
-        <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
-          <div class="form-inputs">
-            <label class="amount mb-3">
-              <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
-            </label>
+                    <div class="card-product-infos">
+                        <h2><%= item.title %></h2>
+                      <div class="d-flex flex-row">
+                          <small>
+                            <i class="fa-solid fa-euro-sign"></i>
+                            <%= item.price / 100.0 %>
+                          </small>
+                      </div>
+                      <div>
+                        <p><small>One of a kind original</small></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+          <% end %>
+          <% @flat_cart_arr.uniq.each do |item| %>
+              <div class="col-12">
+                <div class="card-product mt-3 p-3">
+                  <%= image_tag item["image"] %>
 
-            <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
-            <%= f.input :city, label: 'City', input_html: { class: 'form-control' } %>
-            <%= f.input :state, label: 'State', input_html: { class: 'form-control' } %>
-            <%= f.input :country, label: 'Country', input_html: { class: 'form-control' } %>
-            <%= f.input :zip, label: 'Zipcode', input_html: { class: 'form-control' } %>
-            <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
-            <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
-            <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
-            <%= f.input :note, as: :hidden %>
+                  <div class="card-product-infos">
+                      <h2><%= item["title"] %></h2>
+                    <div class="d-flex flex-row">
+                        <small>
+                          <i class="fa-solid fa-euro-sign"></i>
+                          <%= item["price"] / 100.0 %>
+                        </small>
+                    </div>
+                    <div class="d-flex flex-row justify-content-evenly">
+                      <%= button_to add_to_cart_prints_path(item["id"]), method: :post, class: "btn btn-sm btn-outline-dark rounded-pill" do %>
+                        <i class="fa-solid fa-plus fa-2xs"></i>
+                      <% end %>
+                      <%= @flat_cart_arr.map {|i| i == item }.count %>
+                      <%= button_to remove_from_cart_prints_path(item["id"]), method: :delete, class: 'btn btn-sm btn-outline-dark rounded-pill' do %>
+                        <i class="fa-solid fa-minus fa-2xs"></i>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <div class="mt-5">
+            <hr>
+            <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></p>
           </div>
-
-          <% amount = (@cart.sum(&:price) + @prints_total) %>
-          <script
-            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-            data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
-            data-description="Your art is on the way!"
-            data-amount="<%= amount %>"
-            data-locale="auto">
-          </script>
-
-          <input type="submit" value="Pay with card" class="btn btn-primary">
-        <% end %>
       </div>
     </div>
-    <input class="tabInput" name="tabs" type="radio" id="tab-2"/>
-    <label class="tabLabel" for="tab-2">Pay With PayPal <i class="fa-brands fa-paypal fa-lg"></i></label>
-    <div class="panel">
-      <h1 class="tabH1"><i class="fa-brands fa-paypal fa-2xl"></i> PayPal</h1>
-      <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
-      <div>
-        <% amount = (@cart.sum(&:price) + @prints_total) %>
-        <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
-          <div class="form-inputs">
-            <label class="amount mb-3">
-              <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
-            </label>
+    <div class="col-12 col-lg-6">
+       <div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= (@cart.sum(&:price) + @prints_total) / 100.00 %>">
 
-            <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
-            <%= f.input :city, label: 'City', input_html: { class: 'form-control' } %>
-            <%= f.input :state, label: 'State', input_html: { class: 'form-control' } %>
-            <%= f.input :country, label: 'Country', input_html: { class: 'form-control' } %>
-            <%= f.input :zip, label: 'Zipcode', input_html: { class: 'form-control' } %>
-            <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
-            <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
-            <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
-            <%= f.input :note, as: :hidden %>
+      <div class="tabs">
+        <input class="tabInput" name="tabs" type="radio" id="tab-1" checked="checked"/>
+        <label class="tabLabel" for="tab-1">Pay With <i class="fa-brands fa-stripe fa-2xl"></i></label>
+        <div class="panel">
+          <h1 class="tabH1"><i class="fa-brands fa-stripe fa-2xl"></i></h1>
+          <p class="tabP mb-3">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
+          <div>
+            <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
+              <div class="form-inputs">
+                <label class="amount mb-3">
+                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
+                </label>
+
+                <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
+                <%= f.input :city, label: 'City', input_html: { class: 'form-control' } %>
+                <%= f.input :state, label: 'State', input_html: { class: 'form-control' } %>
+                <%= f.input :country, label: 'Country', input_html: { class: 'form-control' } %>
+                <%= f.input :zip, label: 'Zipcode', input_html: { class: 'form-control' } %>
+                <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
+                <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
+                <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
+                <%= f.input :note, as: :hidden %>
+              </div>
+
+              <% amount = (@cart.sum(&:price) + @prints_total) %>
+              <script
+                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
+                data-description="Your art is on the way!"
+                data-amount="<%= amount %>"
+                data-locale="auto">
+              </script>
+
+              <input type="submit" value="Pay with card" class="btn btn-primary">
+            <% end %>
           </div>
-          <div id="payment-form"></div>
-          <input type="submit" value="Pay with card" class="btn btn-primary">
-        <% end %>
-
-        <script src="https://js.braintreegateway.com/js/braintree-2.32.1.min.js"></script>
-        <script>
-          var clientToken = "<%= Braintree::ClientToken.generate %>"; // Generated server-side instead
-          braintree.setup(
-              // gon.client_token, "dropin", {
-              clientToken, "dropin", {
-              container: "payment-form",
-              paypal: {
-                singleUse: true,
-                currency: 'EUR',
-                locale: 'en_us'
-              },
-              dataCollector: {
-                paypal: true
-              },
-            }
-          );
-        </script>
-       </div>
-    </div>
-    <input class="tabInput" name="tabs" type="radio" id="tab-3"/>
-    <label class="tabLabel" for="tab-3">Pay With Crypto <i class="fa-brands fa-ethereum fa-lg"></i><i class="fa-brands fa-bitcoin fa-lg"></i></label>
-    <div class="panel">
-      <h1 class="tabH1">Crypto Payments <i class="fa-brands fa-ethereum fa-lg"></i><i class="fa-brands fa-bitcoin fa-lg"></i></h1>
-
-      <p class="tabP">
-        Connect your preferred wallet, to pay
-        <i class="fa-regular fa-hand-point-down"></i>
-      </p>
-
-      <div class="d-flex justify-content-center my-3">
-        <button data-crypto-target="buttonOpen" data-action="click->crypto#openModal" class="btn btn-primary mt-3">
-          Connect Wallet
-        </button>
-      </div>
-      <div class="d-flex justify-content-center flex-column mx-auto text-center">
-          <p data-crypto-target="address"></p>
-      </div>
-
-<div class="d-flex align-items-center justify-content-center  my-3">
-
-  <section data-crypto-target="modal" class="cryptomodal hidden">
-    <div class="flex">
-      <button data-crypto-target="buttonClose" data-action="click->crypto#closeModal" class="btn-close"></button>
-    </div>
-
-       <button data-action="click->crypto#connectWallet" class="btn btn-primary">
-        <div class="d-flex flex-column justify-content-center align-items-center">
-          <div><img height="30px" size="24" src="https://opensea.io/static/images/logos/metamask-fox.svg" alt="Metamaks Fox"></div>
-          <div data-wallet-target="metamask" class="mx-5">Metamask <i class="fa-brands fa-ethereum fa-xs"></i></div>
         </div>
-      </button>
+        <input class="tabInput" name="tabs" type="radio" id="tab-2"/>
+        <label class="tabLabel" for="tab-2">Pay With PayPal <i class="fa-brands fa-paypal fa-lg"></i></label>
+        <div class="panel">
+          <h1 class="tabH1"><i class="fa-brands fa-paypal fa-2xl"></i> PayPal</h1>
+          <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
+          <div>
+            <% amount = (@cart.sum(&:price) + @prints_total) %>
+            <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
+              <div class="form-inputs">
+                <label class="amount mb-3">
+                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
+                </label>
 
-      <button data-action="click->crypto#walletConnect" class="btn btn-primary">
-        <div class="d-flex flex-column justify-content-center align-items-center">
-          <div><img height="30px" size="24" src="https://static.opensea.io/logos/walletconnect-alternative.png" alt="Wallet Connect"></div>
-          <div data-crypto-target="wc" class="mx-3">Wallet Connect <i class="fa-brands fa-ethereum fa-xs"></i></div>
-        </div>
-      </button>
+                <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
+                <%= f.input :city, label: 'City', input_html: { class: 'form-control' } %>
+                <%= f.input :state, label: 'State', input_html: { class: 'form-control' } %>
+                <%= f.input :country, label: 'Country', input_html: { class: 'form-control' } %>
+                <%= f.input :zip, label: 'Zipcode', input_html: { class: 'form-control' } %>
+                <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
+                <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
+                <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
+                <%= f.input :note, as: :hidden %>
+              </div>
+              <div id="payment-form"></div>
+              <input type="submit" value="Pay with card" class="btn btn-primary">
+            <% end %>
 
-
-      <button data-action="click->crypto#xdefiConnect" class="btn btn-primary">
-        <div class="d-flex flex-column justify-content-center align-items-center">
-          <div><img height="30px" size="24" src="https://www.gitbook.com/cdn-cgi/image/width=256,dpr=2,height=40,fit=contain,format=auto/https%3A%2F%2F4266502175-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FV16jazlRl57seHanahS6%252Flogo%252FioIrYN9TYWHNeHKcyuhj%252Fimage%2520(2).jpg%3Falt%3Dmedia%26token%3D8c5b33e0-7098-47ae-b59c-f43945b753cb" alt="xdefi Logo"></div>
-          <div data-crypto-target="xdefi" class="mx-5">Xdefi crypto <i class="fa-brands fa-bitcoin fa-xs"></i></div>
-        </div>
-      </button>
-
-
-  </section>
-
-  <div data-crypto-target="overlay" data-action="click->crypto#closeModal" class="overlay hidden"></div>
-
-</div>
-
-
-
-      <div class="d-flex justify-content-center flex-column mx-auto text-center">
-          <p data-crypto-target="address"></p>
-      </div>
-      <div class="d-flex justify-content-center">
-        <div data-crypto-target="loader" class="lds-ellipsis">
-          <div></div><div></div><div></div><div></div>
-        </div>
-      </div>
-      <p class="tabP" >
-        Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!
-      </p>
-
-
-      <div>
-        <% amount = (@cart.sum(&:price) + @prints_total) %>
-        <%= simple_form_for @order, data: { crypto_target: "form"} do |f| %>
-          <div class="form-inputs">
-            <label class="amount mb-3">
-              <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
-            </label>
-
-            <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
-            <%= f.input :city, label: 'City', input_html: { class: 'form-control' } %>
-            <%= f.input :state, label: 'State', input_html: { class: 'form-control' } %>
-            <%= f.input :country, label: 'Country', input_html: { class: 'form-control' } %>
-            <%= f.input :zip, label: 'Zipcode', input_html: { class: 'form-control' } %>
-            <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
-            <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
-            <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
-            <%= f.input :note, as: :hidden, input_html: { data: {crypto_target: "note"} } %>
+            <script src="https://js.braintreegateway.com/js/braintree-2.32.1.min.js"></script>
+            <script>
+              var clientToken = "<%= Braintree::ClientToken.generate %>"; // Generated server-side instead
+              braintree.setup(
+                  // gon.client_token, "dropin", {
+                  clientToken, "dropin", {
+                  container: "payment-form",
+                  paypal: {
+                    singleUse: true,
+                    currency: 'EUR',
+                    locale: 'en_us'
+                  },
+                  dataCollector: {
+                    paypal: true
+                  },
+                }
+              );
+            </script>
           </div>
-          <input type="submit" value="Pay with crypto" class="btn btn-primary" data-action="click->crypto#pay" data-crypto-target="pay">
-        <% end %>
+        </div>
+        <input class="tabInput" name="tabs" type="radio" id="tab-3"/>
+        <label class="tabLabel" for="tab-3">Pay With Crypto <i class="fa-brands fa-ethereum fa-lg"></i><i class="fa-brands fa-bitcoin fa-lg"></i></label>
+        <div class="panel">
+          <h1 class="tabH1">Crypto Payments <i class="fa-brands fa-ethereum fa-lg"></i><i class="fa-brands fa-bitcoin fa-lg"></i></h1>
+
+          <p class="tabP">
+            Connect your preferred wallet, to pay
+            <i class="fa-regular fa-hand-point-down"></i>
+          </p>
+
+          <div class="d-flex justify-content-center my-3">
+            <button data-crypto-target="buttonOpen" data-action="click->crypto#openModal" class="btn btn-primary mt-3">
+              Connect Wallet
+            </button>
+          </div>
+          <div class="d-flex justify-content-center flex-column mx-auto text-center">
+              <p data-crypto-target="address"></p>
+          </div>
+
+    <div class="d-flex align-items-center justify-content-center  my-3">
+
+      <section data-crypto-target="modal" class="cryptomodal hidden">
+        <div class="flex">
+          <button data-crypto-target="buttonClose" data-action="click->crypto#closeModal" class="btn-close"></button>
+        </div>
+
+          <button data-action="click->crypto#connectWallet" class="btn btn-primary">
+            <div class="d-flex flex-column justify-content-center align-items-center">
+              <div><img height="30px" size="24" src="https://opensea.io/static/images/logos/metamask-fox.svg" alt="Metamaks Fox"></div>
+              <div data-wallet-target="metamask" class="mx-5">Metamask <i class="fa-brands fa-ethereum fa-xs"></i></div>
+            </div>
+          </button>
+
+          <button data-action="click->crypto#walletConnect" class="btn btn-primary">
+            <div class="d-flex flex-column justify-content-center align-items-center">
+              <div><img height="30px" size="24" src="https://static.opensea.io/logos/walletconnect-alternative.png" alt="Wallet Connect"></div>
+              <div data-crypto-target="wc" class="mx-3">Wallet Connect <i class="fa-brands fa-ethereum fa-xs"></i></div>
+            </div>
+          </button>
+
+
+          <button data-action="click->crypto#xdefiConnect" class="btn btn-primary">
+            <div class="d-flex flex-column justify-content-center align-items-center">
+              <div><img height="30px" size="24" src="https://www.gitbook.com/cdn-cgi/image/width=256,dpr=2,height=40,fit=contain,format=auto/https%3A%2F%2F4266502175-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FV16jazlRl57seHanahS6%252Flogo%252FioIrYN9TYWHNeHKcyuhj%252Fimage%2520(2).jpg%3Falt%3Dmedia%26token%3D8c5b33e0-7098-47ae-b59c-f43945b753cb" alt="xdefi Logo"></div>
+              <div data-crypto-target="xdefi" class="mx-5">Xdefi crypto <i class="fa-brands fa-bitcoin fa-xs"></i></div>
+            </div>
+          </button>
+
+
+      </section>
+
+      <div data-crypto-target="overlay" data-action="click->crypto#closeModal" class="overlay hidden"></div>
+
+    </div>
+
+
+
+          <div class="d-flex justify-content-center flex-column mx-auto text-center">
+              <p data-crypto-target="address"></p>
+          </div>
+          <div class="d-flex justify-content-center">
+            <div data-crypto-target="loader" class="lds-ellipsis">
+              <div></div><div></div><div></div><div></div>
+            </div>
+          </div>
+          <p class="tabP" >
+            Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!
+          </p>
+
+
+          <div>
+            <% amount = (@cart.sum(&:price) + @prints_total) %>
+            <%= simple_form_for @order, data: { crypto_target: "form"} do |f| %>
+              <div class="form-inputs">
+                <label class="amount mb-3">
+                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
+                </label>
+
+                <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
+                <%= f.input :city, label: 'City', input_html: { class: 'form-control' } %>
+                <%= f.input :state, label: 'State', input_html: { class: 'form-control' } %>
+                <%= f.input :country, label: 'Country', input_html: { class: 'form-control' } %>
+                <%= f.input :zip, label: 'Zipcode', input_html: { class: 'form-control' } %>
+                <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
+                <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
+                <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
+                <%= f.input :note, as: :hidden, input_html: { data: {crypto_target: "note"} } %>
+              </div>
+              <input type="submit" value="Pay with crypto" class="btn btn-primary" data-action="click->crypto#pay" data-crypto-target="pay">
+            <% end %>
+          </div>
+        </div>
       </div>
+
+
+
+    </div>
+
     </div>
   </div>
 
