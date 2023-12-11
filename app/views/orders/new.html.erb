@@ -1,13 +1,17 @@
 
 <div class="container">
+  <div>
+    <div class="text-center mt-3">
+      <h1>Checkout</h1>
+    </div>
+  </div>
   <div class="row">
-    <div class="col-12 col-lg-6">
-      <h1 class="text-center mt-5">Checkout</h1>
-      <div class="bg-secondary rounded shadow p-5">
+    <div class="col-12 col-lg-6 my-5">
+      <div class="bg-light rounded shadow p-5">
           <% @cart.each do |item| %>
               <%= link_to "/paintings/#{item.id}", style: "text-decoration: none;" do %>
                 <div class="col-12">
-                  <div class="card-product mt-3">
+                  <div class="card-product mt-3 p-3">
                     <%= cl_image_tag item.photos[0].key if item.photos.present? %>
 
                     <div class="card-product-infos">
@@ -26,7 +30,7 @@
           <% @flat_cart_arr.each do |item| %>
             <%= link_to "/prints/show/#{item["id"]}", style: "text-decoration: none;" do %>
               <div class="col-12">
-                <div class="card-product mt-3">
+                <div class="card-product mt-3 p-3">
                   <%= image_tag item["image"] %>
 
                   <div class="card-product-infos">
@@ -44,7 +48,7 @@
           <% end %>
           <div class="mt-5">
             <hr>
-            <p class="mt-3">Total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></p>
+            <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></p>
           </div>
       </div>
     </div>
