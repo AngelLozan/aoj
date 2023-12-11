@@ -124,7 +124,9 @@ class PrintsController < ApplicationController
 
   def remove_from_cart_prints
     id = params[:id]
-    session[:prints_cart].delete(id)
+    print_cart = session[:prints_cart]
+    print_cart.delete_at(print_cart.index(id) || print_cart.length)
+    # session[:prints_cart].delete(id)
     redirect_to prints_path
   end
 
