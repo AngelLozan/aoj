@@ -21,7 +21,7 @@
           <div class="card-body">
               <h5 class="card-title"><%= painting.title %></h5>
               <p class="card-text"><%= painting.description %></p>
-              <div class="d-flex flex-row">
+              <div class="d-flex flex-row price">
                   <small>
                     <%= number_to_currency(painting.price / 100.00, :unit=> '€') %>
                   </small>
