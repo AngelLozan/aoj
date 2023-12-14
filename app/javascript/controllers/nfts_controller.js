@@ -159,9 +159,9 @@ web3;
 
     const ownerDiv = document.createElement("div");
       ownerDiv.classList.add("d-flex", "flex-row", "align-items-center", "mt-3");
-      const owner = document.createElement("p");
+      const owner = document.createElement("small");
       owner.classList.add("card-text", "mt-1");
-      owner.textContent = `Current Owner: ${item.owner}`;
+      owner.textContent = `Owned by: ${item.owner}`;
 
     const price = document.createElement("div");
       price.classList.add("d-flex", "flex-row", "mt-3", "align-items-center");

@@ -29,8 +29,6 @@
             </div>
           <% if @cart.include?(painting) %>
             <p>In your cart <i class="fa-solid fa-cart-shopping"></i></p>
-          <% elsif painting.status == "sold" %>
-            <p>Sold</p>
           <% end %>
         </div>
 
