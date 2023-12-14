@@ -164,9 +164,12 @@ web3;
       owner.textContent = `Current Owner: ${item.owner}`;
 
     const price = document.createElement("div");
-      price.classList.add("d-flex", "flex-row", "mt-3");
-      const icon = document.createElement("i");
-      icon.classList.add("fa-brands", "fa-ethereum", "fa-xs", "mt-2", "mx-3");
+      price.classList.add("d-flex", "flex-row", "mt-3", "align-items-center");
+      // const icon = document.createElement("i");
+      const icon = document.createElement("img");
+      // icon.classList.add("fa-brands", "fa-ethereum", "fa-xs", "mt-2", "mx-3");
+      icon.classList.add("avatar", "mx-3");
+      icon.src = 'https://polygonscan.com/assets/poly/images/svg/logos/token-light.svg?v=23.12.1.0'
       const small = document.createElement("small");
       small.textContent = `${item.price} MATIC`;
 
