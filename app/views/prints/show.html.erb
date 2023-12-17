@@ -1,7 +1,13 @@
-<div class="container-fluid pb-5 text-center">
 
-<div class="container-fluid mt-3 p-5 text-center">
-  <div >
+
+<div class="container-fluid p-5 text-center">
+
+      <div class="sticky">
+        <%= button_to add_to_cart_prints_path(@print["id"]), method: :post, class: "btn btn-outline-primary tree" do %>
+          <i class="fa-solid fa-cart-plus fa-xl"></i>
+          Purchase Print
+        <% end %>
+      </div>
 
     <div class="prod-card my-3">
       <% if Rails.env.test? %>
@@ -25,7 +31,5 @@
       <% end %>
 
     </div>
-  </div>
-</div>
 
 </div>

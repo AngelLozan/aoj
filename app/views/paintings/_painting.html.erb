@@ -1,5 +1,13 @@
 <div class="container-fluid mt-3 text-center">
   <div id="<%= dom_id painting %>">
+    <% if painting.status != "sold" && !@cart.include?(painting) %>
+      <div class="sticky">
+        <%= button_to add_to_cart_path(painting), method: :post, class: "btn btn-outline-primary tree" do %>
+          <i class="fa-solid fa-cart-plus fa-xl"></i>
+          Purchase Original
+        <% end %>
+      </div>
+    <% end %>
 
     <div class="prod-card my-3">
       <% if Rails.env.test? %>

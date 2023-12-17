@@ -19,7 +19,7 @@
           <div class="card-body">
               <h5 class="card-title"><%= product["title"] %></h5>
               <p class="card-text"><%= product["description"] %></p>
-              <div class="d-flex flex-row">
+              <div class="d-flex flex-row price">
                   <small>
                     <%= number_to_currency(product["price"] / 100.00, :unit=> '€') %>
                   </small>

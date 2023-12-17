@@ -142,34 +142,51 @@ web3;
       image.src = item.image;
       image.alt = "NFT";
 
-      const cardBody = document.createElement("div");
+    const cardBody = document.createElement("div");
       cardBody.classList.add("card-body");
 
+    const titleDiv = document.createElement("div");
+      titleDiv.classList.add("d-flex", "flex-row", "align-items-center", "mt-3");
       const title = document.createElement("h5");
       title.classList.add("card-title", "mt-3");
       title.textContent = item.title;
 
+    const infoDiv = document.createElement("div");
+      infoDiv.classList.add("d-flex", "flex-column", "align-items-center", "mt-3");
       const description = document.createElement("p");
       description.classList.add("card-text", "mt-1");
       description.textContent = item.description;
 
-      const owner = document.createElement("p");
+    const ownerDiv = document.createElement("div");
+      ownerDiv.classList.add("d-flex", "flex-row", "align-items-center", "mt-3");
+      const owner = document.createElement("small");
       owner.classList.add("card-text", "mt-1");
-      owner.textContent = `Current Owner: ${item.owner}`;
+      owner.textContent = `Owned by: ${item.owner}`;
 
-      const price = document.createElement("div");
-      price.classList.add("d-flex", "flex-row");
-      const icon = document.createElement("i");
-      icon.classList.add("fa-brands", "fa-ethereum", "fa-xs", "mt-2", "mx-3");
+    const price = document.createElement("div");
+      price.classList.add("d-flex", "flex-row", "mt-3", "align-items-center");
+      // const icon = document.createElement("i");
+      const icon = document.createElement("img");
+      // icon.classList.add("fa-brands", "fa-ethereum", "fa-xs", "mt-2", "mx-3");
+      icon.classList.add("avatar", "mx-3");
+      icon.src = 'https://polygonscan.com/assets/poly/images/svg/logos/token-light.svg?v=23.12.1.0'
       const small = document.createElement("small");
       small.textContent = `${item.price} MATIC`;
 
+
       price.appendChild(icon);
       price.appendChild(small);
-      cardBody.appendChild(title);
-      cardBody.appendChild(description);
-      cardBody.appendChild(owner);
+      ownerDiv.appendChild(owner);
+      titleDiv.appendChild(title);
+      infoDiv.appendChild(description);
+      cardBody.appendChild(titleDiv);
       cardBody.appendChild(price);
+      cardBody.appendChild(ownerDiv);
+      cardBody.appendChild(infoDiv);
+      // cardBody.appendChild(title);
+      // cardBody.appendChild(description);
+      // cardBody.appendChild(owner);
+      // cardBody.appendChild(price);
       card.appendChild(image);
       card.appendChild(cardBody);
       cardContainer.appendChild(card);
