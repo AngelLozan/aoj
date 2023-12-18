@@ -74,6 +74,7 @@ gem 'mail'
 gem 'json'
 gem 'uri'
 gem 'net-http'
+gem 'nokogiri', '~> 1.12', '>= 1.12.4'
 
 
 group :development, :test, :production do

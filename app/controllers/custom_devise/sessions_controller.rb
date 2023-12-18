@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 class CustomDevise::SessionsController < Devise::SessionsController
   before_action :load_cart_prints
   before_action :load_cart
@@ -54,11 +56,17 @@ class CustomDevise::SessionsController < Devise::SessionsController
         p "Product is: #{product["id"]}"
         p "=========================================="
 
+        html_tag_pattern = /<.*?>(.*?)<\/.*?>/
+        description = product['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
+        parsed_description = Nokogiri::HTML.parse(description)
+        cleaned_description = description.gsub(html_tag_pattern, '')
+
         if product["images"].empty?
+
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => product['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
+            'description' => cleaned_description,
             'image' => 'abstractart.png',
             'price' => product['variants'].first['price'],
             'variant' => product['variants'].first['id']
@@ -67,7 +75,7 @@ class CustomDevise::SessionsController < Devise::SessionsController
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => product['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
+            'description' => cleaned_description,
             'image' => product["images"].first["src"],
             'price' => product['variants'].first['price'],
             'variant' => product['variants'].first['id']

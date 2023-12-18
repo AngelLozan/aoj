@@ -38,11 +38,15 @@ class PrintsController < ApplicationController
         p "Product is: #{product["id"]}"
         p "=========================================="
 
+        html_tag_pattern = /<.*?>(.*?)<\/.*?>/i
+        description = product['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
+        cleaned_description = description.gsub(html_tag_pattern, '')
+
         if product["images"].empty?
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => product['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
+            'description' => cleaned_description,
             'image' => 'abstractart.png',
             'price' => product['variants'].first['price'],
             'variant' => product['variants'].first['id']
@@ -51,7 +55,7 @@ class PrintsController < ApplicationController
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => product['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
+            'description' => cleaned_description,
             'image' => product["images"].first["src"],
             'price' => product['variants'].first['price'],
             'variant' => product['variants'].first['id']
@@ -86,11 +90,17 @@ class PrintsController < ApplicationController
 
     print = raw_data
 
+    html_tag_pattern = /<.*?>(.*?)<\/.*?>/i
+    description = print['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
+    cleaned_description = description.gsub(html_tag_pattern, '')
+
+
     if print["images"].empty?
+
       @print = {
         'id' => print['id'],
         'title' => print['title'],
-        'description' => print['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
+        'description' => cleaned_description,
         'image' => 'abstractart.png',
         'price' => print['variants'].first['price']
       }
@@ -98,7 +108,7 @@ class PrintsController < ApplicationController
       @print = {
         'id' => print['id'],
         'title' => print['title'],
-        'description' => print['description'].gsub(/\.:\s.*(?:\n|\z)/, ''),
+        'description' => cleaned_description,
         'image' => print["images"].first["src"],
         'price' => print['variants'].first['price'],
       }
