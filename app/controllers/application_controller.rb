@@ -33,16 +33,16 @@ class ApplicationController < ActionController::Base
         p "Product is: #{product["id"]}"
         p "=========================================="
 
-        html_tag_pattern = /<.*?>(.*?)<\/.*?>/i
+
         description = product['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
-        cleaned_description = description.gsub(html_tag_pattern, '')
+
 
         if product["images"].empty?
 
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => cleaned_description,
+            'description' => description,
             'image' => 'abstractart.png',
             'price' => product['variants'].first['price'],
             'variant' => product['variants'].first['id']
@@ -51,7 +51,7 @@ class ApplicationController < ActionController::Base
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => cleaned_description,
+            'description' => description,
             'image' => product["images"].first["src"],
             'price' => product['variants'].first['price'],
             'variant' => product['variants'].first['id']

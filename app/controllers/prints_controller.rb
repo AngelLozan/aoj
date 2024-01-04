@@ -90,9 +90,9 @@ class PrintsController < ApplicationController
 
     print = raw_data
 
-    html_tag_pattern = /<.*?>(.*?)<\/.*?>/i
+
     description = print['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
-    cleaned_description = description.gsub(html_tag_pattern, '')
+
 
 
     if print["images"].empty?
@@ -100,7 +100,7 @@ class PrintsController < ApplicationController
       @print = {
         'id' => print['id'],
         'title' => print['title'],
-        'description' => cleaned_description,
+        'description' => description,
         'image' => 'abstractart.png',
         'price' => print['variants'].first['price']
       }
@@ -108,7 +108,7 @@ class PrintsController < ApplicationController
       @print = {
         'id' => print['id'],
         'title' => print['title'],
-        'description' => cleaned_description,
+        'description' => description,
         'image' => print["images"].first["src"],
         'price' => print['variants'].first['price'],
       }
