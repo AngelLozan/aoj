@@ -8,7 +8,7 @@
           <%=image_tag print["image"] %>
         <% end %>
       <h1 class="mt-3"><%= print["title"] %></h1>
-      <p class="prod-price"> <%= number_to_currency(print["price"] / 100.00, :unit=> '€') %></p>
+      <p class="prod-price"> <%= number_to_currency(print["price"] / 100.00, :unit=> '$') %></p>
       <p><%= print["description"] %></p>
         <% if @prints_cart.include?(print) %>
           <%= button_to 'Remove from cart', remove_from_cart_print_path(print), method: :delete, class: 'btn btn-danger' %>

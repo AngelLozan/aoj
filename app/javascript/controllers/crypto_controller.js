@@ -307,6 +307,22 @@ export default class extends Controller {
     }
   }
 
+  // async txReceipt(_txHash) {
+  //      let receipt = await ethereum.request({
+  //         "method": "eth_getTransactionReceipt",
+  //         "params": [
+  //           _txHash
+  //         ]
+  //       });
+  //       console.log("RECEIPT", receipt);
+  //       if (receipt.status) {
+  //         console.log("Confirmed tx");
+  //       } else {
+  //         console.log("Not confirmed tx");
+  //       }
+  //       return receipt;
+  // }
+
   async #sendEth() {
     this.loaderTarget.style.display = "inline-block";
     const price = await this.calculatePrice();
@@ -354,15 +370,32 @@ export default class extends Controller {
         ],
       });
       console.log("TXHASH", txHash);
-      // let receipt = await this.web3.eth.getTransactionReceipt(txHash);
-      // console.log("RECEIPT", receipt);
 
-      if (txHash) {
-        this.noteTarget.value = `Please verify this transaction is confirrmed in your wallet: ${txHash}`;
-        this.payTarget.innerText = "Paid";
-        await this.postPayment(); // Goes to create order
-        this.loaderTarget.style.display = "none";
-      }
+      const interval = setInterval(() => {
+        console.log("Attempting to get transaction receipt...");
+        this.web3.eth.getTransactionReceipt(txHash)
+        .then((rec) => {
+          if (rec) {
+            console.log(rec);
+            let receipt = rec;
+            clearInterval(interval);
+            if (receipt.status) {
+              this.noteTarget.value = `Please verify this transaction is confirmed in your wallet: https://etherscan.io/tx/${txHash}`;
+              this.payTarget.innerText = "Paid";
+              this.postPayment(); // Goes to create order
+              this.loaderTarget.style.display = "none";
+            }
+          }
+        });
+      }, 1000);
+
+      // if (txHash) {
+      // if (receipt.status === true) {
+      //   this.noteTarget.value = `Please verify this transaction is confirrmed in your wallet: ${txHash}`;
+      //   this.payTarget.innerText = "Paid";
+      //   await this.postPayment(); // Goes to create order
+      //   this.loaderTarget.style.display = "none";
+      // }
     } catch (error) {
       console.log(error.message);
       this.loaderTarget.style.display = "none";
@@ -423,7 +456,7 @@ export default class extends Controller {
       console.log("RESULT", result);
 
       if (bitcoinTxHashRegex.test(result) === true) {
-        this.noteTarget.value = `Please verify this transaction is confirrmed in your wallet: ${result}`;
+        this.noteTarget.value = `Please verify this transaction is confirrmed in your wallet: https://mempool.space/tx/${result}`;
         this.payTarget.innerText = "Paid";
         await this.postPayment();
         this.loaderTarget.style.display = "none";
