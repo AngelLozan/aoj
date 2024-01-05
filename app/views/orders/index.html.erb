@@ -9,15 +9,18 @@
     <% end %>
   </div>
 
-  <div class="row" id="orders" data-controller="orders">
+  <div class="row row-cols-1 row-cols-md-2" id="orders" data-controller="orders">
     <% @orders.each do |order| %>
-      <div class="col-sm-6 d-flex align-items-stretch">
-        <div data-action="click->orders#openOrder" data-url="/orders/<%= order.id %>">
+    <% if !order.complete? %>
+      <div class="d-flex align-items-stretch">
+        <div class="card my-5 mx-3 p-3 shadow rounded" data-action="click->orders#openOrder" data-url="/orders/<%= order.id %>">
           <% if order.status != "complete" %>
               <%= render order %>
             <% end %>
         </div>
       </div>
+    <% end %>
+
     <% end %>
   </div>
 
