@@ -19,8 +19,7 @@
                         <h2><%= item.title %></h2>
                       <div class="d-flex flex-row">
                           <small>
-                            <i class="fa-solid fa-euro-sign"></i>
-                            <%= item.price / 100.0 %>
+                            <%= number_to_currency(item["price"] / 100.00, :unit=> '$') %>
                           </small>
                       </div>
                       <div>
@@ -40,8 +39,7 @@
                       <h2><%= item["title"] %></h2>
                     <div class="d-flex flex-row">
                         <small>
-                          <i class="fa-solid fa-euro-sign"></i>
-                          <%= item["price"] / 100.0 %>
+                         <%= number_to_currency(item["price"] / 100.00, :unit=> '$') %>
                         </small>
                     </div>
                     <div class="d-flex flex-row justify-content-evenly">
@@ -59,7 +57,7 @@
             <% end %>
           <div class="mt-5">
             <hr>
-            <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></p>
+            <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></p>
           </div>
       </div>
     </div>
@@ -71,12 +69,12 @@
         <label class="tabLabel" for="tab-1">Pay With <i class="fa-brands fa-stripe fa-2xl"></i></label>
         <div class="panel">
           <h1 class="tabH1"><i class="fa-brands fa-stripe fa-2xl"></i></h1>
-          <p class="tabP mb-3">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
+          <p class="tabP mb-3">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able: <a href="/contacts/new" target="_blank">Get in touch</a>. Thank you for supporting a more colorful world!</p>
           <div>
             <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
               <div class="form-inputs">
                 <label class="amount mb-3">
-                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
+                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
                 </label>
 
                 <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
@@ -107,13 +105,13 @@
         <label class="tabLabel" for="tab-2">Pay With PayPal <i class="fa-brands fa-paypal fa-lg"></i></label>
         <div class="panel">
           <h1 class="tabH1"><i class="fa-brands fa-paypal fa-2xl"></i> PayPal</h1>
-          <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!</p>
+          <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able: <a href="/contacts/new" target="_blank">Get in touch</a>. Thank you for supporting a more colorful world!</p>
           <div>
             <% amount = (@cart.sum(&:price) + @prints_total) %>
             <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
               <div class="form-inputs">
                 <label class="amount mb-3">
-                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
+                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
                 </label>
 
                 <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
@@ -208,7 +206,7 @@
 
 
           <div class="d-flex justify-content-center flex-column mx-auto text-center">
-              <p data-crypto-target="address"></p>
+              <p cdata-crypto-target="address"></p>
           </div>
           <div class="d-flex justify-content-center">
             <div data-crypto-target="loader" class="lds-ellipsis">
@@ -216,7 +214,7 @@
             </div>
           </div>
           <p class="tabP" >
-            Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able. Thank you for supporting a more colorful world!
+            Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able: <a href="/contacts/new" target="_blank">Get in touch</a>. Thank you for supporting a more colorful world!
           </p>
 
 
@@ -225,7 +223,7 @@
             <%= simple_form_for @order, data: { crypto_target: "form"} do |f| %>
               <div class="form-inputs">
                 <label class="amount mb-3">
-                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '€') %></strong>
+                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
                 </label>
 
                 <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
