@@ -5,11 +5,9 @@ require 'net/http'
 
 class NftsController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :nfts, :endpoint ]
-  # after_action :set_image_urls, only: [ :nfts  ]
   before_action :load_cart
-  # before_action :load_products, only: :load_cart_prints
-  # before_action :load_cart_prints
   before_action :load_orders
+
 
   def nfts
   end
@@ -25,11 +23,6 @@ class NftsController < ApplicationController
 
   private
 
-  # def set_image_urls
-  #   puts request.body
-  #   data = JSON.parse(request.body.read)
-  #   @image_urls = data["images"]
-  # end
 
   def load_cart
     if session[:cart].nil?

@@ -28,6 +28,7 @@
             <%= image_tag "aoj.jpeg", class: "avatar-lg", alt: "dropdown menu" %>
           </a>
             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+              <%= link_to "Originals", paintings_path, class: "dropdown-item" %>
               <%= link_to "About", "/about", class: "dropdown-item" %>
               <%= link_to "CV", "/cv", class: "dropdown-item" %>
               <%= link_to "Photography", "/photography", class: "dropdown-item" %>
