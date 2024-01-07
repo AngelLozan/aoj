@@ -52,7 +52,7 @@ web3;
   tokenContract = "0x2562ffA357FbDd56024AeA7D8E2111ad299766c9";
 
   async connect() {
-
+    let contract;
     this.messageTarget.style.visibility = "visible";
     this.messageTarget.style.display = "flex";
 
@@ -65,12 +65,27 @@ web3;
 
       this.web3 = await this.getWeb3Value();
 
-      const contract = await new this.web3.eth.Contract(
-        this.tokenURIABI,
-        this.tokenContract
-      );
+      if (contract === undefined) {
+        console.log("Grabbing new contract");
+        contract = await new this.web3.eth.Contract(
+          this.tokenURIABI,
+          this.tokenContract
+        );
+        const contractInfo = {
+          address: contract.options.address,
+          abi: contract.options.jsonInterface,
+        };
+        localStorage.setItem("contractInfo", JSON.stringify(contractInfo));
+      } else {
+        console.log("Grabbing cached contract");
+        const storedContractInfo = JSON.parse(localStorage.getItem("contractInfo"));
+        const contract = new this.web3.eth.Contract(
+          storedContractInfo.abi,
+          storedContractInfo.address
+        );
+      }
 
-      console.log(contract);
+      console.log("CONTRACT: ", contract);
       const data = await this.getNFTMetadata(contract);
       console.log(data);
 
@@ -227,6 +242,8 @@ web3;
   async getNFTMetadata(contract) {
     let images = [];
     let objectArr = [];
+
+
     const reg = /\b(\w{6})\w+(\w{4})\b/g;
 
     try {
@@ -235,10 +252,26 @@ web3;
       for (let i = 1; i < 15; i++) {
         if(i === 1 || i === 2) continue;
         const tokenId = i;
-        const result = await contract.methods.tokenURI(tokenId).call();
-        const owner = await contract.methods.ownerOf(tokenId).call();
+        let result = localStorage.getItem(`result${i}`);
+        let owner = localStorage.getItem(`owner${i}`);
+        // let response = localStorage.getItem(`response${i}`);
+        let stringResponse = localStorage.getItem(`stringResponse${i}`);
+
+
+        if (result === null || owner === null || response === null) {
+          result = await contract.methods.tokenURI(tokenId).call();
+          owner = await contract.methods.ownerOf(tokenId).call();
+          let response = await fetch(result, { timeout: i === 3 ? 10000 : 5000 });
+          stringResponse = await response.text();
+
+          localStorage.setItem(`result${i}`, result);
+          localStorage.setItem(`owner${i}`, owner);
+          // localStorage.setItem(`response${i}`, response) ;
+          localStorage.setItem(`stringResponse${i}`, stringResponse);
+        }
 
         console.log("OWNER >>> ", owner);
+        console.log("RESULT >>> ", result);
 
         if (!result) {
           console.log(`No result for tokenId ${tokenId}!`);
@@ -249,23 +282,17 @@ web3;
         }
 
         try {
-          let response;
-          if (i === 3) {
-            response = await fetch(result, { timeout: 10000 });
-          } else {
-            response = await fetch(result, { timeout: 5000 });
-          }
 
-          const fixedJsonString = await response.text();
-          const parsedData = JSON.parse(
-            fixedJsonString.replace(/,\s*([\]}])/g, "$1")
-          ); // remove trailing comma
-          // @dev Sample response: https://gateway.pinata.cloud/ipfs/QmV8ZcFPvEDxZDQowAGmqag1QCHg3SmevrpyDyUxGazEGA
 
-          let pic = parsedData.image;
-          let title = parsedData.name;
-          let description = parsedData.description;
-          let price = parsedData.attributes[4].value;
+
+          // console.log("RESPONSE >>> ", JSON.parse(response));
+          console.log("String response >>> ", stringResponse);
+          let objj = JSON.parse(stringResponse);
+
+          let pic = objj.image;
+          let title = objj.name;
+          let description = objj.description;
+          let price = objj.attributes[4].value;
           let formattedPrice = price.replace("$", "");
           let formatOwner = owner.replace(reg, "$1****$2");
 
