@@ -5,7 +5,7 @@ import Web3 from "web3";
 export default class extends Controller {
   static targets = ["loader", "image", "cards", "message"];
 
-web3;
+  web3;
 
 
   tokenURIABI = [
@@ -65,7 +65,7 @@ web3;
 
       this.web3 = await this.getWeb3Value();
 
-      if (contract === undefined) {
+      if (localStorage.getItem("contractInfo") === null) {
         console.log("Grabbing new contract");
         contract = await new this.web3.eth.Contract(
           this.tokenURIABI,
@@ -78,8 +78,9 @@ web3;
         localStorage.setItem("contractInfo", JSON.stringify(contractInfo));
       } else {
         console.log("Grabbing cached contract");
-        const storedContractInfo = JSON.parse(localStorage.getItem("contractInfo"));
-        const contract = new this.web3.eth.Contract(
+        const info = localStorage.getItem("contractInfo");
+        const storedContractInfo = JSON.parse(info);
+        contract = new this.web3.eth.Contract(
           storedContractInfo.abi,
           storedContractInfo.address
         );
@@ -116,7 +117,6 @@ web3;
       web3 = new Web3(
         new Web3.providers.HttpProvider(
           data.endpoint
-          // "https://polygon-mainnet.infura.io/v3/a981c2c6b5444a6b88acab192eae092d"
         )
       );
 
@@ -218,6 +218,7 @@ web3;
   }
 
   async getMaticPrice(_price) {
+    let cachedPrice = localStorage.getItem("maticPrice");
     try {
       let res = await fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd`,
@@ -231,8 +232,12 @@ web3;
         }
       );
       let data = await res.json();
+      if (res.status !== 200) {
+        return cachedPrice;
+      }
       const maticPrice = data["matic-network"]["usd"];
       console.log("MATIC PRICE IS: ", maticPrice);
+      localStorage.setItem("maticPrice", maticPrice);
       return maticPrice;
     } catch (error) {
       console.log(error.message);
@@ -254,11 +259,11 @@ web3;
         const tokenId = i;
         let result = localStorage.getItem(`result${i}`);
         let owner = localStorage.getItem(`owner${i}`);
-        // let response = localStorage.getItem(`response${i}`);
         let stringResponse = localStorage.getItem(`stringResponse${i}`);
 
 
-        if (result === null || owner === null || response === null) {
+        if (result === null || owner === null || stringResponse === null) {
+          console.log("Fetching data since something wasn't cached for token: ", tokenId);
           result = await contract.methods.tokenURI(tokenId).call();
           owner = await contract.methods.ownerOf(tokenId).call();
           let response = await fetch(result, { timeout: i === 3 ? 10000 : 5000 });
@@ -266,7 +271,6 @@ web3;
 
           localStorage.setItem(`result${i}`, result);
           localStorage.setItem(`owner${i}`, owner);
-          // localStorage.setItem(`response${i}`, response) ;
           localStorage.setItem(`stringResponse${i}`, stringResponse);
         }
 
@@ -282,10 +286,6 @@ web3;
         }
 
         try {
-
-
-
-          // console.log("RESPONSE >>> ", JSON.parse(response));
           console.log("String response >>> ", stringResponse);
           let objj = JSON.parse(stringResponse);
 

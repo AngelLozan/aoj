@@ -72,6 +72,11 @@
   font-family:"Staatliches", sans-serif;
 }
 
+@media screen and (max-width: 400px) {
+  .message_container {
+    display: none !important;
+  }
+}
 
 .message_container {
   height: 100vh;
@@ -149,8 +154,8 @@
 // 	margin: auto;
 // }
 
-/* If the screen size is 491px wide or less */
-@media screen and (max-width: 491px) {
+/* If the screen size is 350px wide or less */
+@media screen and (max-width: 350px) {
   .pl1 {
     display: none;
   }
