@@ -211,8 +211,8 @@ export default class extends Controller {
   async checkBTCBalance(_address) {
     try {
       let res = await fetch(
-        // `https://api.blockcypher.com/v1/btc/main/addrs/${_address}`, // @dev Mainnet only
-        `https://api.blockcypher.com/v1/btc/test3/addrs/${_address}`, // @dev testnet only
+        `https://api.blockcypher.com/v1/btc/main/addrs/${_address}`, // @dev Mainnet only
+        // `https://api.blockcypher.com/v1/btc/test3/addrs/${_address}`, // @dev testnet only
         {
           method: "GET",
           headers: {
@@ -307,22 +307,6 @@ export default class extends Controller {
     }
   }
 
-  // async txReceipt(_txHash) {
-  //      let receipt = await ethereum.request({
-  //         "method": "eth_getTransactionReceipt",
-  //         "params": [
-  //           _txHash
-  //         ]
-  //       });
-  //       console.log("RECEIPT", receipt);
-  //       if (receipt.status) {
-  //         console.log("Confirmed tx");
-  //       } else {
-  //         console.log("Not confirmed tx");
-  //       }
-  //       return receipt;
-  // }
-
   async #sendEth() {
     this.loaderTarget.style.display = "inline-block";
     const price = await this.calculatePrice();
@@ -336,9 +320,9 @@ export default class extends Controller {
     const limit = await this.web3.eth.estimateGas({
       from: this.accounts[0],
       to: address,
-      // value: this.web3.utils.toHex(convertPrice),
-      // @dev Test value
-      value: this.web3.utils.toWei(0.0001, "ether"),
+      value: this.web3.utils.toHex(convertPrice),
+      // // @dev Test value
+      // value: this.web3.utils.toWei(0.0001, "ether"),
     });
     console.log("LIMIT", limit);
 
@@ -360,9 +344,9 @@ export default class extends Controller {
             from: this.accounts[0],
             to: address,
             // data: this.web3.utils.toHex("AOJ"),
-            // value: this.web3.utils.numberToHex(convertPrice),
-            // @dev Test value
-            value: this.web3.utils.toWei(0.0001, "ether"),
+            value: this.web3.utils.numberToHex(convertPrice),
+            // // @dev Test value
+            // value: this.web3.utils.toWei(0.0001, "ether"),
             gas: this.web3.utils.numberToHex(limit),
             maxPriorityFeePerGas: this.web3.utils.toWei(3, "gwei"),
             maxFeePerGas: this.web3.utils.toWei(3, "gwei"),
@@ -380,22 +364,18 @@ export default class extends Controller {
             let receipt = rec;
             clearInterval(interval);
             if (receipt.status) {
-              this.noteTarget.value = `Please verify this transaction is confirmed in your wallet: https://etherscan.io/tx/${txHash}`;
+              this.noteTarget.value = `Please verify this transaction is confirmed in your wallet & amount is comprable: https://etherscan.io/tx/${txHash}`;
               this.payTarget.innerText = "Paid";
-              this.postPayment(); // Goes to create order
-              this.loaderTarget.style.display = "none";
+              return this.postPayment(); // Goes to create order
+              // this.loaderTarget.style.display = "none";
             }
           }
+        }).then(() => {
+          console.log("Transaction confirmed, posting payment");
+          this.loaderTarget.style.display = "none";
         });
       }, 1000);
 
-      // if (txHash) {
-      // if (receipt.status === true) {
-      //   this.noteTarget.value = `Please verify this transaction is confirrmed in your wallet: ${txHash}`;
-      //   this.payTarget.innerText = "Paid";
-      //   await this.postPayment(); // Goes to create order
-      //   this.loaderTarget.style.display = "none";
-      // }
     } catch (error) {
       console.log(error.message);
       this.loaderTarget.style.display = "none";
@@ -409,10 +389,10 @@ export default class extends Controller {
     const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/;
     try {
       const balance = await this.checkBTCBalance(this.addressTarget.value);
-      // const amount = await this.calculateBtcPrice();
+      const amount = await this.calculateBtcPrice();
       const feeRate = await this.calculateBTCFee();
       console.log("FEE RATE", feeRate);
-      const amount = 10000; // @dev test amount of Satoshis
+      // const amount = 10000; // @dev test amount of Satoshis
       console.log("BALANCE", balance);
       if ((amount + feeRate) > balance) {
         this.loaderTarget.style.display = "none";
@@ -456,7 +436,7 @@ export default class extends Controller {
       console.log("RESULT", result);
 
       if (bitcoinTxHashRegex.test(result) === true) {
-        this.noteTarget.value = `Please verify this transaction is confirrmed in your wallet: https://mempool.space/tx/${result}`;
+        this.noteTarget.value = `Please verify this transaction is confirmed in your wallet & amount is comprable: https://mempool.space/tx/${result}`;
         this.payTarget.innerText = "Paid";
         await this.postPayment();
         this.loaderTarget.style.display = "none";
