@@ -23,7 +23,7 @@ Due to the nature of the active storage of the paintings in the test, you will n
 
 ## Deployment to Digital Ocean:
 - Create a droplet with rails marketplace app
-- SSH into droplet
+- SSH into droplet ` ssh root@<ip of droplet>` or `ssh <short name >` if you have set up a config file in .ssh.
 - Optional: touch config in .ssh local machine with the below so you can `ssh <app name>`
 ```
 Host <name>
@@ -41,9 +41,10 @@ Host <name>
 `nano /etc/systemd/system/rails.service`
 
 - Change `WorkingDirectory=/home/rails/rails_app` to `WorkingDirectory=/home/<app name>`
-
+n you have an account available, log in
 - Give priviledges to rails user: `gpasswd -a rails sudo`
-- Change into user in drop cli: `sudo -i -u rails`
+- Change into user in drop cli: `sudo -i -u rails` (mine is scott)
+
 
 - GO to home directory `cd ..`
 - Clone your repo: `git clone <repo url>`
