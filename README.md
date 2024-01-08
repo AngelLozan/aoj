@@ -48,8 +48,8 @@ n you have an account available, log in
 
 - GO to home directory `cd ..`
 - Clone your repo: `git clone <repo url>`
-- `sudo chmod 777 -R app`
-- `cd app`
+- `sudo chmod 777 -R <app name>`
+- `cd <app name>`
 - Use rvm or ensure ruby installed
 - `bundle install`
 - yarn
