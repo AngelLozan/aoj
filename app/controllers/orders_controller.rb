@@ -174,15 +174,17 @@ class OrdersController < ApplicationController
   end
 
   def wallet
-    # Update to the address of the artist
-    address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
+    # @dev test address:
+    # address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
+    address = '0x4DE2d3C611cc080b22480Be43a32006b5b33e73'
     puts ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
 
   def btcwallet
-    # Update to the address of the artist
-    address = 'tb1qn50cajady0d86wttx65w20kz4gweuw74n7m5rg'
+    # @dev Test address:
+    # address = 'tb1qn50cajady0d86wttx65w20kz4gweuw74n7m5rg'
+    address = 'bc1q23dtx34f748phdOnektyvxnnvehqvac3r35a63'
     puts ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
