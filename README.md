@@ -53,9 +53,11 @@ n you have an account available, log in
 - Use rvm or ensure ruby installed
 - `bundle install`
 - yarn
-- Install figaro and use `bundle exec figaro install` to generate a `config/application.yml` file where you can store ENV variables previously hosted in a .env. This will manage environment variables for you in production.
-- `rails db:create`
--`rails db:migrate`
-- `rails db:seed`
+- Install figaro and use `bundle exec figaro install` to generate a `config/application.yml` file where you can store ENV variables previously hosted in a .env. This will manage environment variables for you in production. Potential error will show, but check to see if the file was created (usually is).
+- For production, run below or remove the env assignment for dev.
+- `RAILS_ENV=production bundle exec rake assets:precompile`
+- `RAILS_ENV=production rails db:create`
+-`RAILS_ENV=production rails db:migrate`
+- `RAILS_ENV=production rails db:seed`
 - Restart nginx: `sudo systemctl restart nginx`
 - Then restart the server: `sudo systemctl restart rails.service`
