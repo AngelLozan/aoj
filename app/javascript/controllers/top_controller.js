@@ -79,7 +79,7 @@ export default class extends Controller {
         );
       }
 
-      console.log("CONTRACT: ", contract);
+      // console.log("CONTRACT: ", contract);
       const data = await this.getNFTMetadata(contract);
     } catch (error) {
       console.log("Something went wrong in contract methods: ", error);
@@ -135,7 +135,7 @@ export default class extends Controller {
         //   return cachedPrice;
         // }
         const maticPrice = data["matic-network"]["usd"];
-        console.log("MATIC PRICE IS: ", maticPrice);
+        // console.log("MATIC PRICE IS: ", maticPrice);
         localStorage.setItem("maticPrice", maticPrice);
         return maticPrice;
       } else {
@@ -176,8 +176,8 @@ export default class extends Controller {
           localStorage.setItem(`stringResponse${i}`, stringResponse);
         }
 
-        console.log("OWNER >>> ", owner);
-        console.log("RESULT >>> ", result);
+        // console.log("OWNER >>> ", owner);
+        // console.log("RESULT >>> ", result);
 
         if (!result) {
           console.log(`No result for tokenId ${tokenId}!`);
@@ -188,7 +188,7 @@ export default class extends Controller {
         }
 
         try {
-          console.log("String response >>> ", stringResponse);
+          // console.log("String response >>> ", stringResponse);
           let objj = JSON.parse(stringResponse);
 
           let pic = objj.image;

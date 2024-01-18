@@ -2,6 +2,7 @@ require 'mail'
 require 'json'
 require 'uri'
 require 'net/http'
+require 'base64'
 
 class OrdersController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[ new create wallet btcwallet alchemy ]
@@ -29,6 +30,96 @@ class OrdersController < ApplicationController
     # gon.client_token = generate_client_token
   end
 
+  def create_paypal
+    @order = Order.new(order_params)
+
+    # Add paintings from cart to order
+    @cart.each do |painting|
+      @order.paintings << painting
+    end
+
+    # Add prints from cart to order
+    @flat_cart_arr.each do |print|
+      @order.prints << print
+    end
+
+    # Payment logic, amount in cents
+    @amount = (@cart.sum(&:price) + @prints_total)
+
+    whole_amount = sprintf('%.2f', @amount/100.0)
+    reference = SecureRandom.uuid
+    puts ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
+    access_token = generate_access_token
+    uri = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders")
+
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+
+  request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
+  request['Authorization'] = "Bearer #{access_token}"
+   # request.body = JSON.dump({}) # if you need to send a body with the request...
+  request.body = {
+    "purchase_units": [
+      {
+        "amount": {
+          "currency_code": "USD",
+          "value": "#{whole_amount}"
+        },
+        "reference_id": "#{reference}"
+      }
+    ],
+    "intent": "CAPTURE",
+    "payment_source": {
+      "paypal": {
+        "experience_context": {
+          "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED",
+          "payment_method_selected": "PAYPAL",
+          "brand_name": "The Art of Jaleh",
+          "locale": "en-US",
+          "landing_page": "LOGIN",
+          "shipping_preference": "SET_PROVIDED_ADDRESS",
+          "user_action": "PAY_NOW",
+          "return_url": "",
+          "cancel_url": ""
+        }
+      }
+    }
+  }.to_json
+
+  response = http.request(request)
+  raw_data = JSON.parse(response.body)
+  puts ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+  byebug
+
+    if raw_data.id?
+      puts "success!: #{raw_data.id}"
+      order_id = raw_data.id
+      respond_to do |format|
+        # byebug
+        if @order.save
+          @cart.each do |painting|
+            painting.update(status: "sold")
+          end
+        if @order.prints.any?
+          submit_printify_order
+        end
+          session[:cart] = []
+          session[:prints_cart] = []
+          OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+          OrderMailer.customer(@order).deliver_later # Email customer
+          format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+          format.json { render json: {orderID: order_id } }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+        end
+      end
+
+    else
+      puts " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
+      redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
+    end
+
+  end
 
   def create
     @order = Order.new(order_params)
@@ -45,37 +136,72 @@ class OrdersController < ApplicationController
 
     # Payment logic, amount in cents
     @amount = (@cart.sum(&:price) + @prints_total)
+    byebug
+  if order_params[:note] == "Paypal"
+    # Paypal
 
-    # raise
+    whole_amount = sprintf('%.2f', @amount/100.0)
+    reference = SecureRandom.uuid
+    access_token = generate_access_token
 
-    if params[:payment_method_nonce]
-      # Braintree
-      whole_amount = sprintf('%.2f', @amount/100.0)
+    uri = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders")
 
-      puts ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
 
-      gateway = Braintree::Gateway.new(
-        :environment => :sandbox,
-        :merchant_id => ENV["BRAINTREE_MERCHANT_ID"],
-        :public_key => ENV["BRAINTREE_PUBLIC_KEY"],
-        :private_key => ENV["BRAINTREE_PRIVATE_KEY"],
-      )
+    request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
+    request['Authorization'] = "Bearer #{access_token}"
+    # request.body = JSON.dump({}) # if you need to send a body with the request...
+          # "reference_id": "#{reference}"
+    request.body = {
+      "purchase_units": [
+        {
+          "amount": {
+            "currency_code": "USD",
+            "value": "#{whole_amount}"
+          }
+        }
+      ],
+      "intent": "CAPTURE",
+      "payment_source": {
+        "paypal": {
+          "experience_context": {
+            "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED",
+            # "payment_method_selected": "PAYPAL",
+            "brand_name": "The Art of Jaleh",
+            "locale": "en-US",
+            "landing_page": "LOGIN",
+            # "shipping_preference": "SET_PROVIDED_ADDRESS",
+            # "user_action": "PAY_NOW",
+            # "return_url": "",
+            # "cancel_url": ""
+          }
+        }
+      }
+    }.to_json
 
-      nonce_from_the_client = params[:payment_method_nonce]
+    response = http.request(request)
+    raw_data = JSON.parse(response.body)
+    puts ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+    byebug
 
-      puts ">>>>>>>>>>>>>>> NONCE: #{nonce_from_the_client}<<<<<<<<<<<<<<<<<<<"
+      # if raw_data["id"]
+        puts "ID: #{raw_data["id"]}"
+        order_id = raw_data["id"]
+        # capture_payment_url = raw_data["links"][1]["href"]
+        uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{order_id}/capture}")
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        request_capture = Net::HTTP::Post.new(uri_capture.path, {'Content-Type' => 'application/json'})
+        request_capture['Authorization'] = "Bearer #{access_token}"
+        response_capture = http.request(request_capture)
+        capture_data = JSON.parse(response_capture.body)
 
-      result = gateway.transaction.sale(
-        :amount => whole_amount,
-        :payment_method_nonce => nonce_from_the_client,
-        options: { submit_for_settlement: true }
-      )
+        puts ">>>>>>>>>>>>>>> RAW DATA: #{capture_data}<<<<<<<<<<<<<<<<<<<"
 
-      puts ">>>>>>>>>>>>>>> RESULT: #{result}<<<<<<<<<<<<<<<<<<<"
-
-      if result.success?
-        puts "success!: #{result.transaction.id}"
-
+      if capture_data["status"] == "COMPLETED"
+        puts "SUCCESS: #{capture_data["status"]}"
+        
         respond_to do |format|
           # byebug
           if @order.save
@@ -90,22 +216,18 @@ class OrdersController < ApplicationController
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
             OrderMailer.customer(@order).deliver_later # Email customer
             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+            format.json { render json: {orderID: order_id } }
           else
             format.html { render :new, status: :unprocessable_entity }
           end
         end
 
-      elsif result.transaction
-        puts "Error processing transaction:"
-        puts "  code: #{result.transaction.processor_response_code}"
-        puts "  text: #{result.transaction.processor_response_text}"
-        redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
-      else
-        puts " >>>>>>>>> ERROR: #{result.errors} <<<<<<<<<<<<<"
-        redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
-      end
+    else
+      puts " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
+      redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
+    end
 
-    elsif params[:stripeToken]
+  elsif params[:stripeToken]
       # Stripe
       customer = Stripe::Customer.create({
         email: params[:stripeEmail],
@@ -245,8 +367,25 @@ class OrdersController < ApplicationController
     end
   end
 
-  def generate_client_token
-    Braintree::ClientToken.generate
+  def generate_access_token
+    client_id = ENV['PAYPAL_CLIENT_ID']
+    app_secret = ENV['PAYPAL_SECRET_KEY']
+    auth = Base64.strict_encode64("#{client_id}:#{app_secret}")
+    url = URI.parse('https://api.sandbox.paypal.com/v1/oauth2/token')
+
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+
+    request = Net::HTTP::Post.new(url.path,
+                                   { 'Content-Type' => 'application/x-www-form-urlencoded',
+                                     'Authorization' => "Basic #{auth}" })
+
+    request.body = 'grant_type=client_credentials'
+
+    response = http.request(request)
+    data = JSON.parse(response.body)
+
+    data['access_token']
   end
 
 

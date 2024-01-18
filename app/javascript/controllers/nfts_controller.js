@@ -86,9 +86,9 @@ export default class extends Controller {
         );
       }
 
-      console.log("CONTRACT: ", contract);
+      // console.log("CONTRACT: ", contract);
       const data = await this.getNFTMetadata(contract);
-      console.log(data);
+      // console.log(data);
 
       await this.renderCards(data);
 
@@ -113,7 +113,7 @@ export default class extends Controller {
       if (!res.ok) throw new Error("Could not get web3 value");
 
       data = await res.json();
-      console.log(data.endpoint);
+      // console.log(data.endpoint);
       web3 = new Web3(
         new Web3.providers.HttpProvider(
           data.endpoint
@@ -274,8 +274,8 @@ export default class extends Controller {
           localStorage.setItem(`stringResponse${i}`, stringResponse);
         }
 
-        console.log("OWNER >>> ", owner);
-        console.log("RESULT >>> ", result);
+        // console.log("OWNER >>> ", owner);
+        // console.log("RESULT >>> ", result);
 
         if (!result) {
           console.log(`No result for tokenId ${tokenId}!`);
@@ -286,7 +286,7 @@ export default class extends Controller {
         }
 
         try {
-          console.log("String response >>> ", stringResponse);
+          // console.log("String response >>> ", stringResponse);
           let objj = JSON.parse(stringResponse);
 
           let pic = objj.image;
