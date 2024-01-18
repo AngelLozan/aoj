@@ -128,23 +128,11 @@
               <input type="submit" value="Pay with card" class="btn btn-primary">
             <% end %>
 
-            <script src="https://js.braintreegateway.com/js/braintree-2.32.1.min.js"></script>
+
+            <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV['PAYPAL_CLIENT_ID'] %>&components=buttons"></script>
+            <div id="paypal-button-container"></div>
             <script>
-              var clientToken = "<%= Braintree::ClientToken.generate %>"; // Generated server-side instead
-              braintree.setup(
-                  // gon.client_token, "dropin", {
-                  clientToken, "dropin", {
-                  container: "payment-form",
-                  paypal: {
-                    singleUse: true,
-                    currency: 'EUR',
-                    locale: 'en_us'
-                  },
-                  dataCollector: {
-                    paypal: true
-                  },
-                }
-              );
+              
             </script>
           </div>
         </div>
