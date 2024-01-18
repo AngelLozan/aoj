@@ -5,7 +5,7 @@ require 'net/http'
 require 'base64'
 
 class OrdersController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[ new create wallet btcwallet alchemy ]
+  skip_before_action :authenticate_user!, only: %i[ new create create_paypal wallet btcwallet alchemy ]
   before_action :set_order, only: %i[ show edit update destroy ]
   before_action :load_orders
   before_action :load_cart
@@ -31,93 +31,68 @@ class OrdersController < ApplicationController
   end
 
   def create_paypal
-    @order = Order.new(order_params)
+    paypal_params = {
+      address: params[:order][:address],
+      city: params[:order][:city],
+      state: params[:order][:state],
+      country: params[:order][:country],
+      zip: params[:order][:zip],
+      phone: params[:order][:phone],
+      name: params[:order][:name],
+      email: params[:order][:email],
+      note: params[:order][:note],
+      paypal_order_id: params[:paypal_order_id]
+      # Add other order parameters as needed
+    }
+    @order = Order.new(paypal_params)
 
-    # Add paintings from cart to order
     @cart.each do |painting|
       @order.paintings << painting
     end
 
-    # Add prints from cart to order
     @flat_cart_arr.each do |print|
       @order.prints << print
     end
 
-    # Payment logic, amount in cents
     @amount = (@cart.sum(&:price) + @prints_total)
+    orderID = paypal_params[:paypal_order_id]
 
-    whole_amount = sprintf('%.2f', @amount/100.0)
-    reference = SecureRandom.uuid
-    puts ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
-    access_token = generate_access_token
-    uri = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders")
+     uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{orderID}/capture}")
+     http = Net::HTTP.new(uri_capture.host, uri_capture.port)
+     http.use_ssl = true
+     request_capture = Net::HTTP::Post.new(uri_capture.path, {'Content-Type' => 'application/json'})
+     request_capture['Authorization'] = "Bearer #{access_token}"
+     response_capture = http.request(request_capture)
+     capture_data = JSON.parse(response_capture.body)
 
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = true
+     puts ">>>>>>>>>>>>>>> RAW DATA: #{capture_data} <<<<<<<<<<<<<<<<<<<"
 
-  request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
-  request['Authorization'] = "Bearer #{access_token}"
-   # request.body = JSON.dump({}) # if you need to send a body with the request...
-  request.body = {
-    "purchase_units": [
-      {
-        "amount": {
-          "currency_code": "USD",
-          "value": "#{whole_amount}"
-        },
-        "reference_id": "#{reference}"
-      }
-    ],
-    "intent": "CAPTURE",
-    "payment_source": {
-      "paypal": {
-        "experience_context": {
-          "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED",
-          "payment_method_selected": "PAYPAL",
-          "brand_name": "The Art of Jaleh",
-          "locale": "en-US",
-          "landing_page": "LOGIN",
-          "shipping_preference": "SET_PROVIDED_ADDRESS",
-          "user_action": "PAY_NOW",
-          "return_url": "",
-          "cancel_url": ""
-        }
-      }
-    }
-  }.to_json
+       if capture_data["status"] == "COMPLETED"
+         puts ">>>>>>>>>>>>>>> SUCCESS: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
 
-  response = http.request(request)
-  raw_data = JSON.parse(response.body)
-  puts ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
-  byebug
+         respond_to do |format|
+           # byebug
+           if @order.save
+             @cart.each do |painting|
+               painting.update(status: "sold")
+             end
+           if @order.prints.any?
+             submit_printify_order
+           end
+             session[:cart] = []
+             session[:prints_cart] = []
+             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+             OrderMailer.customer(@order).deliver_later # Email customer
+             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+           else
+             format.html { render :new, status: :unprocessable_entity }
+           end
+         end
 
-    if raw_data.id?
-      puts "success!: #{raw_data.id}"
-      order_id = raw_data.id
-      respond_to do |format|
-        # byebug
-        if @order.save
-          @cart.each do |painting|
-            painting.update(status: "sold")
-          end
-        if @order.prints.any?
-          submit_printify_order
-        end
-          session[:cart] = []
-          session[:prints_cart] = []
-          OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
-          OrderMailer.customer(@order).deliver_later # Email customer
-          format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
-          format.json { render json: {orderID: order_id } }
         else
-          format.html { render :new, status: :unprocessable_entity }
+          puts ">>>>>>>>>>>>>>> ERROR: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
+          redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
         end
-      end
-
-    else
-      puts " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
-      redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
-    end
 
   end
 
@@ -136,7 +111,7 @@ class OrdersController < ApplicationController
 
     # Payment logic, amount in cents
     @amount = (@cart.sum(&:price) + @prints_total)
-    byebug
+    # byebug
   if order_params[:note] == "Paypal"
     # Paypal
 
@@ -172,7 +147,7 @@ class OrdersController < ApplicationController
             "locale": "en-US",
             "landing_page": "LOGIN",
             # "shipping_preference": "SET_PROVIDED_ADDRESS",
-            # "user_action": "PAY_NOW",
+            "user_action": "PAY_NOW",
             # "return_url": "",
             # "cancel_url": ""
           }
@@ -183,48 +158,15 @@ class OrdersController < ApplicationController
     response = http.request(request)
     raw_data = JSON.parse(response.body)
     puts ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
-    byebug
+    # byebug
 
-      # if raw_data["id"]
-        puts "ID: #{raw_data["id"]}"
-        order_id = raw_data["id"]
-        # capture_payment_url = raw_data["links"][1]["href"]
-        uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{order_id}/capture}")
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
-        request_capture = Net::HTTP::Post.new(uri_capture.path, {'Content-Type' => 'application/json'})
-        request_capture['Authorization'] = "Bearer #{access_token}"
-        response_capture = http.request(request_capture)
-        capture_data = JSON.parse(response_capture.body)
-
-        puts ">>>>>>>>>>>>>>> RAW DATA: #{capture_data}<<<<<<<<<<<<<<<<<<<"
-
-      if capture_data["status"] == "COMPLETED"
-        puts "SUCCESS: #{capture_data["status"]}"
-        
-        respond_to do |format|
-          # byebug
-          if @order.save
-            @cart.each do |painting|
-              painting.update(status: "sold")
-            end
-          if @order.prints.any?
-            submit_printify_order
-          end
-            session[:cart] = []
-            session[:prints_cart] = []
-            OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
-            OrderMailer.customer(@order).deliver_later # Email customer
-            format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
-            format.json { render json: {orderID: order_id } }
-          else
-            format.html { render :new, status: :unprocessable_entity }
-          end
-        end
-
+    if raw_data["id"]
+      puts "ID: #{raw_data["id"]}"
+      order_id = raw_data["id"]
+      return render :json => { :orderID => order_id }, :status => :ok
     else
       puts " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
-      redirect_to new_order_path, notice: "Sorry, something went wrong with this card, please try again 🙏."
+      redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
     end
 
   elsif params[:stripeToken]
@@ -346,7 +288,7 @@ class OrdersController < ApplicationController
 
   def order_params
     # order_paintings: [] is an array of painting ids to set from the cart before save
-    params.require(:order).permit(:name, :address, :city, :state, :zip, :country, :phone, :status, :email, :note, :tracking, :link, paintings: [])
+    params.require(:order).permit(:name, :address, :city, :state, :zip, :country, :phone, :status, :email, :note, :tracking, :link, :paypal_order_id, paintings: [])
   end
 
   def set_order

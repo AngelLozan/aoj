@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_09_162209) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_18_233225) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -67,6 +67,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_09_162209) do
     t.string "tracking"
     t.string "link"
     t.jsonb "prints", default: [], array: true
+    t.string "paypal_order_id"
   end
 
   create_table "paintings", force: :cascade do |t|

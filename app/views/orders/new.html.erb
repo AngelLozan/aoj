@@ -144,9 +144,29 @@
                     });
                     const result = await response.json();
                     console.log("Paypal order created: ", result.orderID);
+                    return result.orderID;
                  } catch(e){
                   console.log(e);
                  }
+                },
+                onApprove: async (data) => {
+                  const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
+                  const form = document.querySelector('#order-form');
+                  const formData = new FormData(form);
+                  formData.append('paypal_order_id', data.orderID);
+                  try {
+                    const response = await fetch('/create_paypal', {
+                      method: 'POST',
+                       headers: {
+                        "X-CSRF-Token": csrfMetaTag.content,
+                      },
+                      body: formData,
+                    });
+                    const result = await response.json();
+                    console.log("Paypal order approved: ", result);
+                  } catch(e){
+                    console.log(e);
+                  }
                 }
               }).render('#paypal-button-container');
             </script>
