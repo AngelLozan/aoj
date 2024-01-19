@@ -131,41 +131,49 @@
             <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV['PAYPAL_CLIENT_ID'] %>&components=buttons"></script>
 
             <script>
-              paypal.Buttons({
-                env: 'sandbox', // Valid values are sandbox and live.
-                createOrder: async () => {
-                 try {
-                  const response = await fetch('/create_paypal', {
-                      method: 'POST',
-                      headers: {
-                        "X-CSRF-Token": csrfMetaTag.content,
-                      },
-                    });
-                    const result = await response.json();
-                    console.log("Paypal order created: ", result.orderID);
-                    return result.orderID;
-                 } catch(e){
-                  console.log(e);
-                 }
-                },
-                onApprove: async (data) => {
-                  const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
-                  const form = document.querySelector('#order-form');
-                  const formAction = form.getAttribute('action');
-                  const formData = new FormData(form);
-                  formData.append('paypal_order_id', data.orderID);
+              try {
+                paypal.Buttons({
+                  env: 'sandbox', // Valid values are sandbox and live.
+                  createOrder: async () => {
                   try {
-                    const response = await fetch(formAction, {
-                      method: 'POST',
-                      body: formData,
-                    });
-                    const result = await response.json();
-                    console.log("Paypal order approved: ", result);
+                    const form = document.querySelector('#order-form');
+                    const formData = new FormData(form);
+                    const response = await fetch('/create_paypal', {
+                        method: 'POST',
+                        headers: {
+                          "X-CSRF-Token": csrfMetaTag.content,
+                        },
+                        body: formData,
+                      });
+                      const result = await response.json();
+                      console.log("Paypal order created: ", result.orderID);
+                      return result.orderID;
                   } catch(e){
                     console.log(e);
                   }
-                }
-              }).render('#paypal-button-container');
+                  },
+                  onApprove: async (data) => {
+                    // const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
+                    const form = document.querySelector('#order-form');
+                    const formAction = form.getAttribute('action');
+                    const formData = new FormData(form);
+                    formData.append('paypal_order_id', data.orderID);
+                    try {
+                      const response = await fetch(formAction, {
+                        method: 'POST',
+                        body: formData,
+                      });
+                      const result = await response.json();
+                      console.log("Paypal order approved: ", result);
+                    } catch(e){
+                      console.log(e);
+                    }
+                  }
+                }).render('#paypal-button-container');
+                console.log("Paypal buttons rendered from new page.")
+              } catch(e){
+                console.log("Something went wrong loading buttons on new page", e);
+              }
             </script>
           </div>
         </div>

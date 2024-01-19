@@ -33,6 +33,7 @@ class OrdersController < ApplicationController
   def create_paypal
     # @dev Create the paypal order and start the flow. Client approves and it's captured in new page.
     @amount = (@cart.sum(&:price) + @prints_total)
+    puts ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
 
     whole_amount = sprintf('%.2f', @amount/100.0)
     access_token = generate_access_token
@@ -127,9 +128,9 @@ class OrdersController < ApplicationController
 
   if order_params[:note] == "Paypal"
     # Paypal
-    orderID = order_params[:paypal_order_id]
-
-    uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{orderID}/capture}")
+    orderID = params[:paypal_order_id]
+    access_token = generate_access_token
+    uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{orderID}/capture")
     http = Net::HTTP.new(uri_capture.host, uri_capture.port)
     http.use_ssl = true
     request_capture = Net::HTTP::Post.new(uri_capture.path, {'Content-Type' => 'application/json'})
@@ -143,7 +144,7 @@ class OrdersController < ApplicationController
         puts ">>>>>>>>>>>>>>> SUCCESS: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
 
         respond_to do |format|
-          # byebug
+          byebug
           if @order.save
             @cart.each do |painting|
               painting.update(status: "sold")
