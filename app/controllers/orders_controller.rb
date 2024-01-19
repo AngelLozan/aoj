@@ -31,103 +31,16 @@ class OrdersController < ApplicationController
   end
 
   def create_paypal
-    paypal_params = {
-      address: params[:order][:address],
-      city: params[:order][:city],
-      state: params[:order][:state],
-      country: params[:order][:country],
-      zip: params[:order][:zip],
-      phone: params[:order][:phone],
-      name: params[:order][:name],
-      email: params[:order][:email],
-      note: params[:order][:note],
-      paypal_order_id: params[:paypal_order_id]
-      # Add other order parameters as needed
-    }
-    @order = Order.new(paypal_params)
-
-    @cart.each do |painting|
-      @order.paintings << painting
-    end
-
-    @flat_cart_arr.each do |print|
-      @order.prints << print
-    end
-
     @amount = (@cart.sum(&:price) + @prints_total)
-    orderID = paypal_params[:paypal_order_id]
-
-     uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{orderID}/capture}")
-     http = Net::HTTP.new(uri_capture.host, uri_capture.port)
-     http.use_ssl = true
-     request_capture = Net::HTTP::Post.new(uri_capture.path, {'Content-Type' => 'application/json'})
-     request_capture['Authorization'] = "Bearer #{access_token}"
-     response_capture = http.request(request_capture)
-     capture_data = JSON.parse(response_capture.body)
-
-     puts ">>>>>>>>>>>>>>> RAW DATA: #{capture_data} <<<<<<<<<<<<<<<<<<<"
-
-       if capture_data["status"] == "COMPLETED"
-         puts ">>>>>>>>>>>>>>> SUCCESS: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
-
-         respond_to do |format|
-           # byebug
-           if @order.save
-             @cart.each do |painting|
-               painting.update(status: "sold")
-             end
-           if @order.prints.any?
-             submit_printify_order
-           end
-             session[:cart] = []
-             session[:prints_cart] = []
-             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
-             OrderMailer.customer(@order).deliver_later # Email customer
-             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
-           else
-             format.html { render :new, status: :unprocessable_entity }
-           end
-         end
-
-        else
-          puts ">>>>>>>>>>>>>>> ERROR: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
-          redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
-        end
-
-  end
-
-  def create
-    @order = Order.new(order_params)
-
-    # Add paintings from cart to order
-    @cart.each do |painting|
-      @order.paintings << painting
-    end
-
-    # Add prints from cart to order
-    @flat_cart_arr.each do |print|
-      @order.prints << print
-    end
-
-    # Payment logic, amount in cents
-    @amount = (@cart.sum(&:price) + @prints_total)
-    # byebug
-  if order_params[:note] == "Paypal"
-    # Paypal
 
     whole_amount = sprintf('%.2f', @amount/100.0)
-    reference = SecureRandom.uuid
     access_token = generate_access_token
 
     uri = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders")
-
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
     request['Authorization'] = "Bearer #{access_token}"
-    # request.body = JSON.dump({}) # if you need to send a body with the request...
-          # "reference_id": "#{reference}"
     request.body = {
       "purchase_units": [
         {
@@ -158,7 +71,6 @@ class OrdersController < ApplicationController
     response = http.request(request)
     raw_data = JSON.parse(response.body)
     puts ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
-    # byebug
 
     if raw_data["id"]
       puts "ID: #{raw_data["id"]}"
@@ -168,6 +80,90 @@ class OrdersController < ApplicationController
       puts " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
       redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
     end
+    # paypal_params = {
+    #   address: params[:order][:address],
+    #   city: params[:order][:city],
+    #   state: params[:order][:state],
+    #   country: params[:order][:country],
+    #   zip: params[:order][:zip],
+    #   phone: params[:order][:phone],
+    #   name: params[:order][:name],
+    #   email: params[:order][:email],
+    #   note: params[:order][:note],
+    #   paypal_order_id: params[:paypal_order_id]
+    #   # Add other order parameters as needed
+    # }
+    # @order = Order.new(paypal_params)
+
+    # @cart.each do |painting|
+    #   @order.paintings << painting
+    # end
+
+    # @flat_cart_arr.each do |print|
+    #   @order.prints << print
+    # end
+
+    # @amount = (@cart.sum(&:price) + @prints_total)
+
+
+  end
+
+  def create
+    @order = Order.new(order_params)
+
+    # Add paintings from cart to order
+    @cart.each do |painting|
+      @order.paintings << painting
+    end
+
+    # Add prints from cart to order
+    @flat_cart_arr.each do |print|
+      @order.prints << print
+    end
+
+    # Payment logic, amount in cents
+    @amount = (@cart.sum(&:price) + @prints_total)
+
+  if order_params[:note] == "Paypal"
+    # Paypal
+    orderID = order_params[:paypal_order_id]
+
+    uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{orderID}/capture}")
+    http = Net::HTTP.new(uri_capture.host, uri_capture.port)
+    http.use_ssl = true
+    request_capture = Net::HTTP::Post.new(uri_capture.path, {'Content-Type' => 'application/json'})
+    request_capture['Authorization'] = "Bearer #{access_token}"
+    response_capture = http.request(request_capture)
+    capture_data = JSON.parse(response_capture.body)
+
+    puts ">>>>>>>>>>>>>>> RAW DATA: #{capture_data} <<<<<<<<<<<<<<<<<<<"
+
+      if capture_data["status"] == "COMPLETED"
+        puts ">>>>>>>>>>>>>>> SUCCESS: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
+
+        respond_to do |format|
+          # byebug
+          if @order.save
+            @cart.each do |painting|
+              painting.update(status: "sold")
+            end
+          if @order.prints.any?
+            submit_printify_order
+          end
+            session[:cart] = []
+            session[:prints_cart] = []
+            OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
+            OrderMailer.customer(@order).deliver_later # Email customer
+            format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+          else
+            format.html { render :new, status: :unprocessable_entity }
+          end
+        end
+
+       else
+         puts ">>>>>>>>>>>>>>> ERROR: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
+         redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
+       end
 
   elsif params[:stripeToken]
       # Stripe
