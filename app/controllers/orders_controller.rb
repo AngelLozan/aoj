@@ -31,6 +31,7 @@ class OrdersController < ApplicationController
   end
 
   def create_paypal
+    # @dev Create the paypal order and start the flow. Client approves and it's captured in new page.
     @amount = (@cart.sum(&:price) + @prints_total)
 
     whole_amount = sprintf('%.2f', @amount/100.0)
@@ -155,6 +156,7 @@ class OrdersController < ApplicationController
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
             OrderMailer.customer(@order).deliver_later # Email customer
             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+            return render :json => { :status => capture_data["status"] }, :status => :ok
           else
             format.html { render :new, status: :unprocessable_entity }
           end

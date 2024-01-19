@@ -22,6 +22,9 @@ application.register("nfts", NftsController)
 import OrdersController from "./orders_controller"
 application.register("orders", OrdersController)
 
+import PaypalController from "./paypal_controller"
+application.register("paypal", PaypalController)
+
 import PhotographyController from "./photography_controller"
 application.register("photography", PhotographyController)
 

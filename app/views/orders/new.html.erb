@@ -106,7 +106,7 @@
         <div class="panel">
           <h1 class="tabH1"><i class="fa-brands fa-paypal fa-2xl"></i> PayPal</h1>
           <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able: <a href="/contacts/new" target="_blank">Get in touch</a>. Thank you for supporting a more colorful world!</p>
-          <div>
+          <div data-controller="paypal">
             <% amount = (@cart.sum(&:price) + @prints_total) %>
             <%= simple_form_for @order, url: create_order_path, method: :post, html: { id: 'order-form' } do |f| %>
               <div class="form-inputs">
