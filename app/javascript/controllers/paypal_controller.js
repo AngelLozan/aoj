@@ -54,6 +54,10 @@ export default class extends Controller {
               });
               const result = await response.json();
               console.log("Paypal order approved: ", result);
+              this.displayFlashMessage("Thank you for order, please check your email!", 'success');
+              setTimeout(() => {
+                window.location.href = "/";
+              }, 2000);
             } catch(e){
               console.log(e);
             }
@@ -70,5 +74,25 @@ export default class extends Controller {
     const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
     return csrfMetaTag ? csrfMetaTag.content : "";
   }
+
+  displayFlashMessage(message, type) {
+    const flashElement = document.createElement('div');
+    flashElement.className = `alert alert-${type} alert-dismissible fade show m-1`;
+    flashElement.role = 'alert';
+    flashElement.setAttribute('data-controller', 'flash');
+    flashElement.textContent = message;
+
+    const button = document.createElement('button');
+    button.className = 'btn-close';
+    button.setAttribute('data-bs-dismiss', 'alert');
+
+    flashElement.appendChild(button);
+    document.body.appendChild(flashElement);
+
+    setTimeout(() => {
+        flashElement.remove();
+    }, 5000);
+}
+
 
 }
