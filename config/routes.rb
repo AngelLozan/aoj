@@ -36,6 +36,7 @@ Rails.application.routes.draw do
 
   get '/orders/new', to: "orders#new", as: 'new_order'
   post '/orders', to: "orders#create", as: 'create_order'
+  post :create_paypal , to: "orders#create_paypal"
   get '/orders/:id', to: "orders#show", as: 'order'
   get '/orders', to: "orders#index", as: 'orders'
   get '/orders/:id/edit', to: "orders#edit", as: 'edit_order'

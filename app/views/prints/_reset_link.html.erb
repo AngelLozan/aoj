@@ -1,0 +1,5 @@
+<% if query.present? %>
+  <%= link_to "#", data: { action: "click->search#resetSearch" }, class: "text-muted" do %>
+    Reset
+  <% end %>
+<% end %>

@@ -106,9 +106,9 @@
         <div class="panel">
           <h1 class="tabH1"><i class="fa-brands fa-paypal fa-2xl"></i> PayPal</h1>
           <p class="tabP">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able: <a href="/contacts/new" target="_blank">Get in touch</a>. Thank you for supporting a more colorful world!</p>
-          <div>
+          <div data-controller="paypal">
             <% amount = (@cart.sum(&:price) + @prints_total) %>
-            <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
+            <%= simple_form_for @order, url: create_order_path, method: :post, html: { id: 'order-form' } do |f| %>
               <div class="form-inputs">
                 <label class="amount mb-3">
                   <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
@@ -122,29 +122,58 @@
                 <%= f.input :phone, label: 'Contact Phone Number', input_html: { class: 'form-control' } %>
                 <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
                 <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
-                <%= f.input :note, as: :hidden %>
+                <%= f.input :note, as: :hidden, input_html: { value: 'Paypal' } %>
               </div>
-              <div id="payment-form"></div>
-              <input type="submit" value="Pay with card" class="btn btn-primary">
-            <% end %>
 
-            <script src="https://js.braintreegateway.com/js/braintree-2.32.1.min.js"></script>
+            <% end %>
+            <div id="paypal-button-container"></div>
+
+            <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV['PAYPAL_CLIENT_ID'] %>&components=buttons"></script>
+
             <script>
-              var clientToken = "<%= Braintree::ClientToken.generate %>"; // Generated server-side instead
-              braintree.setup(
-                  // gon.client_token, "dropin", {
-                  clientToken, "dropin", {
-                  container: "payment-form",
-                  paypal: {
-                    singleUse: true,
-                    currency: 'EUR',
-                    locale: 'en_us'
+              try {
+                paypal.Buttons({
+                  env: 'sandbox', // Valid values are sandbox and live.
+                  createOrder: async () => {
+                  try {
+                    const form = document.querySelector('#order-form');
+                    const formData = new FormData(form);
+                    const response = await fetch('/create_paypal', {
+                        method: 'POST',
+                        headers: {
+                          "X-CSRF-Token": csrfMetaTag.content,
+                        },
+                        body: formData,
+                      });
+                      const result = await response.json();
+                      console.log("Paypal order created: ", result.orderID);
+                      return result.orderID;
+                  } catch(e){
+                    console.log(e);
+                  }
                   },
-                  dataCollector: {
-                    paypal: true
-                  },
-                }
-              );
+                  onApprove: async (data) => {
+                    // const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
+                    const form = document.querySelector('#order-form');
+                    const formAction = form.getAttribute('action');
+                    const formData = new FormData(form);
+                    formData.append('paypal_order_id', data.orderID);
+                    try {
+                      const response = await fetch(formAction, {
+                        method: 'POST',
+                        body: formData,
+                      });
+                      const result = await response.json();
+                      console.log("Paypal order approved: ", result);
+                    } catch(e){
+                      console.log(e);
+                    }
+                  }
+                }).render('#paypal-button-container');
+                console.log("Paypal buttons rendered from new page.")
+              } catch(e){
+                console.log("Something went wrong loading buttons on new page", e);
+              }
             </script>
           </div>
         </div>

@@ -67,6 +67,15 @@ class PrintsController < ApplicationController
     @products = @products
     @products = Kaminari.paginate_array(@products).page(params[:page]).per(10)
 
+    return unless params[:query].present?
+
+    sql_subquery = <<~SQL
+      products.title ILIKE :query
+    SQL
+    # @products = @products.select(sql_subquery, query: "%#{params[:query]}%").page params[:page]
+    @products = @products.select {|p| p["title"].downcase.include? params[:query]}
+    @products = Kaminari.paginate_array(@products).page(params[:page]).per(10)
+
   end
 
   def show

@@ -13,6 +13,9 @@ application.register("cookies", CookiesController)
 import CryptoController from "./crypto_controller"
 application.register("crypto", CryptoController)
 
+import FlashController from "./flash_controller"
+application.register("flash", FlashController)
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
@@ -22,6 +25,9 @@ application.register("nfts", NftsController)
 import OrdersController from "./orders_controller"
 application.register("orders", OrdersController)
 
+import PaypalController from "./paypal_controller"
+application.register("paypal", PaypalController)
+
 import PhotographyController from "./photography_controller"
 application.register("photography", PhotographyController)
 
@@ -30,6 +36,9 @@ application.register("price", PriceController)
 
 import PrintsController from "./prints_controller"
 application.register("prints", PrintsController)
+
+import SearchController from "./search_controller"
+application.register("search", SearchController)
 
 import TopController from "./top_controller"
 application.register("top", TopController)
