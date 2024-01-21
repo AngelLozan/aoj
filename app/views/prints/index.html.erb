@@ -1,8 +1,28 @@
 
-<div class="container pb-5">
+<div class="container pb-5" data-controller="search">
   <div class="text-center mt-3">
     <h1>Prints</h1>
   </div>
+
+   <div class="d-flex justify-content-center my-3">
+    <%= form_with url: prints_path, method: :get, class: "d-flex", data: { search_target: 'searchForm' } do %>
+      <div class="input-group col-sm-6 col-md-4">
+        <%= text_field_tag :query,
+          params[:query],
+          class: "border border-blue-200 rounded p-2",
+          autocomplete: "off",
+          placeholder: "Find a print",
+          data: { search_target: 'input' }
+        %>
+        <%= submit_tag "Search", name: "", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class='d-flex justify-content-center'>
+    <%= render 'reset_link', query: params[:query] %>
+  </div>
+
 
 
 

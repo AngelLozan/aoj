@@ -37,6 +37,9 @@ application.register("price", PriceController)
 import PrintsController from "./prints_controller"
 application.register("prints", PrintsController)
 
+import SearchController from "./search_controller"
+application.register("search", SearchController)
+
 import TopController from "./top_controller"
 application.register("top", TopController)
 

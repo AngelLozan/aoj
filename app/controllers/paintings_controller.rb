@@ -14,6 +14,13 @@ class PaintingsController < ApplicationController
 
   def index
     @paintings = Painting.all.order(created_at: :desc).page params[:page]
+
+    return unless params[:query].present?
+
+    sql_subquery = <<~SQL
+      paintings.title ILIKE :query
+    SQL
+    @paintings = @paintings.where(sql_subquery, query: "%#{params[:query]}%").page params[:page]
   end
 
   def show
