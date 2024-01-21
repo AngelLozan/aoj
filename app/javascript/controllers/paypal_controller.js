@@ -54,12 +54,18 @@ export default class extends Controller {
               });
               const result = await response.json();
               console.log("Paypal order approved: ", result);
-              this.displayFlashMessage("Thank you for order, please check your email!", 'success');
+              if (result.error) {
+                this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
+              } else {
+              form.reset();
+              this.displayFlashMessage("Thank you for order, your painting will arrive soon.", 'info');
               setTimeout(() => {
                 window.location.href = "/";
               }, 2000);
+            }
             } catch(e){
               console.log(e);
+              this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
             }
           }
         }).render('#paypal-button-container');

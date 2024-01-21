@@ -13,6 +13,9 @@ application.register("cookies", CookiesController)
 import CryptoController from "./crypto_controller"
 application.register("crypto", CryptoController)
 
+import FlashController from "./flash_controller"
+application.register("flash", FlashController)
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
