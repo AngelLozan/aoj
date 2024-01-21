@@ -144,7 +144,7 @@ class OrdersController < ApplicationController
         puts ">>>>>>>>>>>>>>> SUCCESS: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
 
         respond_to do |format|
-          byebug
+          # byebug
           if @order.save
             @cart.each do |painting|
               painting.update(status: "sold")
