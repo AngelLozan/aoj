@@ -57,12 +57,12 @@ export default class extends Controller {
               if (result.error) {
                 this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
               } else {
-              form.reset();
-              this.displayFlashMessage("Thank you for order, your painting will arrive soon.", 'info');
-              setTimeout(() => {
-                window.location.href = "/";
-              }, 2000);
-            }
+                form.reset();
+                this.displayFlashMessage("Thank you for order, your painting will arrive soon.", 'info');
+                setTimeout(() => {
+                  window.location.href = "/paintings";
+                }, 1000);
+              }
             } catch(e){
               console.log(e);
               this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
@@ -80,7 +80,7 @@ export default class extends Controller {
     const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
     return csrfMetaTag ? csrfMetaTag.content : "";
   }
-
+  
   displayFlashMessage(message, type) {
     const flashElement = document.createElement('div');
     flashElement.className = `alert alert-${type} alert-dismissible fade show m-1`;

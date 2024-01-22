@@ -156,10 +156,12 @@ class OrdersController < ApplicationController
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
             OrderMailer.customer(@order).deliver_later # Email customer
-            format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
+            # format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
             return render :json => { :status => capture_data["status"] }, :status => :ok
+            # format.json { render json: { status: capture_data["status"] }, status: :ok }
           else
             format.html { render :new, status: :unprocessable_entity }
+            format.json { render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity }
           end
         end
 
