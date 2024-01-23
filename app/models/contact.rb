@@ -4,9 +4,9 @@ class Contact < ApplicationRecord
   def headers
     {
       subject: subject,
-      to: 'scottloz@protonmail.com',
+      to: 'hellojaleh@gmail.com',
       from: %("#{name}" <#{email}>)
     }
   end
-  
+
 end
