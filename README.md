@@ -35,13 +35,14 @@ Host <name>
 
 `nano /etc/nginx/sites-available/rails`
 
-- change `root /home/rails/rails_app/public;` to `root /home/<app name>/public;`
+- change `root /home/rails/rails_app/public;` to `root /home/<app name>/public;` (named after github repo name)
 
 - Change working dir similarly:
 `nano /etc/systemd/system/rails.service`
 
-- Change `WorkingDirectory=/home/rails/rails_app` to `WorkingDirectory=/home/<app name>`
+- Change `WorkingDirectory=/home/rails/rails_app` to `WorkingDirectory=/home/<app name>` (named after github repo name)
 n you have an account available, log in
+- Change command to start server to include production environment: `ExecStart=RAILS_ENV=production /bin/bash -lc 'bundle exec puma`
 - Give priviledges to rails user: `gpasswd -a rails sudo`
 - Change into user in drop cli: `sudo -i -u rails` (mine is scott)
 
