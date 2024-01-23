@@ -14,6 +14,16 @@ class OrdersController < ApplicationController
 
   def index
     @orders = Order.all
+
+    return unless params[:query].present?
+
+    sql_subquery = <<~SQL
+      orders.name ILIKE :query
+      OR orders.phone ILIKE :query
+      OR orders.email ILIKE :query
+      OR CAST(orders.status AS VARCHAR) ILIKE :query
+    SQL
+    @orders = @orders.where(sql_subquery, query: "%#{params[:query]}%")
   end
 
   def show
