@@ -82,5 +82,5 @@ test:
 production:
   <<: *default
   database: aoj_production
-  # username: aoj
-  # password: <%= ENV["AOJ_DATABASE_PASSWORD"] %>
+  username: <%= ENV["POSTGRES_USER"] %>
+  password: <%= ENV["POSTGRES_PASSWORD"] %>
