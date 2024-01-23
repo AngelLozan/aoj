@@ -42,4 +42,6 @@
 .byebug_history
 /config/credentials.yml.enc
 /config/application.yml
+/config/credentials.yml.enc
+/config/master.key
 ```
