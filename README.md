@@ -55,6 +55,11 @@ n you have an account available, log in
 - `bundle install`
 - yarn
 - Install figaro and use `bundle exec figaro install` to generate a `config/application.yml` file where you can store ENV variables previously hosted in a .env. This will manage environment variables for you in production. Potential error will show, but check to see if the file was created (usually is).
+- Copy contents of .env into application.yml, but format as below:
+```
+CLOUDINARY_URL: <url>
+```
+- May need to remove existing `config/credentials.yml.enc` and re-generate the `master.key`: `EDITOR="nano" rails credentials:edit`
 - For production, run below or remove the env assignment for dev.
 - `RAILS_ENV=production bundle exec rake assets:precompile`
 - `RAILS_ENV=production rails db:create`
