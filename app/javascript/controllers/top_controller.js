@@ -96,7 +96,6 @@ export default class extends Controller {
       if (!res.ok) throw new Error("Could not get web3 value");
 
       data = await res.json();
-      console.log(data.endpoint);
       web3 = new Web3(
         new Web3.providers.HttpProvider(
           data.endpoint
