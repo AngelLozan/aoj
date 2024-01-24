@@ -2,7 +2,7 @@ require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-  config.action_mailer.default_url_options = { host: "http://theartofjaleh.com/" }
+  config.action_mailer.default_url_options = { host: "https://theartofjaleh.com/" }
   # Code is not reloaded between requests.
   config.cache_classes = true
   config.action_dispatch.signed_cookie_digest = "SHA256"
