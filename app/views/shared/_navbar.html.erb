@@ -41,12 +41,14 @@
             </div>
           </li>
         <% else %>
-          <% if @cart && @cart.count > 0 || @prints_cart && @cart.count > 0 || @cart && @prints_cart.count > 0 || @prints_cart && @prints_cart.count > 0%>
-            <li class="nav-item">
-              <%= link_to new_order_path, class: "btn btn-primary rounded" do %>
-                <i class="fa-solid fa-cart-shopping me-3"></i><span class="badge bg-secondary"><%= @cart.count + @prints_cart.count %></span>
-              <% end %>
-            </li>
+          <% if defined?(@cart) && defined?(@prints_cart) %>
+            <% if @cart && @cart.count > 0 || @prints_cart && @cart.count > 0 || @cart && @prints_cart.count > 0 || @prints_cart && @prints_cart.count > 0%>
+              <li class="nav-item">
+                <%= link_to new_order_path, class: "btn btn-primary rounded" do %>
+                  <i class="fa-solid fa-cart-shopping me-3"></i><span class="badge bg-secondary"><%= @cart.count + @prints_cart.count %></span>
+                <% end %>
+              </li>
+            <% end %>
           <% end %>
           <li class="nav-item">
             <%= link_to "Originals", paintings_path, class: "nav-link" %>
@@ -69,8 +71,6 @@
           <li class="nav-item">
             <%= link_to "Contact", new_contact_path, class: "nav-link" %>
           </li>
-
-
         <% end %>
       </ul>
     </div>
