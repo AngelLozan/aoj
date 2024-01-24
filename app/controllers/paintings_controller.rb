@@ -35,7 +35,7 @@ class PaintingsController < ApplicationController
   end
 
   def create
-    adjusted_params = painting_params.merge(price: (painting_params[:price].to_f * 100).to_i)
+    adjusted_params = painting_params.merge(price: painting_params[:price].to_i)
     @painting = Painting.new(adjusted_params)
     respond_to do |format|
       if @painting.save
