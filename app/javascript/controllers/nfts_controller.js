@@ -265,12 +265,17 @@ export default class extends Controller {
           console.log("Fetching data since something wasn't cached for token: ", tokenId);
           result = await contract.methods.tokenURI(tokenId).call();
           owner = await contract.methods.ownerOf(tokenId).call();
-          let response = await fetch(result, { timeout: i === 3 ? 10000 : 5000 });
-          stringResponse = await response.text();
+          try {
+            let response = await fetch(result, { timeout: i === 3 ? 10000 : 5000 });
+            stringResponse = await response.text();
 
-          localStorage.setItem(`result${i}`, result);
-          localStorage.setItem(`owner${i}`, owner);
-          localStorage.setItem(`stringResponse${i}`, stringResponse);
+            localStorage.setItem(`result${i}`, result);
+            localStorage.setItem(`owner${i}`, owner);
+            localStorage.setItem(`stringResponse${i}`, stringResponse);
+          } catch (error) {
+            console.log("Error fetching data: ", error);
+            continue;
+          }
         }
 
         // console.log("OWNER >>> ", owner);

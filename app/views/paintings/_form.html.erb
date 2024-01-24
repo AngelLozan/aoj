@@ -9,7 +9,7 @@
     <% if @painting.price? %>
       <%= f.input :price, data: { target: 'price.input' } %>
     <% else %>
-      <%= f.input :price, label: 'Price in cents' %>
+      <%= f.input :price, label: 'Price to be multipled by 100 (ex: 10056 = $100.56)' %>
     <% end %>
 
     <%= f.input :title %>

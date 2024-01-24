@@ -6,12 +6,14 @@ Rails.application.configure do
   # Code is not reloaded between requests.
   config.cache_classes = true
   config.action_dispatch.signed_cookie_digest = "SHA256"
+  # config.action_dispatch.trusted_proxies = ["127.0.0.1", "::1", "139.59.173.126"]
+
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
   # and those relying on copy on write to perform better.
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
-  config.hosts << ["theartofjaleh.com", "www.theartofjaleh.com"]
+  # config.hosts << ["theartofjaleh.com", "www.theartofjaleh.com"]
 
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
@@ -25,6 +27,7 @@ Rails.application.configure do
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
   config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
+  config.hosts.clear
 
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass
@@ -33,7 +36,7 @@ Rails.application.configure do
   config.assets.compile = false
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  # config.asset_host = "http://assets.example.com"
+  # config.asset_host = "https://theartofjaleh.com"
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
@@ -46,7 +49,7 @@ Rails.application.configure do
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
   # config.action_cable.url = "wss://example.com/cable"
-  # config.action_cable.allowed_request_origins = [ "http://example.com", /http:\/\/example.*/ ]
+  # config.action_cable.allowed_request_origins = [ "https://theartofjaleh.com", "https://www.theartofjaleh.com"]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true

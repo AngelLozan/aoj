@@ -48,7 +48,7 @@ class OrdersController < ApplicationController
     whole_amount = sprintf('%.2f', @amount/100.0)
     access_token = generate_access_token
 
-    uri = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders")
+    uri = URI("https://api-m.paypal.com/v2/checkout/orders")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
@@ -92,31 +92,6 @@ class OrdersController < ApplicationController
       puts " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
       redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
     end
-    # paypal_params = {
-    #   address: params[:order][:address],
-    #   city: params[:order][:city],
-    #   state: params[:order][:state],
-    #   country: params[:order][:country],
-    #   zip: params[:order][:zip],
-    #   phone: params[:order][:phone],
-    #   name: params[:order][:name],
-    #   email: params[:order][:email],
-    #   note: params[:order][:note],
-    #   paypal_order_id: params[:paypal_order_id]
-    #   # Add other order parameters as needed
-    # }
-    # @order = Order.new(paypal_params)
-
-    # @cart.each do |painting|
-    #   @order.paintings << painting
-    # end
-
-    # @flat_cart_arr.each do |print|
-    #   @order.prints << print
-    # end
-
-    # @amount = (@cart.sum(&:price) + @prints_total)
-
 
   end
 
@@ -140,7 +115,7 @@ class OrdersController < ApplicationController
     # Paypal
     orderID = params[:paypal_order_id]
     access_token = generate_access_token
-    uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{orderID}/capture")
+    uri_capture = URI("https://api-m.paypal.com/v2/checkout/orders/#{orderID}/capture")
     http = Net::HTTP.new(uri_capture.host, uri_capture.port)
     http.use_ssl = true
     request_capture = Net::HTTP::Post.new(uri_capture.path, {'Content-Type' => 'application/json'})
@@ -324,7 +299,7 @@ class OrdersController < ApplicationController
     client_id = ENV['PAYPAL_CLIENT_ID']
     app_secret = ENV['PAYPAL_SECRET_KEY']
     auth = Base64.strict_encode64("#{client_id}:#{app_secret}")
-    url = URI.parse('https://api.sandbox.paypal.com/v1/oauth2/token')
+    url = URI.parse('https://api-m.paypal.com/v1/oauth2/token')
 
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true

@@ -73,7 +73,7 @@ class PrintsController < ApplicationController
       products.title ILIKE :query
     SQL
     # @products = @products.select(sql_subquery, query: "%#{params[:query]}%").page params[:page]
-    @products = @products.select {|p| p["title"].downcase.include? params[:query]}
+    @products = @products.select {|p| p["title"].downcase.include? params[:query].downcase}
     @products = Kaminari.paginate_array(@products).page(params[:page]).per(10)
 
   end

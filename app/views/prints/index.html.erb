@@ -6,16 +6,14 @@
 
    <div class="d-flex justify-content-center my-3">
     <%= form_with url: prints_path, method: :get, class: "d-flex", data: { search_target: 'searchForm' } do %>
-      <div class="input-group col-sm-6 col-md-4">
-        <%= text_field_tag :query,
-          params[:query],
-          class: "border border-blue-200 rounded p-2",
-          autocomplete: "off",
-          placeholder: "Find a print",
-          data: { search_target: 'input' }
-        %>
-        <%= submit_tag "Search", name: "", class: "btn btn-primary" %>
-      </div>
+      <div class="p-1 bg-light rounded rounded-pill shadow-sm mb-4">
+          <div class="input-group">
+            <input name="query" id="query" data-search-target="input" type="text" placeholder="What're you seeking?" data-search-target="search" class="form-control border-0 bg-light rounded-pill">
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-link text-primary"><i class="fa fa-search"></i></button>
+            </div>
+          </div>
+        </div>
     <% end %>
   </div>
 
