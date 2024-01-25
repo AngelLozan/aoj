@@ -21,7 +21,7 @@ Due to the nature of the active storage of the paintings in the test, you will n
 
 - Paypal sandbox cards: Use current month and one year in advance ex: 10/24 for the expiration date.
 
-## Deployment to Digital Ocean:
+## Deployment to Digital Ocean (start in terminal):
 - Create a droplet with rails marketplace app
 - SSH into droplet ` ssh root@<ip of droplet>` or `ssh <short name >` if you have set up a config file in .ssh.
 - Optional: touch config in .ssh local machine with the below so you can `ssh <app name>`
@@ -43,15 +43,27 @@ Host <name>
 proxy_set_header Upgrade $http_upgrade;
 proxy_set_header Connection "upgrade";
 ```
+- Change server name to your domain name: `server_name <domain name> www.<domain name>;`
 
 - Change working dir similarly:
 `nano /etc/systemd/system/rails.service`
 
 - Change `WorkingDirectory=/home/rails/rails_app` to `WorkingDirectory=/home/<app name>` (named after github repo name)
 n you have an account available, log in
-- Change command to start server to include production environment: `ExecStart=RAILS_ENV=production /bin/bash -lc 'bundle exec puma`
+- Change command to start server to include production environment: `ExecStart= /bin/bash -lc 'bundle exec puma -e production`
+
+## Not in terminal, but in droplet dashboard:
+- If you have a domain name, in the droplet console under "Domains" add your domain names as A records TTL 3600 and point it to the droplet IP address. Ensure you set up the name servers in your domain registrar to point to Digital Ocean's name servers:
+
+  ```
+  ns1.digitalocean.com
+  ns2.digitalocean.com
+  ns3.digitalocean.com
+  ```
+## Back to terminal:
+
 - Give priviledges to rails user: `gpasswd -a rails sudo`
-- Change into user in drop cli: `sudo -i -u rails` (mine is scott)
+- Change into user in drop cli: `sudo -i -u rails` or whatever you want to call the user. Rails is pre-existing.
 
 
 - GO to home directory `cd ..`
@@ -64,7 +76,7 @@ n you have an account available, log in
 - Install figaro and use `bundle exec figaro install` to generate a `config/application.yml` file where you can store ENV variables previously hosted in a .env. This will manage environment variables for you in production. Potential error will show, but check to see if the file was created (usually is).
 - Copy contents of .env into application.yml, but format as below:
 ```
-CLOUDINARY_URL: <url>
+EXAMPLE_ENV_VAR: <value>
 ```
 - May need to remove existing `config/credentials.yml.enc` and re-generate the `master.key`: `EDITOR="nano" rails credentials:edit`
 - For production, run below or remove the env assignment for dev.
@@ -72,6 +84,8 @@ CLOUDINARY_URL: <url>
 - `RAILS_ENV=production rails db:create`
 -`RAILS_ENV=production rails db:migrate`
 - `RAILS_ENV=production rails db:seed`
+
+- Obtain SSL certificate: `sudo certbot --nginx -d <domain name> -d <www.domain name>`
 - Restart nginx: `sudo systemctl restart nginx`
 - Then restart the server: `sudo systemctl restart rails.service`
 - View logs by changing into the rails user `sudo -i -u rails` and then `cd <app name>` and `tail -f log/production.log`
