@@ -175,6 +175,7 @@ class OrdersController < ApplicationController
             @cart.each do |painting|
               painting.update(status: "sold")
             end
+
           if @order.prints.any?
             submit_printify_order
           end
@@ -347,7 +348,7 @@ class OrdersController < ApplicationController
     # end
 
     request_body = {
-      "external_id": ENV["SALES_CHANNEL_ID"] || "",
+      "external_id": ENV["SALES_CHANNEL"] || "",
       "label": "AOJ", # Optional
       "line_items": all_items,
       "shipping_method": 1,
