@@ -37,6 +37,13 @@ Host <name>
 
 - change `root /home/rails/rails_app/public;` to `root /home/<app name>/public;` (named after github repo name)
 
+- Also add the following to your server location / block:
+
+```
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection "upgrade";
+```
+
 - Change working dir similarly:
 `nano /etc/systemd/system/rails.service`
 

@@ -27,8 +27,7 @@
 
                 <div class="d-flex flex-row">
                     <small>
-                      <i class="fa-solid fa-dollar-sign"></i>
-                      <%= painting.price / 100.0 %>
+                      <%= number_to_currency(painting.price / 100.00, :unit=> '$') %>
                     </small>
                 </div>
                 <div class="d-flex flex-row">
