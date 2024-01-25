@@ -166,7 +166,7 @@ class OrdersController < ApplicationController
         customer: customer.id,
         amount: @amount,
         description: "Rails Stripe customer",
-        currency: "eur",
+        currency: "usd",
       })
 
         respond_to do |format|
