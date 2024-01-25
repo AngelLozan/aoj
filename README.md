@@ -4,7 +4,7 @@
 
 This is an application to showcase the work of an artist and help them manage their online store by removing the need to utilize third parties to sell their work.
 
-View development app at: http://209.97.136.205/
+App here: https://theartofjaleh.com/
 
 ## Account administration
 
@@ -88,6 +88,7 @@ EXAMPLE_ENV_VAR: <value>
 -`RAILS_ENV=production rails db:migrate`
 - `RAILS_ENV=production rails db:seed`
 
+- Exit rails user and as root enable OpenSSH: `ufw allow OpenSSH`
 - Obtain SSL certificate: `sudo certbot --nginx -d <domain name> -d <www.domain name>`
 - Restart nginx: `sudo systemctl restart nginx`
 - Then restart the server: `sudo systemctl restart rails.service`
