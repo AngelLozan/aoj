@@ -348,7 +348,7 @@ class OrdersController < ApplicationController
     # end
 
     request_body = {
-      "external_id": ENV["SALES_CHANNEL"] || "",
+      "external_id": order_params[:name],
       "label": "AOJ", # Optional
       "line_items": all_items,
       "shipping_method": 1,

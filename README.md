@@ -74,3 +74,4 @@ CLOUDINARY_URL: <url>
 - `RAILS_ENV=production rails db:seed`
 - Restart nginx: `sudo systemctl restart nginx`
 - Then restart the server: `sudo systemctl restart rails.service`
+- View logs by changing into the rails user `sudo -i -u rails` and then `cd <app name>` and `tail -f log/production.log`
