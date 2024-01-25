@@ -31,6 +31,9 @@ Host <name>
   HostName <ip of droplet>
   IdentityFile ~/.ssh/<name>
 ```
+- Save a copy of your rails password and Postgres password in a safe place. You will need them later when you populate the application.yml file. Password is used throughout to clone repos, use sudo as rails user, etc.
+
+- Update packages: `sudo apt-get update`
 - Change default rails project folder:
 
 `nano /etc/nginx/sites-available/rails`
