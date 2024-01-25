@@ -16,6 +16,11 @@ export default class extends Controller {
     this.searchFormTarget.submit();
   }
 
+  resetSearchPrints() {
+    // this.searchFormTarget.reset();
+    window.location.href = "/prints/index";
+  }
+
   get searchFormTarget() {
     // return this.targets.find('searchForm');
     return document.querySelector('form[data-search-target="searchForm"]');

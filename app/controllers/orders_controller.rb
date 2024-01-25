@@ -43,7 +43,7 @@ class OrdersController < ApplicationController
   def create_paypal
     # @dev Create the paypal order and start the flow. Client approves and it's captured in new page.
     @amount = (@cart.sum(&:price) + @prints_total)
-    puts ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
+    Rails.logger.info ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
 
     whole_amount = sprintf('%.2f', @amount/100.0)
     access_token = generate_access_token
@@ -82,14 +82,14 @@ class OrdersController < ApplicationController
 
     response = http.request(request)
     raw_data = JSON.parse(response.body)
-    puts ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+    Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
 
     if raw_data["id"]
-      puts "ID: #{raw_data["id"]}"
+      Rails.logger.info "ID: #{raw_data["id"]}"
       order_id = raw_data["id"]
       return render :json => { :orderID => order_id }, :status => :ok
     else
-      puts " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
+      Rails.logger.info " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
       redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
     end
 
@@ -123,10 +123,15 @@ class OrdersController < ApplicationController
     response_capture = http.request(request_capture)
     capture_data = JSON.parse(response_capture.body)
 
-    puts ">>>>>>>>>>>>>>> RAW DATA: #{capture_data} <<<<<<<<<<<<<<<<<<<"
+    Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA: #{capture_data} <<<<<<<<<<<<<<<<<<<"
 
       if capture_data["status"] == "COMPLETED"
-        puts ">>>>>>>>>>>>>>> SUCCESS: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
+        Rails.logger.info ">>>>>>>>>>>>>>> SUCCESS: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
+
+        if @order.prints.any?
+          Rails.logger.info ">>>>>>>>>>>>>>> Paypal prints being submitted <<<<<<<<<<<<<<<<<<<"
+          submit_printify_order
+        end
 
         respond_to do |format|
           # byebug
@@ -134,9 +139,7 @@ class OrdersController < ApplicationController
             @cart.each do |painting|
               painting.update(status: "sold")
             end
-          if @order.prints.any?
-            submit_printify_order
-          end
+
             session[:cart] = []
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
@@ -151,7 +154,7 @@ class OrdersController < ApplicationController
         end
 
        else
-         puts ">>>>>>>>>>>>>>> ERROR: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
+         Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
          redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
        end
 
@@ -169,6 +172,11 @@ class OrdersController < ApplicationController
         currency: "usd",
       })
 
+      if @order.prints.any?
+        Rails.logger.info ">>>>>>>>>>>>>>> Stripe prints being submitted <<<<<<<<<<<<<<<<<<<"
+        submit_printify_order
+      end
+
         respond_to do |format|
           # byebug
           if @order.save
@@ -176,9 +184,9 @@ class OrdersController < ApplicationController
               painting.update(status: "sold")
             end
 
-          if @order.prints.any?
-            submit_printify_order
-          end
+          # if @order.prints.any?
+          #   submit_printify_order
+          # end
             session[:cart] = []
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
@@ -191,15 +199,21 @@ class OrdersController < ApplicationController
 
     else
       # Crypto
-      puts "Crypto"
+      Rails.logger.info "Crypto"
+
+      if @order.prints.any?
+        Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being submitted <<<<<<<<<<<<<<<<<<<"
+        submit_printify_order
+      end
+
       respond_to do |format|
         if @order.save
           @cart.each do |painting|
             painting.update(status: "sold")
           end
-          if @order.prints.any?
-            submit_printify_order
-          end
+          # if @order.prints.any?
+          #   submit_printify_order
+          # end
           session[:cart] = []
           session[:prints_cart] = []
           # byebug
@@ -228,7 +242,7 @@ class OrdersController < ApplicationController
     # @dev test address:
     # address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
     address = '0x4DE2d3C611cc080b22480Be43a32006b5b33e73'
-    puts ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
+    Rails.logger.info ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
 
@@ -236,7 +250,7 @@ class OrdersController < ApplicationController
     # @dev Test address:
     # address = 'tb1qn50cajady0d86wttx65w20kz4gweuw74n7m5rg'
     address = 'bc1q23dtx34f748phdOnektyvxnnvehqvac3r35a63'
-    puts ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
+    Rails.logger.info ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
 
@@ -383,12 +397,12 @@ class OrdersController < ApplicationController
       # raw_data = response.read_body
       raw_data = JSON.parse(response.read_body)
 
-      puts ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+      Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
 
       if raw_data["id"]
-        puts ">>>>>>>>>>>>>>> ORDER ID: #{raw_data["id"]}<<<<<<<<<<<<<<<<<<<"
+        Rails.logger.info ">>>>>>>>>>>>>>> ORDER ID: #{raw_data["id"]}<<<<<<<<<<<<<<<<<<<"
       else
-        puts ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+        Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
       end
   end
 end

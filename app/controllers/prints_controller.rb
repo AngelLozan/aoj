@@ -65,7 +65,9 @@ class PrintsController < ApplicationController
       end
     end
     @products = @products
-    @products = Kaminari.paginate_array(@products).page(params[:page]).per(10)
+    if !params[:query] || params[:query].empty?
+      @products = Kaminari.paginate_array(@products).page(params[:page]).per(10)
+    end
 
     return unless params[:query].present?
 

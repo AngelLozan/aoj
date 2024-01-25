@@ -309,11 +309,11 @@ ul.social li{
             	<tr>
             		<td style="padding: 0 2.5em; text-align: center; padding-bottom: 3em;">
             			<div class="text">
-            				<h2>Your painting is on the way!</h2>
+            				<h2>Your art is on the way!</h2>
                     <h3> Tracking number: <%= @order.tracking %></h3>
                     <h3>
                       <a href='<%= @order.link %>' >
-                        Use this link to view the progress of your painting.
+                        Use this link to view the progress of your order.
                       </a>
                     </h3>
             			</div>
@@ -322,10 +322,10 @@ ul.social li{
             	<tr>
 			          <td style="text-align: center;">
 			          	<div class="text-author">
-				          	<img src="https://jsadravi.files.wordpress.com/2021/12/0b850b4f-20e0-47a9-8c02-03a17066d629.jpg" alt="" style="width: 100px; max-width: 600px; height: auto; margin: auto; display: block;">
+				          	<%= image_tag attachments['aoj.jpeg'].url, :style => "width: 100px; max-width: 600px; height: auto; margin: auto; display: block;" %>
 				          	<h3 class="name">Jaleh Sadravi</h3>
 				          	<span class="position">Artist, The Art of Jaleh</span>
-				           	<p><a href="http://theartofjaleh.com/" class="btn btn-primary">Find out more</a></p>
+				           	<p><a href="https://theartofjaleh.com/" class="btn btn-primary">Find out more</a></p>
 			           	</div>
 			          </td>
 			        </tr>

@@ -11,11 +11,13 @@ class OrderMailer < ApplicationMailer
   end
 
   def customer(_order)
+    attachments.inline['aoj.jpeg'] = File.read("#{Rails.root}/app/assets/images/aoj.jpeg")
     @order = _order
     mail( to: @order.email, subject: "Thank you for your order!" )
   end
 
   def tracking(_order)
+    attachments.inline['aoj.jpeg'] = File.read("#{Rails.root}/app/assets/images/aoj.jpeg")
     @order = _order
     mail(to: @order.email, subject: "Your order has shipped!")
   end
