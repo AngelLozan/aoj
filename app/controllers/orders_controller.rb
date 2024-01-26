@@ -41,8 +41,15 @@ class OrdersController < ApplicationController
   end
 
   def create_paypal
+
+    # @dev If there are prints in the cart, submit the order to Printify & get shipping to submit with paypal order.
+    if @prints_total > 0
+      order_id = submit_printify_order
+      shipping_cost = calculate_shipping(order_id)
+    end
+
     # @dev Create the paypal order and start the flow. Client approves and it's captured in new page.
-    @amount = (@cart.sum(&:price) + @prints_total)
+    @amount = (@cart.sum(&:price) + @prints_total + shipping_cost)
     Rails.logger.info ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
 
     whole_amount = sprintf('%.2f', @amount/100.0)
@@ -128,10 +135,12 @@ class OrdersController < ApplicationController
       if capture_data["status"] == "COMPLETED"
         Rails.logger.info ">>>>>>>>>>>>>>> SUCCESS: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
 
-        if @order.prints.any?
-          Rails.logger.info ">>>>>>>>>>>>>>> Paypal prints being submitted <<<<<<<<<<<<<<<<<<<"
-          submit_printify_order
-        end
+        # @dev Done in create_paypal
+        # if @order.prints.any?
+        #   Rails.logger.info ">>>>>>>>>>>>>>> Paypal prints being submitted <<<<<<<<<<<<<<<<<<<"
+        #   order_id = submit_printify_order
+        #   shipping_cost = calculate_shipping(order_id)
+        # end
 
         respond_to do |format|
           # byebug
@@ -160,6 +169,15 @@ class OrdersController < ApplicationController
 
   elsif params[:stripeToken]
       # Stripe
+
+      if @order.prints.any?
+        Rails.logger.info ">>>>>>>>>>>>>>> Stripe prints being submitted <<<<<<<<<<<<<<<<<<<"
+        order_id = submit_printify_order
+        shipping_cost = calculate_shipping(order_id)
+      end
+
+      total_price = (@amount + shipping_cost)
+
       customer = Stripe::Customer.create({
         email: params[:stripeEmail],
         source: params[:stripeToken],
@@ -167,15 +185,10 @@ class OrdersController < ApplicationController
 
       charge = Stripe::Charge.create({
         customer: customer.id,
-        amount: @amount,
+        amount: total_price, #@amount,
         description: "Rails Stripe customer",
         currency: "usd",
       })
-
-      if @order.prints.any?
-        Rails.logger.info ">>>>>>>>>>>>>>> Stripe prints being submitted <<<<<<<<<<<<<<<<<<<"
-        submit_printify_order
-      end
 
         respond_to do |format|
           # byebug
@@ -203,8 +216,11 @@ class OrdersController < ApplicationController
 
       if @order.prints.any?
         Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being submitted <<<<<<<<<<<<<<<<<<<"
-        submit_printify_order
+        order_id = submit_printify_order
+        shipping_cost = calculate_shipping(order_id)
       end
+
+      total_price = (@amount + shipping_cost)
 
       respond_to do |format|
         if @order.save
@@ -401,8 +417,56 @@ class OrdersController < ApplicationController
 
       if raw_data["id"]
         Rails.logger.info ">>>>>>>>>>>>>>> ORDER ID: #{raw_data["id"]}<<<<<<<<<<<<<<<<<<<"
+        return raw_data["id"]
       else
         Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
       end
   end
+
+  def calculate_shipping(order_id)
+    all_items = []
+    shop_id = ENV["PRINTIFY_SHOP_ID"]
+
+    @flat_cart_arr.each do |print|
+      if all_items.any? { |item| item["id"] == print["id"] }
+        all_items.map do |item|
+          item["quantity"] += 1 if item["id"] == print["id"]
+        end
+      else
+        all_items << {
+          "product_id": print["id"], # string
+          "variant_id": print["variant"], # integer
+          "quantity": 1
+        }
+      end
+    end
+
+      url = URI("https://api.printify.com/v1/shops/#{shop_id}/orders/#{order_id}.json");
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true;
+
+      request = Net::HTTP::Get.new(url)
+      request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
+      request["Content-Type"] = "application/json"
+      request["Accept"] = "application/json"
+      request["User-Agent"] = "RUBY"
+      request.body = JSON.dump(request_body)
+
+      response = http.request(request)
+      raw_data = JSON.parse(response.read_body)
+
+      Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+
+      total_price = raw_data["total_price"]
+      Rails.logger.info ">>>>>>>>>>>>>>> TOTAL PRICE: #{total_price}<<<<<<<<<<<<<<<<<<<"
+      shipping_cost = raw_data["total_shipping"]
+      Rails.logger.info ">>>>>>>>>>>>>>> SHIPPING COST: #{shipping_cost}<<<<<<<<<<<<<<<<<<<"
+
+      if raw_data["total_shipping"]
+        return shipping_cost
+      else
+        Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+      end
+  end
+
 end

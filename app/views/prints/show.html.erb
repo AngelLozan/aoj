@@ -16,7 +16,12 @@
           <%=image_tag @print["image"] %>
         <% end %>
       <h1 class="mt-3 px-5"><%= @print["title"] %></h1>
-      <p class="prod-price"> <%= number_to_currency(@print["price"] / 100.00, :unit=> '$') %></p>
+      <% if @print["price"] >= 5000 %>
+        <p class="prod-price"> <%= number_to_currency(@print["price"] / 100.00, :unit=> '$') %> <small>Shipping included</small></p>
+      <% else %>
+        <p class="prod-price"> <%= number_to_currency(@print["price"] / 100.00, :unit=> '$') %> <small>+ Shipping</small></p>
+      <% end %>
+
       <p class="d-flex px-5"><%= @print["description"] %></p>
 
       <% if @flat_cart_arr.any? { |print| print["id"] == @print["id"]} %>

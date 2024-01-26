@@ -32,21 +32,21 @@
           <% end %>
           <% @flat_cart_arr.uniq.each do |item| %>
               <div class="col-12">
-                <div class="card-product mt-3 p-3">
+                <div class="card-product p-3 mt-3">
                   <%= image_tag item["image"] %>
 
                   <div class="card-product-infos">
                       <h2><%= item["title"] %></h2>
                     <div class="d-flex flex-row">
-                        <small>
-                         <%= number_to_currency(item["price"] / 100.00, :unit=> '$') %>
-                        </small>
+                      <small>
+                        <%= number_to_currency(item["price"] / 100.00, :unit=> '$') %>
+                      </small>
                     </div>
                     <div class="d-flex flex-row justify-content-evenly">
                       <%= button_to add_to_cart_prints_path(item["id"]), method: :post, class: "btn btn-sm btn-outline-dark rounded-pill" do %>
                         <i class="fa-solid fa-plus fa-2xs"></i>
                       <% end %>
-                      <%= @flat_cart_arr.map {|i| i == item }.count %>
+                      <%= @flat_cart_arr.select { |i| i == item }.count %>
                       <%= button_to remove_from_cart_prints_path(item["id"]), method: :delete, class: 'btn btn-sm btn-outline-dark rounded-pill' do %>
                         <i class="fa-solid fa-minus fa-2xs"></i>
                       <% end %>
@@ -57,7 +57,12 @@
             <% end %>
           <div class="mt-5">
             <hr>
-            <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></p>
+            <% if @cart.sum(&:price) + @prints_total >= 5000 %>
+              <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> <small>+ free shipping</small></p>
+            <% else %>
+              <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> <small>+ shipping calculated at checkout</small></p>
+            <% end %>
+
           </div>
       </div>
     </div>
@@ -74,7 +79,11 @@
             <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
               <div class="form-inputs">
                 <label class="amount mb-3">
-                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% if @cart.sum(&:price) + @prints_total >= 5000 %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% else %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> </strong><small>+ shipping calculated at checkout</small>
+                  <% end %>
                 </label>
 
                 <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
@@ -111,7 +120,11 @@
             <%= simple_form_for @order, url: create_order_path, method: :post, html: { id: 'order-form' } do |f| %>
               <div class="form-inputs">
                 <label class="amount mb-3">
-                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% if @cart.sum(&:price) + @prints_total >= 5000 %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% else %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> </strong><small>+ shipping calculated at checkout</small>
+                  <% end %>
                 </label>
 
                 <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
@@ -252,7 +265,11 @@
             <%= simple_form_for @order, data: { crypto_target: "form"} do |f| %>
               <div class="form-inputs">
                 <label class="amount mb-3">
-                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% if @cart.sum(&:price) + @prints_total >= 5000 %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% else %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> </strong><small>+ shipping calculated at checkout</small>
+                  <% end %>
                 </label>
 
                 <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
