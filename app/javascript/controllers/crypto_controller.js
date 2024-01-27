@@ -220,11 +220,12 @@ export default class extends Controller {
     }
   }
 
+// @dev Testnet / Mainnet uncomment
   async calculateBTCFee() {
     try {
       let res = await fetch(
-        `https://api.blockcypher.com/v1/btc/main`, // @dev Mainnet. Another api: https://api.blockchain.info/mempool/fees
-        // `https://api.blockcypher.com/v1/btc/test3`, // @dev Testnet
+        // `https://api.blockcypher.com/v1/btc/main`, // @dev Mainnet. Another api: https://api.blockchain.info/mempool/fees
+        `https://api.blockcypher.com/v1/btc/test3`, // @dev Testnet
         {
           method: "GET",
           headers: {
@@ -242,11 +243,12 @@ export default class extends Controller {
     }
   }
 
+  // @dev Testnet / Mainnet uncomment
   async checkBTCBalance(_address) {
     try {
       let res = await fetch(
-        `https://api.blockcypher.com/v1/btc/main/addrs/${_address}`, // @dev Mainnet only
-        // `https://api.blockcypher.com/v1/btc/test3/addrs/${_address}`, // @dev testnet only
+        // `https://api.blockcypher.com/v1/btc/main/addrs/${_address}`, // @dev Mainnet only
+        `https://api.blockcypher.com/v1/btc/test3/addrs/${_address}`, // @dev testnet only
         {
           method: "GET",
           headers: {
@@ -340,7 +342,7 @@ export default class extends Controller {
       console.log(error.message);
     }
   }
-// @dev Calls calculatePrice then postPayment if success of tx
+// @dev Calls calculatePrice then postPayment if success of tx (test values present)
   async #sendEth() {
     this.loaderTarget.style.display = "inline-block";
     const price = await this.calculatePrice();
@@ -354,9 +356,9 @@ export default class extends Controller {
     const limit = await this.web3.eth.estimateGas({
       from: this.accounts[0],
       to: address,
-      value: this.web3.utils.toHex(convertPrice),
-      // // @dev Test value
-      // value: this.web3.utils.toWei(0.0001, "ether"),
+      // value: this.web3.utils.toHex(convertPrice),
+      // @dev Test value
+      value: this.web3.utils.toWei(0.0001, "ether"),
     });
     console.log("LIMIT", limit);
 
@@ -378,12 +380,12 @@ export default class extends Controller {
             from: this.accounts[0],
             to: address,
             // data: this.web3.utils.toHex("AOJ"),
-            value: this.web3.utils.numberToHex(convertPrice),
-            // // @dev Test value
-            // value: this.web3.utils.toWei(0.0001, "ether"),
+            // value: this.web3.utils.numberToHex(convertPrice),
+            // @dev Test value
+            value: this.web3.utils.toWei(0.0001, "ether"),
             gas: this.web3.utils.numberToHex(limit),
-            maxPriorityFeePerGas: this.web3.utils.toWei(3, "gwei"),
-            maxFeePerGas: this.web3.utils.toWei(3, "gwei"),
+            maxPriorityFeePerGas: this.web3.utils.toWei(3, "gwei"), // 3 or 5 (tip to miner)
+            // maxFeePerGas: this.web3.utils.toWei(3, "gwei"), // Optional Default in web3.js
           },
         ],
       });
@@ -416,17 +418,17 @@ export default class extends Controller {
       alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
-// @dev Calls calculateBTCPrice then postPayment if success of tx
+// @dev Calls calculateBTCPrice then postPayment if success of tx (test values present)
   async #sendBTC() {
     this.loaderTarget.style.display = "inline-block";
     console.log("BTC PAYMENT");
     const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/;
     try {
       const balance = await this.checkBTCBalance(this.addressTarget.value);
-      const amount = await this.calculateBtcPrice();
+      // const amount = await this.calculateBtcPrice();
       const feeRate = await this.calculateBTCFee();
       console.log("FEE RATE", feeRate);
-      // const amount = 10000; // @dev test amount of Satoshis
+      const amount = 10000; // @dev test amount of Satoshis
       console.log("BALANCE", balance);
       if ((amount + feeRate) > balance) {
         this.loaderTarget.style.display = "none";
