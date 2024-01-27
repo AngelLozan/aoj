@@ -46,23 +46,33 @@ export default class extends Controller {
     }
 
   }
-
+// @dev Returns price plus shipping
   async getTotalPrice() {
     try {
-      let res = await fetch(
-        `/orders/total_price`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "X-CSRF-Token": this.csrfToken,
-          },
-        }
-      );
-      let data = await res.json();
-      console.log(data);
-      return data.amount;
+      let res = await fetch(`/orders/total_price`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+        },
+        body: new FormData(this.formTarget),
+      });
+      let response = await res.json();
+      console.log("RESPONSE:", response);
+      return response.amount;
+      // let res = await fetch(
+      //   `/orders/total_price`,
+      //   {
+      //     method: "GET",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Accept: "application/json",
+      //       "X-CSRF-Token": this.csrfToken,
+      //     },
+      //   }
+      // );
+      // let data = await res.json();
+      // console.log(data);
+      // return data.amount;
     } catch (error) {
       console.log("Was not able to get price total with shipping: ", error.message);
     }
@@ -157,6 +167,7 @@ export default class extends Controller {
     return csrfMetaTag ? csrfMetaTag.content : "";
   }
 
+  // @dev calls getTotalPrice
   async calculatePrice() {
     // const price = this.priceValue;
     const price = await this.getTotalPrice();
@@ -182,10 +193,10 @@ export default class extends Controller {
       console.log(error.message);
     }
   }
-
+// @dev Calls getTotalPrice
   async calculateBtcPrice() {
     // const price = this.priceValue;
-    const price = this.getTotalPrice();
+    const price = await this.getTotalPrice();
     try {
       let res = await fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur`,
@@ -288,7 +299,7 @@ export default class extends Controller {
       console.log(error.message);
     }
   }
-
+// @dev Posts the form data to create so that order in AOJ system.
   async postPayment(e) {
     try {
       let submitPayment = await fetch(`/orders/`, {
@@ -329,7 +340,7 @@ export default class extends Controller {
       console.log(error.message);
     }
   }
-
+// @dev Calls calculatePrice then postPayment if success of tx
   async #sendEth() {
     this.loaderTarget.style.display = "inline-block";
     const price = await this.calculatePrice();
@@ -405,7 +416,7 @@ export default class extends Controller {
       alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
-
+// @dev Calls calculateBTCPrice then postPayment if success of tx
   async #sendBTC() {
     this.loaderTarget.style.display = "inline-block";
     console.log("BTC PAYMENT");
@@ -476,13 +487,11 @@ export default class extends Controller {
     }
   }
 
-
-
   connectWallet(e) {
     console.log("connectWallet");
     this.#permissions();
   }
-
+// @dev Calls either sendETH or sendBTC
   pay(e) {
     e.preventDefault();
     // @dev Mainnet only

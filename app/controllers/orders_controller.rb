@@ -43,6 +43,7 @@ class OrdersController < ApplicationController
   def create_paypal
 
     # @dev If there are prints in the cart, submit the order to Printify & get shipping to submit with paypal order.
+    # @dev Works because order params (form data) is sent here from script in view.
     if @prints_total > 0
       order_id = submit_printify_order
       shipping_cost = calculate_shipping(order_id)
@@ -238,7 +239,7 @@ class OrdersController < ApplicationController
       #   shipping_cost = calculate_shipping(order_id)
       # end
 
-      total_price = (@amount + shipping_cost)
+      # total_price = (@amount + shipping_cost)
 
       respond_to do |format|
         if @order.save
@@ -279,6 +280,7 @@ class OrdersController < ApplicationController
     render json: { endpoint: ENV['ALCHEMY_ENDPOINT'], projectID: ENV['PROJECT_ID'] }, status: :ok
   end
 
+  # @dev Posts from crypto controller with formData for @order so order params present for printify methods
   def total_price
     if @prints_total > 0
       order_id = submit_printify_order
