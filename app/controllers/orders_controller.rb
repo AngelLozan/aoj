@@ -50,7 +50,12 @@ class OrdersController < ApplicationController
     end
 
     # @dev Create the paypal order and start the flow. Client approves and it's captured in new page.
-    @amount = (@cart.sum(&:price) + @prints_total + shipping_cost)
+    if (@cart.sum(&:price) + @prints_total) > 5000
+      @amount = (@cart.sum(&:price) + @prints_total)
+    else
+      @amount = (@cart.sum(&:price) + @prints_total + shipping_cost)
+    end
+
     Rails.logger.info ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
 
     whole_amount = sprintf('%.2f', @amount/100.0)
@@ -192,7 +197,13 @@ class OrdersController < ApplicationController
         shipping_cost = calculate_shipping(order_id)
       end
 
-      total_price = (@amount + shipping_cost)
+      if (@cart.sum(&:price) + @prints_total) > 5000
+        total_price = @amount
+      else
+        total_price = (@amount + shipping_cost)
+      end
+
+
 
       customer = Stripe::Customer.create({
         email: params[:stripeEmail],
@@ -288,7 +299,13 @@ class OrdersController < ApplicationController
       order_id = submit_printify_order
       shipping_cost = calculate_shipping(order_id)
     end
-    @amount = (@cart.sum(&:price) + @prints_total + shipping_cost)
+
+    if (@cart.sum(&:price) + @prints_total) > 5000
+      @amount = (@cart.sum(&:price) + @prints_total)
+    else
+      @amount = (@cart.sum(&:price) + @prints_total + shipping_cost)
+    end
+
     Rails.logger.info ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
     render json: { amount: @amount }, status: :ok
   end
