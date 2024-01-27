@@ -47,6 +47,27 @@ export default class extends Controller {
 
   }
 
+  async getTotalPrice() {
+    try {
+      let res = await fetch(
+        `/orders/total_price`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-Token": this.csrfToken,
+          },
+        }
+      );
+      let data = await res.json();
+      console.log(data);
+      return data.amount;
+    } catch (error) {
+      console.log("Was not able to get price total with shipping: ", error.message);
+    }
+  }
+
   async getWeb3Value() {
     let data;
     let web3;
@@ -137,7 +158,8 @@ export default class extends Controller {
   }
 
   async calculatePrice() {
-    const price = this.priceValue;
+    // const price = this.priceValue;
+    const price = await this.getTotalPrice();
     try {
       let res = await fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur`,
@@ -162,7 +184,8 @@ export default class extends Controller {
   }
 
   async calculateBtcPrice() {
-    const price = this.priceValue;
+    // const price = this.priceValue;
+    const price = this.getTotalPrice();
     try {
       let res = await fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur`,

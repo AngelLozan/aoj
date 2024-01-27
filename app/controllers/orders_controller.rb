@@ -97,6 +97,10 @@ class OrdersController < ApplicationController
       return render :json => { :orderID => order_id }, :status => :ok
     else
       Rails.logger.info " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
+      if @order.prints.any?
+        Rails.logger.info ">>>>>>>>>>>>>>> PayPal create prints being cancelled <<<<<<<<<<<<<<<<<<<"
+        cancel_order(order_id)
+      end
       redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
     end
 
@@ -119,8 +123,9 @@ class OrdersController < ApplicationController
     @amount = (@cart.sum(&:price) + @prints_total)
 
   if order_params[:note] == "Paypal"
-    # Paypal
-    orderID = params[:paypal_order_id]
+    Rails.logger.info "PayPal"
+
+    orderID = params[:paypal_order_id] # @dev From create_paypal. Added onto params and not part of forrm data, but allowed in model as int.
     access_token = generate_access_token
     uri_capture = URI("https://api-m.paypal.com/v2/checkout/orders/#{orderID}/capture")
     http = Net::HTTP.new(uri_capture.host, uri_capture.port)
@@ -159,16 +164,24 @@ class OrdersController < ApplicationController
           else
             format.html { render :new, status: :unprocessable_entity }
             format.json { render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity }
+            if @order.prints.any?
+              Rails.logger.info ">>>>>>>>>>>>>>> Paypal prints being cancelled <<<<<<<<<<<<<<<<<<<"
+              cancel_order(order_id)
+            end
           end
         end
 
        else
          Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
          redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
+         if @order.prints.any?
+          Rails.logger.info ">>>>>>>>>>>>>>> Paypal error prints being cancelled <<<<<<<<<<<<<<<<<<<"
+          cancel_order(order_id)
+        end
        end
 
   elsif params[:stripeToken]
-      # Stripe
+      Rails.logger.info "Stripe"
 
       if @order.prints.any?
         Rails.logger.info ">>>>>>>>>>>>>>> Stripe prints being submitted <<<<<<<<<<<<<<<<<<<"
@@ -207,6 +220,10 @@ class OrdersController < ApplicationController
             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
           else
             format.html { render :new, status: :unprocessable_entity }
+            if @order.prints.any?
+              Rails.logger.info ">>>>>>>>>>>>>>> Stripe prints being cancelled <<<<<<<<<<<<<<<<<<<"
+              cancel_order(order_id)
+            end
           end
         end
 
@@ -214,11 +231,12 @@ class OrdersController < ApplicationController
       # Crypto
       Rails.logger.info "Crypto"
 
-      if @order.prints.any?
-        Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being submitted <<<<<<<<<<<<<<<<<<<"
-        order_id = submit_printify_order
-        shipping_cost = calculate_shipping(order_id)
-      end
+      # @dev Do this in total price to send to the js controller.
+      # if @order.prints.any?
+      #   Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being submitted <<<<<<<<<<<<<<<<<<<"
+      #   order_id = submit_printify_order
+      #   shipping_cost = calculate_shipping(order_id)
+      # end
 
       total_price = (@amount + shipping_cost)
 
@@ -240,6 +258,10 @@ class OrdersController < ApplicationController
           format.text { render plain: "submitted" }
         else
           format.html { render :new, status: :unprocessable_entity }
+          if @order.prints.any?
+            Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being cancelled <<<<<<<<<<<<<<<<<<<"
+            cancel_order(order_id)
+          end
         end
       end
     end
@@ -247,11 +269,24 @@ class OrdersController < ApplicationController
   rescue Stripe::CardError => e
     flash[:error] = e.message
     redirect_to new_order_path
-
+    if @order.prints.any?
+      Rails.logger.info ">>>>>>>>>>>>>>> Stripe card error prints being cancelled <<<<<<<<<<<<<<<<<<<"
+      cancel_order(order_id)
+    end
   end
 
   def alchemy
     render json: { endpoint: ENV['ALCHEMY_ENDPOINT'], projectID: ENV['PROJECT_ID'] }, status: :ok
+  end
+
+  def total_price
+    if @prints_total > 0
+      order_id = submit_printify_order
+      shipping_cost = calculate_shipping(order_id)
+    end
+    @amount = (@cart.sum(&:price) + @prints_total + shipping_cost)
+    Rails.logger.info ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
+    render json: { amount: @amount }, status: :ok
   end
 
   def wallet
@@ -424,22 +459,7 @@ class OrdersController < ApplicationController
   end
 
   def calculate_shipping(order_id)
-    all_items = []
     shop_id = ENV["PRINTIFY_SHOP_ID"]
-
-    @flat_cart_arr.each do |print|
-      if all_items.any? { |item| item["id"] == print["id"] }
-        all_items.map do |item|
-          item["quantity"] += 1 if item["id"] == print["id"]
-        end
-      else
-        all_items << {
-          "product_id": print["id"], # string
-          "variant_id": print["variant"], # integer
-          "quantity": 1
-        }
-      end
-    end
 
       url = URI("https://api.printify.com/v1/shops/#{shop_id}/orders/#{order_id}.json");
       http = Net::HTTP.new(url.host, url.port)
@@ -464,6 +484,36 @@ class OrdersController < ApplicationController
 
       if raw_data["total_shipping"]
         return shipping_cost
+      else
+        Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+      end
+  end
+
+  def cancel_order(order_id)
+    shop_id = ENV["PRINTIFY_SHOP_ID"]
+
+      url = URI("https://api.printify.com/v1/shops/#{shop_id}/orders/#{order_id}/cancel.json");
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true;
+
+      request = Net::HTTP::Post.new(url)
+      request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
+      request["Content-Type"] = "application/json"
+      request["Accept"] = "application/json"
+      request["User-Agent"] = "RUBY"
+      request.body = JSON.dump(request_body)
+
+      response = http.request(request)
+      raw_data = JSON.parse(response.read_body)
+
+      Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+
+      status = raw_data["status"]
+      Rails.logger.info ">>>>>>>>>>>>>>> Status: #{status}<<<<<<<<<<<<<<<<<<<"
+
+
+      if status == "cancelled"
+        Rails.logger.info ">>>>>>>>>>>>>>> Order #{order_id} cancelled<<<<<<<<<<<<<<<<<<<"
       else
         Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
       end
