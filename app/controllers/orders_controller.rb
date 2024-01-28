@@ -5,7 +5,7 @@ require 'net/http'
 require 'base64'
 
 class OrdersController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[ new create create_paypal wallet btcwallet alchemy ]
+  skip_before_action :authenticate_user!, only: %i[ new create create_paypal wallet btcwallet alchemy total_price]
   before_action :set_order, only: %i[ show edit update destroy ]
   before_action :load_orders
   before_action :load_cart
