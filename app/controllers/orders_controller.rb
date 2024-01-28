@@ -5,7 +5,7 @@ require 'net/http'
 require 'base64'
 
 class OrdersController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[ new create create_paypal wallet btcwallet alchemy total_price]
+  skip_before_action :authenticate_user!, only: %i[ new create create_paypal wallet btcwallet alchemy total_price cancel_print_order]
   before_action :set_order, only: %i[ show edit update destroy ]
   before_action :load_orders
   before_action :load_cart
@@ -51,14 +51,14 @@ class OrdersController < ApplicationController
 
     # @dev Create the paypal order and start the flow. Client approves and it's captured in new page.
     if (@cart.sum(&:price) + @prints_total) > 5000
-      @amount = (@cart.sum(&:price) + @prints_total)
+      total = (@cart.sum(&:price) + @prints_total)
     else
-      @amount = (@cart.sum(&:price) + @prints_total + shipping_cost)
+      total = (@cart.sum(&:price) + @prints_total + shipping_cost)
     end
 
-    Rails.logger.info ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
+    Rails.logger.info ">>>>>>>>>>>>>>> Total: #{total}<<<<<<<<<<<<<<<<<<<"
 
-    whole_amount = sprintf('%.2f', @amount/100.0)
+    whole_amount = sprintf('%.2f', total/100.0)
     access_token = generate_access_token
 
     # uri = URI("https://api-m.paypal.com/v2/checkout/orders")
@@ -127,7 +127,8 @@ class OrdersController < ApplicationController
     end
 
     # Payment logic, amount in cents
-    @amount = (@cart.sum(&:price) + @prints_total)
+    # @amount = (@cart.sum(&:price) + @prints_total)
+
 
   if order_params[:note] == "Paypal"
     Rails.logger.info "PayPal"
@@ -191,19 +192,10 @@ class OrdersController < ApplicationController
   elsif params[:stripeToken]
       Rails.logger.info "Stripe"
 
-      if @order.prints.any?
-        Rails.logger.info ">>>>>>>>>>>>>>> Stripe prints being submitted <<<<<<<<<<<<<<<<<<<"
-        order_id = submit_printify_order
-        shipping_cost = calculate_shipping(order_id)
-      end
-
-      if (@cart.sum(&:price) + @prints_total) > 5000
-        total_price = @amount
-      else
-        total_price = (@amount + shipping_cost)
-      end
-
-
+      total_price = order_params[:total]
+      Rails.logger.info ">>>>>>>>>>>>>>> Total Price: #{total_price}<<<<<<<<<<<<<<<<<<<"
+      order_id = order_params[:stripe_order_id]
+      Rails.logger.info ">>>>>>>>>>>>>>> Order ID: #{order_id}<<<<<<<<<<<<<<<<<<<"
 
       customer = Stripe::Customer.create({
         email: params[:stripeEmail],
@@ -231,6 +223,8 @@ class OrdersController < ApplicationController
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
             OrderMailer.customer(@order).deliver_later # Email customer
+            flash[:notice] = "Thank you for your order! It will arrive soon."
+            format.text { render plain: "submitted" }
             format.html { redirect_to paintings_url, notice: "Thank you for your order! It will arrive soon." }
           else
             format.html { render :new, status: :unprocessable_entity }
@@ -293,6 +287,14 @@ class OrdersController < ApplicationController
     render json: { endpoint: ENV['ALCHEMY_ENDPOINT'], projectID: ENV['PROJECT_ID'] }, status: :ok
   end
 
+  def cancel_print_order
+    Rails.logger.info ">>>>>>>>>>>>>>> CANCEL PRINT ORDER CALLED <<<<<<<<<<<<<<<<<<<"
+    order_id = order_params[:stripe_order_id]
+    cancel_order(order_id)
+    render json: { status: "success" }, status: :ok
+    # redirect_to new_order_path
+  end
+
   # @dev Posts from crypto controller with formData for @order so order params present for printify methods
   def total_price
     if @prints_total > 0
@@ -307,7 +309,7 @@ class OrdersController < ApplicationController
     end
 
     Rails.logger.info ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
-    render json: { amount: @amount }, status: :ok
+    render json: { amount: @amount, stripe_order_id: order_id }, status: :ok
   end
 
   def wallet
@@ -361,7 +363,7 @@ class OrdersController < ApplicationController
 
   def order_params
     # order_paintings: [] is an array of painting ids to set from the cart before save
-    params.require(:order).permit(:name, :address, :city, :state, :zip, :country, :phone, :status, :email, :note, :tracking, :link, :paypal_order_id, paintings: [])
+    params.require(:order).permit(:name, :address, :city, :state, :zip, :country, :phone, :status, :email, :note, :tracking, :link, :paypal_order_id, :stripe_order_id, :total, paintings: [])
   end
 
   def set_order
@@ -408,6 +410,7 @@ class OrdersController < ApplicationController
   def submit_printify_order
     all_items = []
     shop_id = ENV["PRINTIFY_SHOP_ID"]
+    external_id = SecureRandom.uuid
 
     # @dev Add prints from cart to order.
     # @dev If print already exists in all_items, increment quantity by 1 instead of adding a new line item
@@ -435,7 +438,7 @@ class OrdersController < ApplicationController
     # end
 
     request_body = {
-      "external_id": order_params[:name],
+      "external_id": external_id, # order_params[:name],
       "label": "AOJ", # Optional
       "line_items": all_items,
       "shipping_method": 1,
@@ -470,13 +473,13 @@ class OrdersController < ApplicationController
       # raw_data = response.read_body
       raw_data = JSON.parse(response.read_body)
 
-      Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+      Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA SUBMIT_PRINTIFY: #{raw_data}<<<<<<<<<<<<<<<<<<<"
 
       if raw_data["id"]
         Rails.logger.info ">>>>>>>>>>>>>>> ORDER ID: #{raw_data["id"]}<<<<<<<<<<<<<<<<<<<"
         return raw_data["id"]
       else
-        Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+        Rails.logger.info ">>>>>>>>>>>>>>> ERROR SUBMIT_PRINTIFY: #{raw_data}<<<<<<<<<<<<<<<<<<<"
       end
   end
 
@@ -492,12 +495,12 @@ class OrdersController < ApplicationController
       request["Content-Type"] = "application/json"
       request["Accept"] = "application/json"
       request["User-Agent"] = "RUBY"
-      request.body = JSON.dump(request_body)
+      # request.body = JSON.dump(request_body)
 
       response = http.request(request)
       raw_data = JSON.parse(response.read_body)
 
-      Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+      Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA CALCULATE SHIPPING: #{raw_data}<<<<<<<<<<<<<<<<<<<"
 
       total_price = raw_data["total_price"]
       Rails.logger.info ">>>>>>>>>>>>>>> TOTAL PRICE: #{total_price}<<<<<<<<<<<<<<<<<<<"
@@ -507,7 +510,7 @@ class OrdersController < ApplicationController
       if raw_data["total_shipping"]
         return shipping_cost
       else
-        Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+        Rails.logger.info ">>>>>>>>>>>>>>> ERROR CALCULATE SHIPPING: #{raw_data}<<<<<<<<<<<<<<<<<<<"
       end
   end
 
@@ -523,12 +526,12 @@ class OrdersController < ApplicationController
       request["Content-Type"] = "application/json"
       request["Accept"] = "application/json"
       request["User-Agent"] = "RUBY"
-      request.body = JSON.dump(request_body)
+      # request.body = JSON.dump(request_body)
 
       response = http.request(request)
       raw_data = JSON.parse(response.read_body)
 
-      Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+      Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA CANCEL PRINTIFY: #{raw_data}<<<<<<<<<<<<<<<<<<<"
 
       status = raw_data["status"]
       Rails.logger.info ">>>>>>>>>>>>>>> Status: #{status}<<<<<<<<<<<<<<<<<<<"
@@ -537,7 +540,7 @@ class OrdersController < ApplicationController
       if status == "cancelled"
         Rails.logger.info ">>>>>>>>>>>>>>> Order #{order_id} cancelled<<<<<<<<<<<<<<<<<<<"
       else
-        Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{raw_data}<<<<<<<<<<<<<<<<<<<"
+        Rails.logger.info ">>>>>>>>>>>>>>> ERROR CANCEL PRINTIFY: #{raw_data}<<<<<<<<<<<<<<<<<<<"
       end
   end
 

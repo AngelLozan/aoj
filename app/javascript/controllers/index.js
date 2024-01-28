@@ -40,6 +40,9 @@ application.register("prints", PrintsController)
 import SearchController from "./search_controller"
 application.register("search", SearchController)
 
+import StripeController from "./stripe_controller"
+application.register("stripe", StripeController)
+
 import TopController from "./top_controller"
 application.register("top", TopController)
 

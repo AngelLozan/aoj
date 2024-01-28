@@ -75,9 +75,9 @@
         <div class="panel">
           <h1 class="tabH1"><i class="fa-brands fa-stripe fa-2xl"></i></h1>
           <p class="tabP mb-3">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able: <a href="/contacts/new" target="_blank">Get in touch</a>. Thank you for supporting a more colorful world!</p>
-          <div>
-            <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
-              <div class="form-inputs">
+          <div data-controller="stripe" data-stripe-publishable-key-value="<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>" >
+            <%= simple_form_for @order, url: create_order_path, method: :post, data: { stripe_target: "form"} do |f| %>
+              <div class="form-inputs" data-stripe-target="inputs">
                 <label class="amount mb-3">
                   <% if @cart.sum(&:price) + @prints_total >= 5000 %>
                     <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
@@ -95,8 +95,11 @@
                 <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control form-control-sm' } %>
                 <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control form-control-sm' } %>
                 <%= f.input :note, as: :hidden %>
+                <%= f.input :total, input_html: {data: { stripe_target: "total"}}, as: :hidden %>
+                <%= f.input :stripe_order_id, input_html: {data: { stripe_target: "id"}}, as: :hidden %>
               </div>
 
+            <% if false %>
               <% amount = (@cart.sum(&:price) + @prints_total) %>
               <script
                 src="https://checkout.stripe.com/checkout.js" class="stripe-button"
@@ -105,8 +108,9 @@
                 data-amount="<%= amount %>"
                 data-locale="auto">
               </script>
+            <% end %>
 
-              <input type="submit" value="Pay with card" class="btn btn-primary">
+              <input id="stripe-submit" type="submit" value="Pay with card" class="btn btn-primary">
             <% end %>
           </div>
         </div>
@@ -139,55 +143,60 @@
               </div>
 
             <% end %>
-            <div id="paypal-button-container"></div>
 
-            <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV['PAYPAL_CLIENT_ID'] %>&components=buttons"></script>
+             <div id="paypal-button-container"></div>
+            <% if true %>
 
-            <script>
-              try {
-                paypal.Buttons({
-                  env: 'live', // Valid values are sandbox and live.
-                  createOrder: async () => {
-                  try {
-                    const form = document.querySelector('#order-form');
-                    const formData = new FormData(form);
-                    const response = await fetch('/create_paypal', {
-                        method: 'POST',
-                        headers: {
-                          "X-CSRF-Token": csrfMetaTag.content,
-                        },
-                        body: formData,
-                      });
-                      const result = await response.json();
-                      console.log("Paypal order created: ", result.orderID);
-                      return result.orderID;
-                  } catch(e){
-                    console.log(e);
-                  }
-                  },
-                  onApprove: async (data) => {
-                    // const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
-                    const form = document.querySelector('#order-form');
-                    const formAction = form.getAttribute('action');
-                    const formData = new FormData(form);
-                    formData.append('paypal_order_id', data.orderID);
+
+              <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV['PAYPAL_CLIENT_ID'] %>&components=buttons"></script>
+
+              <script>
+                try {
+                  paypal.Buttons({
+                    env: 'sandbox', //'live', // Valid values are sandbox and live.
+                    createOrder: async () => {
                     try {
-                      const response = await fetch(formAction, {
-                        method: 'POST',
-                        body: formData,
-                      });
-                      const result = await response.json();
-                      console.log("Paypal order approved: ", result);
+                      const form = document.querySelector('#order-form');
+                      const formData = new FormData(form);
+                      const response = await fetch('/create_paypal', {
+                          method: 'POST',
+                          headers: {
+                            "X-CSRF-Token": csrfMetaTag.content,
+                          },
+                          body: formData,
+                        });
+                        const result = await response.json();
+                        console.log("Paypal order created: ", result.orderID);
+                        return result.orderID;
                     } catch(e){
                       console.log(e);
                     }
-                  }
-                }).render('#paypal-button-container');
-                console.log("Paypal buttons rendered from new page.")
-              } catch(e){
-                console.log("Something went wrong loading buttons on new page", e);
-              }
-            </script>
+                    },
+                    onApprove: async (data) => {
+                      // const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
+                      const form = document.querySelector('#order-form');
+                      const formAction = form.getAttribute('action');
+                      const formData = new FormData(form);
+                      formData.append('paypal_order_id', data.orderID);
+                      try {
+                        const response = await fetch(formAction, {
+                          method: 'POST',
+                          body: formData,
+                        });
+                        const result = await response.json();
+                        console.log("Paypal order approved: ", result);
+                      } catch(e){
+                        console.log(e);
+                      }
+                    }
+                  }).render('#paypal-button-container');
+                  console.log("Paypal buttons rendered from new page.")
+                } catch(e){
+                  console.log("Something went wrong loading buttons on new page", e);
+                }
+              </script>
+            <% end %>
+
           </div>
         </div>
         <input class="tabInput" name="tabs" type="radio" id="tab-3"/>

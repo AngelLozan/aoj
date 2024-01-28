@@ -49,10 +49,11 @@ export default class extends Controller {
 // @dev Returns price plus shipping
   async getTotalPrice() {
     try {
-      let res = await fetch(`/orders/total_price`, {
+      let res = await fetch(`/total_price`, {
         method: "POST",
         headers: {
           Accept: "application/json",
+          "X-CSRF-Token": this.csrfToken,
         },
         body: new FormData(this.formTarget),
       });
@@ -308,6 +309,7 @@ export default class extends Controller {
         method: "POST",
         headers: {
           Accept: "text/plain",
+          "X-CSRF-Token": this.csrfToken,
         },
         body: new FormData(this.formTarget),
       });
