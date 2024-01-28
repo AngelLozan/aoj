@@ -128,7 +128,7 @@ class OrdersController < ApplicationController
 
     # Payment logic, amount in cents
     # @amount = (@cart.sum(&:price) + @prints_total)
-
+    @order_id = "" # @dev Added here to make available to stripe cancel method
 
   if order_params[:note] == "Paypal"
     Rails.logger.info "PayPal"
@@ -175,7 +175,7 @@ class OrdersController < ApplicationController
             format.json { render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity }
             if @order.prints.any?
               Rails.logger.info ">>>>>>>>>>>>>>> Paypal prints being cancelled <<<<<<<<<<<<<<<<<<<"
-              cancel_order(order_id)
+              cancel_order(orderID)
             end
           end
         end
@@ -185,17 +185,18 @@ class OrdersController < ApplicationController
          redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
          if @order.prints.any?
           Rails.logger.info ">>>>>>>>>>>>>>> Paypal error prints being cancelled <<<<<<<<<<<<<<<<<<<"
-          cancel_order(order_id)
+          cancel_order(orderID)
         end
        end
 
   elsif params[:stripeToken]
       Rails.logger.info "Stripe"
 
+
       total_price = order_params[:total]
       Rails.logger.info ">>>>>>>>>>>>>>> Total Price: #{total_price}<<<<<<<<<<<<<<<<<<<"
-      order_id = order_params[:stripe_order_id]
-      Rails.logger.info ">>>>>>>>>>>>>>> Order ID: #{order_id}<<<<<<<<<<<<<<<<<<<"
+      # order_id = order_params[:stripe_order_id]
+      # Rails.logger.info ">>>>>>>>>>>>>>> Order ID: #{order_id}<<<<<<<<<<<<<<<<<<<"
 
       customer = Stripe::Customer.create({
         email: params[:stripeEmail],
@@ -209,6 +210,10 @@ class OrdersController < ApplicationController
         currency: "usd",
       })
 
+      if @order.prints.any?
+        @order_id = submit_printify_order
+      end
+
         respond_to do |format|
           # byebug
           if @order.save
@@ -216,9 +221,6 @@ class OrdersController < ApplicationController
               painting.update(status: "sold")
             end
 
-          # if @order.prints.any?
-          #   submit_printify_order
-          # end
             session[:cart] = []
             session[:prints_cart] = []
             OrderMailer.order(@order).deliver_later # Email Jaleh she has a new order
@@ -279,7 +281,7 @@ class OrdersController < ApplicationController
     redirect_to new_order_path
     if @order.prints.any?
       Rails.logger.info ">>>>>>>>>>>>>>> Stripe card error prints being cancelled <<<<<<<<<<<<<<<<<<<"
-      cancel_order(order_id)
+      cancel_order(@order_id)
     end
   end
 
@@ -537,7 +539,7 @@ class OrdersController < ApplicationController
       Rails.logger.info ">>>>>>>>>>>>>>> Status: #{status}<<<<<<<<<<<<<<<<<<<"
 
 
-      if status == "cancelled"
+      if status.strip == "cancelled"
         Rails.logger.info ">>>>>>>>>>>>>>> Order #{order_id} cancelled<<<<<<<<<<<<<<<<<<<"
       else
         Rails.logger.info ">>>>>>>>>>>>>>> ERROR CANCEL PRINTIFY: #{raw_data}<<<<<<<<<<<<<<<<<<<"

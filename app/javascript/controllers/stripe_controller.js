@@ -1,60 +1,92 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["form", "inputs", "total", "id"]
+  static targets = ["form", "inputs", "total", "id", "remove", "add"]
   static values = {
     publishableKey: String,
   }
 
   formSubmitListener = null;
-  clickCount = 0;
-  submittedForm = false;
+
 
   async connect() {
     console.log("Connected stripe controller");
     this.setupFormListener();
-    this.observeStripeModalCloseButton();
+    // this.itemListeners();
   }
 
+  // @dev Ensures form elements full before executing button listener for quantity update.
+  async checkFormElements() {
+    console.log("Checking form elements");
+    let missingOne = false; //@dev Form is filled out unless found otherwise below.
+    const formElements = this.formTarget.elements;
+    for (let i = 0; i < formElements.length; i++) {
+      const element = formElements[i];
+      if (element.value === "" && element.type !== "hidden" && element.required === "true") {
+        missingOne = true;
+        break;
+      }
+  }
+  console.log("Missing one: ", missingOne);
+  return missingOne;
+}
 
-    observeStripeModalCloseButton() {
-      const targetNode = document.body;
+  // async itemListeners() {
+  //   console.log("Setting up add item listener");
 
-      const observer = new MutationObserver((mutationsList, observer) => {
-        for (const mutation of mutationsList) {
-          for (const node of mutation.addedNodes) {
-            if (node.tagName && node.tagName.toLowerCase() === 'iframe') {
-              console.log("Stripe modal iframe added");
-            }
-          }
+  //   this.addItemListener = async (event) => {
+  //     // event.preventDefault();
+  //     try {
+  //       let call = await this.checkFormElements()
+  //       if (!call) {
+  //         const [amount, stripeOrderId] = await this.amount();
+  //         await this.initializeStripe(amount, stripeOrderId);
+  //         await this.handleStripeClosed();
+  //         await this.loadStripeScriptAddItem();
+  //       }
+  //     } catch (error) {
+  //       console.log("Error in add item listener: ", error.message);
+  //       await this.handleStripeClosed();
+  //     }
+  //   };
 
-          for (const node of mutation.removedNodes) {
-            if (node.tagName && node.tagName.toLowerCase() === 'iframe') {
-              console.log("Stripe modal iframe removed");
-              if (this.submittedForm === false) {
-                this.handleStripeClosed();
-                console.log("Stripe modal closed before submission, canceling order");
-              }
-            }
-          }
-        }
-      });
+  //   this.removeItemListener = async (event) => {
+  //     // event.preventDefault();
+  //     try {
+  //       let call = await this.checkFormElements()
+  //       if (!call) {
+  //         const [amount, stripeOrderId] = await this.amount();
+  //         await this.initializeStripe(amount, stripeOrderId);
+  //         await this.handleStripeClosed();
+  //         await this.loadStripeScriptAddItem();
+  //       }
+  //     } catch (error) {
+  //       console.log("Error in add item listener: ", error.message);
+  //       await this.handleStripeClosed();
+  //     }
+  //   };
 
-      const config = { childList: true, subtree: true };
-
-      observer.observe(targetNode, config);
-      console.log("Mutation observer connected");
-    }
+  //   await this.addTarget.addEventListener("click", this.addItemListener);
+  //   await this.removeTarget.addEventListener("click", this.removeItemListener);
+  // }
 
   async setupFormListener() {
     console.log("Setting up form listener");
 
     this.formSubmitListener = async (event) => {
       event.preventDefault();
+      let call = await this.checkFormElements()
       try {
-        const [amount, stripeOrderId] = await this.amount();
-        await this.initializeStripe(amount, stripeOrderId);
-        await this.loadStripeScript();
+        if (call) {
+          this.displayFlashMessage("Please fill all required form fields 🙏", 'warning');
+          return;
+        } else {
+          const [amount, stripeOrderId] = await this.amount();
+          await this.initializeStripe(amount, stripeOrderId);
+          await this.handleStripeClosed();
+          await this.loadStripeScript();
+        }
+
       } catch (error) {
         console.log("Error in form listener: ", error.message);
         await this.handleStripeClosed();
@@ -65,8 +97,7 @@ export default class extends Controller {
   }
 
   async handleStripeClosed() {
-    // Handle the closure of the Stripe Checkout modal
-    console.log("Stripe Checkout modal closed");
+    console.log("Cancelling print order used to get shipping price");
 
     try {
       let res = await fetch(`/cancel_print_order`, {
@@ -80,10 +111,10 @@ export default class extends Controller {
       let response = await res.json();
       console.log("RESPONSE:", response);
       if (response.status === "success") {
-        console.log("Successfully cancelled print order");
+        console.log("Successfully cancelled mock print order");
       }
     } catch (error) {
-      console.log("Was not able to get price total with shipping: ", error.message);
+      console.log("Error cancelling shipping: ", error.message);
     }
 
   }
@@ -100,13 +131,12 @@ export default class extends Controller {
     });
   }
 
+
   executeStripeScript() {
     const stripeButton = document.querySelector(".stripe-button-el");
 
     if (stripeButton) {
       stripeButton.click();
-      this.submittedForm = true;
-      this.clickCount++;
     } else {
       console.log("Stripe button not found");
     }
@@ -153,5 +183,24 @@ export default class extends Controller {
     const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
     return csrfMetaTag ? csrfMetaTag.content : "";
   }
+
+  displayFlashMessage(message, type) {
+    const flashElement = document.createElement('div');
+    flashElement.className = `alert alert-${type} alert-dismissible fade show m-1`;
+    flashElement.role = 'alert';
+    flashElement.setAttribute('data-controller', 'flash');
+    flashElement.textContent = message;
+
+    const button = document.createElement('button');
+    button.className = 'btn-close';
+    button.setAttribute('data-bs-dismiss', 'alert');
+
+    flashElement.appendChild(button);
+    document.body.appendChild(flashElement);
+
+    setTimeout(() => {
+        flashElement.remove();
+    }, 5000);
+}
 
 }
