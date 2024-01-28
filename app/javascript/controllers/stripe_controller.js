@@ -22,7 +22,7 @@ export default class extends Controller {
     const formElements = this.formTarget.elements;
     for (let i = 0; i < formElements.length; i++) {
       const element = formElements[i];
-      if (element.value === "" && element.type !== "hidden" && element.required === "true") {
+      if (element.value === "" && element.type !== "hidden" && element.classList.contains('required')) {
         missingOne = true;
         break;
       }
@@ -31,50 +31,13 @@ export default class extends Controller {
   return missingOne;
 }
 
-  // async itemListeners() {
-  //   console.log("Setting up add item listener");
-
-  //   this.addItemListener = async (event) => {
-  //     // event.preventDefault();
-  //     try {
-  //       let call = await this.checkFormElements()
-  //       if (!call) {
-  //         const [amount, stripeOrderId] = await this.amount();
-  //         await this.initializeStripe(amount, stripeOrderId);
-  //         await this.handleStripeClosed();
-  //         await this.loadStripeScriptAddItem();
-  //       }
-  //     } catch (error) {
-  //       console.log("Error in add item listener: ", error.message);
-  //       await this.handleStripeClosed();
-  //     }
-  //   };
-
-  //   this.removeItemListener = async (event) => {
-  //     // event.preventDefault();
-  //     try {
-  //       let call = await this.checkFormElements()
-  //       if (!call) {
-  //         const [amount, stripeOrderId] = await this.amount();
-  //         await this.initializeStripe(amount, stripeOrderId);
-  //         await this.handleStripeClosed();
-  //         await this.loadStripeScriptAddItem();
-  //       }
-  //     } catch (error) {
-  //       console.log("Error in add item listener: ", error.message);
-  //       await this.handleStripeClosed();
-  //     }
-  //   };
-
-  //   await this.addTarget.addEventListener("click", this.addItemListener);
-  //   await this.removeTarget.addEventListener("click", this.removeItemListener);
-  // }
 
   async setupFormListener() {
     console.log("Setting up form listener");
 
     this.formSubmitListener = async (event) => {
       event.preventDefault();
+      let orderId = '';
       let call = await this.checkFormElements()
       try {
         if (call) {
@@ -82,14 +45,19 @@ export default class extends Controller {
           return;
         } else {
           const [amount, stripeOrderId] = await this.amount();
+          orderId = stripeOrderId;
           await this.initializeStripe(amount, stripeOrderId);
-          await this.handleStripeClosed();
+          if (stripeOrderId !== '') {
+            await this.handleStripeClosed();
+          }
           await this.loadStripeScript();
         }
 
       } catch (error) {
         console.log("Error in form listener: ", error.message);
-        await this.handleStripeClosed();
+        if (orderId !== '') {
+          await this.handleStripeClosed();
+        }
       }
     };
 

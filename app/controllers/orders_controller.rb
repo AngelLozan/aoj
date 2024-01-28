@@ -180,14 +180,14 @@ class OrdersController < ApplicationController
           end
         end
 
-       else
-         Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
-         redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
-         if @order.prints.any?
+      else
+        Rails.logger.info ">>>>>>>>>>>>>>> ERROR: #{capture_data["status"]} <<<<<<<<<<<<<<<<<<<"
+        redirect_to new_order_path, notice: "Sorry, something went wrong, please try again 🙏."
+        if @order.prints.any?
           Rails.logger.info ">>>>>>>>>>>>>>> Paypal error prints being cancelled <<<<<<<<<<<<<<<<<<<"
           cancel_order(orderID)
         end
-       end
+      end
 
   elsif params[:stripeToken]
       Rails.logger.info "Stripe"
@@ -311,7 +311,11 @@ class OrdersController < ApplicationController
     end
 
     Rails.logger.info ">>>>>>>>>>>>>>> AMOUNT: #{@amount}<<<<<<<<<<<<<<<<<<<"
-    render json: { amount: @amount, stripe_order_id: order_id }, status: :ok
+    if shipping_cost
+      render json: { amount: @amount, stripe_order_id: order_id }, status: :ok
+    else
+      render json: { amount: @amount, stripe_order_id: '' }, status: :ok
+    end
   end
 
   def wallet
