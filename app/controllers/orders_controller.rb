@@ -232,12 +232,12 @@ class OrdersController < ApplicationController
     else
       # Crypto
       Rails.logger.info "Crypto"
-      crypto_prints_id = 0
+      crypto_prints_id = order_params[:stripe_order_id] # @dev Place printifyorder in this form element for paypal and stripe.
       # @dev Do this in total price to send to the js controller.
-      if @order.prints.any?
-        Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being submitted <<<<<<<<<<<<<<<<<<<"
-        crypto_prints_id = submit_printify_order
-      end
+      # if @order.prints.any?
+      #   Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being submitted <<<<<<<<<<<<<<<<<<<"
+      #   crypto_prints_id = submit_printify_order
+      # end
 
       # total_price = (@amount + shipping_cost)
 
