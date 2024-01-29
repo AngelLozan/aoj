@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus";
 import Web3 from "web3";
 import { Web3ModalAuth } from "@web3modal/auth-html";
+import { getAddress } from 'sats-connect'
+import { sendBtcTransaction } from 'sats-connect'
 
 // Connects to data-controller="crypto"
 export default class extends Controller {
@@ -18,6 +20,7 @@ export default class extends Controller {
     "metamask",
     "note",
     "id",
+    "xverse",
   ];
   static values = {
     price: Number,
@@ -126,11 +129,49 @@ export default class extends Controller {
     }
   }
 
+  async xverseConnect() {
+    try {
+      if(window.BitcoinProvider) {
+        const getAddressOptions = {
+          payload: {
+            purposes: ['payment'],
+            message: 'Address for sending & receiving BTC payments',
+            network: {
+              type:'Testnet' // or 'Mainnet'
+            },
+          },
+          onFinish: async (response) => {
+            console.log(response)
+            if (response.addresses) {
+              this.addressTarget.value = response.addresses[0].address;
+              this.addressTarget.innerText = response.addresses[0].address;
+              this.buttonOpenTarget.innerText = "Connected!";
+              console.log("BTC address: ", response);
+              this.payTarget.disabled = false;
+            }
+            this.closeModal();
+          },
+          onCancel: async () => alert('Request canceled'),
+          onError: async (error) => console.log(error.message),
+          }
+
+        await getAddress(getAddressOptions);
+      } else {
+        this.xverseTarget.innerText = "Please install!";
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+
+  }
+
+  //@dev Testnet / Mainnet uncomment
   async xdefiConnect() {
     // const reg = /\b(\w{6})\w+(\w{4})\b/g;
     try {
       let memo = "AOJ";
-      if (window.xfi) {
+      if (window.xfi && window.xfi.bitcoin) {
+        window.xfi.bitcoin.changeNetwork("testnet"); //@dev uncomment for testnet
         await window.xfi.bitcoin.request(
           { method: "request_accounts", params: [{ memo }] },
           (error, accounts) => {
@@ -244,6 +285,36 @@ export default class extends Controller {
       console.log(data["high_fee_per_kb"]);
       const btcFee = data["high_fee_per_kb"];
       return btcFee;
+    } catch (error) {
+      console.log(error.message);
+      this.displayFlashMessage(
+        "Something went wrong, please try again 🤔",
+        "warning"
+      );
+    }
+  }
+
+  async confirmBtcTransaction(_tx) {
+    try {
+      let res = await fetch(
+        // `https://api.blockcypher.com/v1/btc/main`, // @dev Mainnet. Another api: https://api.blockchain.info/mempool/fees
+        `https://api.blockcypher.com/v1/btc/test3/txs/${_tx}`, // @dev Testnet
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+      let data = await res.json();
+      console.log("Has it been received?", data["received"]);
+      console.log("Block hash", data["block_hash"]);
+      if (data["received"] !== '' && data["block_hash"] !== '') {
+        return true;
+      } else {
+        return false;
+      }
     } catch (error) {
       console.log(error.message);
       this.displayFlashMessage(
@@ -367,6 +438,11 @@ export default class extends Controller {
   }
   // @dev Calls calculatePrice then postPayment if success of tx (test values present)
   async #sendEth() {
+    const call = await this.checkFormElements()
+    if (call) {
+      this.displayFlashMessage("Please fill all required form fields 🙏", 'warning');
+      return;
+    }
     this.loaderTarget.style.display = "inline-block";
     const price = await this.calculatePrice();
     console.log("PRICE", price);
@@ -451,12 +527,20 @@ export default class extends Controller {
   }
   // @dev Calls calculateBTCPrice then postPayment if success of tx (test values present)
   async #sendBTC() {
+    let Result;
+    let Response;
+    const call = await this.checkFormElements()
+    if (call) {
+      this.displayFlashMessage("Please fill all required form fields 🙏", 'warning');
+      return;
+    }
     this.loaderTarget.style.display = "inline-block";
     console.log("BTC PAYMENT");
-    const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/;
+    const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/gi;
     try {
       const balance = await this.checkBTCBalance(this.addressTarget.value);
       // const amount = await this.calculateBtcPrice();
+      let testCall = await this.calculateBtcPrice(); // Used for testnet to ensure printify order submitted.
       const feeRate = await this.calculateBTCFee();
       console.log("FEE RATE", feeRate);
       const amount = 10000; // @dev test amount of Satoshis
@@ -504,15 +588,50 @@ export default class extends Controller {
         );
       });
 
-      console.log("RESULT", result);
+      
+      if (!window.xfi) {
+        console.log("XVERSE payment")
+        const sendBtcOptions = {
+          payload: {
+            network: {
+              type: "Testnet", // or 'Mainnet'
+            },
+            recipients: [
+              {
+                address: recipient,
+                amountSats: amount,
+              },
+            ],
+            senderAddress: from,
+          },
+          onFinish: (response) => {
+            alert(response);
+            console.log("Xverse response", response);
+            Response = response;
+          },
+          onCancel: async () => {
+            alert("Canceled payment");
+            await this.handleCancelPrintify();
+          },
+        };
 
-      if (bitcoinTxHashRegex.test(result) === true) {
+        await sendBtcTransaction(sendBtcOptions);
+
+      }
+
+      console.log("RESULT", result);
+      let test = await bitcoinTxHashRegex.test(Result);
+      console.log("TEST", test);
+
+      // let receipt = this.confirmBtcTransaction(Result);
+      // if (receipt) {
+      if (test) {
         this.noteTarget.value = `Please verify this transaction is confirmed in your wallet & amount is comprable: https://mempool.space/tx/${result}`;
         this.payTarget.innerText = "Paid";
         await this.postPayment();
         this.loaderTarget.style.display = "none";
       } else {
-        console.log("ERROR", result.error);
+        console.log("ERROR", Result.error);
         this.loaderTarget.style.display = "none";
         this.handleCancelPrintify();
         this.displayFlashMessage(
@@ -602,7 +721,7 @@ export default class extends Controller {
 
   async handleCancelPrintify() {
     console.log("Cancelling print order used to get shipping price");
-    const form = document.querySelector("#order-form");
+    const form = this.formTarget;
 
     const timeoutDuration = 30000; // 30 seconds
     const startTime = Date.now();
@@ -635,4 +754,21 @@ export default class extends Controller {
       }
     }
   }
+
+  async checkFormElements() {
+    console.log("Checking form elements");
+    let missingOne = false; //@dev Form is filled out unless found otherwise below.
+    const form = this.formTarget;
+    const formElements = form.elements;
+    for (let i = 0; i < formElements.length; i++) {
+      const element = formElements[i];
+      if (element.value === "" && element.type !== "hidden" && element.classList.contains('required')) {
+        missingOne = true;
+        break;
+      }
+  }
+  console.log("Missing one: ", missingOne);
+  return missingOne;
+}
+
 }

@@ -8,6 +8,7 @@
     "@popperjs/core": "^2.11.8",
     "@web3modal/auth-html": "^2.4.5",
     "bootstrap": "^5.3.1",
+    "sats-connect": "^1.1.2",
     "web3": "^4.0.1",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4"
