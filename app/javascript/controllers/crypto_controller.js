@@ -17,6 +17,7 @@ export default class extends Controller {
     "loader",
     "metamask",
     "note",
+    "id",
   ];
   static values = {
     price: Number,
@@ -26,6 +27,8 @@ export default class extends Controller {
   web3Modal;
 
   web3;
+
+  printify_id;
 
   async connect() {
     this.loaderTarget.style.display = "none";
@@ -60,7 +63,8 @@ export default class extends Controller {
       let response = await res.json();
       console.log("RESPONSE:", response);
       let amount = response.amount;
-      let stripe_order_id = response.stripe_order_id;
+      this.printify_id = response.stripe_order_id;
+      this.idTarget.value = this.printify_id; // @dev Set value of stripe_order_id to printify order ID if need cancel.
       return [amount, stripe_order_id];
     } catch (error) {
       console.log("Was not able to get price total with shipping: ", error.message);
@@ -183,6 +187,7 @@ export default class extends Controller {
     } catch (error) {
       console.log(error.message);
       this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
+      await this.handleCancelPrintify();
     }
   }
 // @dev Calls getTotalPrice
@@ -211,6 +216,7 @@ export default class extends Controller {
     } catch (error) {
       console.log(error.message);
       this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
+      await this.handleCancelPrintify();
     }
   }
 
@@ -418,6 +424,7 @@ export default class extends Controller {
       console.log(error.message);
       this.loaderTarget.style.display = "none";
       this.displayFlashMessage("Transaction didn't go through. Please try again. 🤔", 'warning');
+      await this.handleCancelPrintify();
       // alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
@@ -484,13 +491,17 @@ export default class extends Controller {
       } else {
         console.log("ERROR", result.error);
         this.loaderTarget.style.display = "none";
-        alert("Transaction didn't go through 🤔. Please try again.");
+        this.handleCancelPrintify();
+        this.displayFlashMessage("Transaction didn't go through. Please try again. 🤔", 'warning');
+        // alert("Transaction didn't go through 🤔. Please try again.");
       }
 
     } catch (error) {
       console.log(error.message);
       this.loaderTarget.style.display = "none";
-      alert("Transaction didn't go through 🤔. Please try again.");
+      this.handleCancelPrintify();
+      this.displayFlashMessage("Transaction didn't go through. Please try again. 🤔", 'warning');
+      // alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
 
@@ -560,4 +571,27 @@ export default class extends Controller {
         flashElement.remove();
     }, 5000);
 }
+
+async handleCancelPrintify() {
+  console.log("Cancelling print order used to get shipping price");
+
+  try {
+    let res = await fetch(`/cancel_print_order`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "X-CSRF-Token": this.csrfToken,
+      },
+      body: new FormData(this.formTarget),
+    });
+    let response = await res.json();
+    console.log("RESPONSE:", response);
+    if (response.status === "success") {
+      console.log("Successfully cancelled print order");
+    }
+  } catch (error) {
+    console.log("Error cancelling shipping: ", error.message);
+  }
+}
+
 }
