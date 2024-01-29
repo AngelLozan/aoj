@@ -46,9 +46,8 @@ export default class extends Controller {
     } catch (error) {
       console.log("Something went wrong in connecting: ", error);
     }
-
   }
-// @dev Returns price plus shipping
+  // @dev Returns price plus shipping
   async getTotalPrice() {
     console.log("Getting price total with shipping");
     try {
@@ -65,10 +64,16 @@ export default class extends Controller {
       let amount = response.amount;
       this.printify_id = response.stripe_order_id;
       this.idTarget.value = this.printify_id; // @dev Set value of stripe_order_id to printify order ID if need cancel.
-      return [amount, stripe_order_id];
+      return [amount, this.printify_id];
     } catch (error) {
-      console.log("Was not able to get price total with shipping: ", error.message);
-      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
+      console.log(
+        "Was not able to get price total with shipping: ",
+        error.message
+      );
+      this.displayFlashMessage(
+        "Something went wrong, please try again 🤔",
+        "warning"
+      );
     }
   }
 
@@ -81,12 +86,7 @@ export default class extends Controller {
 
       data = await res.json();
       // console.log("DATA ENDPOINT FOR WEB3: ", data.endpoint);
-      web3 = new Web3(
-        new Web3.providers.HttpProvider(
-          data.endpoint
-        )
-      );
-
+      web3 = new Web3(new Web3.providers.HttpProvider(data.endpoint));
     } catch (error) {
       console.log("Something went wrong grabbing endpoint web3: ", error);
     }
@@ -186,11 +186,14 @@ export default class extends Controller {
       return calculatedPrice;
     } catch (error) {
       console.log(error.message);
-      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
+      this.displayFlashMessage(
+        "Something went wrong, please try again 🤔",
+        "warning"
+      );
       await this.handleCancelPrintify();
     }
   }
-// @dev Calls getTotalPrice
+  // @dev Calls getTotalPrice
   async calculateBtcPrice() {
     // const price = this.priceValue;
     const values = await this.getTotalPrice();
@@ -215,12 +218,15 @@ export default class extends Controller {
       return calculatedPrice;
     } catch (error) {
       console.log(error.message);
-      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
+      this.displayFlashMessage(
+        "Something went wrong, please try again 🤔",
+        "warning"
+      );
       await this.handleCancelPrintify();
     }
   }
 
-// @dev Testnet / Mainnet uncomment
+  // @dev Testnet / Mainnet uncomment
   async calculateBTCFee() {
     try {
       let res = await fetch(
@@ -240,7 +246,10 @@ export default class extends Controller {
       return btcFee;
     } catch (error) {
       console.log(error.message);
-      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
+      this.displayFlashMessage(
+        "Something went wrong, please try again 🤔",
+        "warning"
+      );
     }
   }
 
@@ -264,7 +273,10 @@ export default class extends Controller {
       return balance;
     } catch (error) {
       console.log(error.message);
-      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
+      this.displayFlashMessage(
+        "Something went wrong, please try again 🤔",
+        "warning"
+      );
     }
   }
 
@@ -303,7 +315,7 @@ export default class extends Controller {
       console.log(error.message);
     }
   }
-// @dev Posts the form data to create so that order in AOJ system.
+  // @dev Posts the form data to create so that order in AOJ system.
   async postPayment(e) {
     try {
       let submitPayment = await fetch(`/orders/`, {
@@ -321,7 +333,10 @@ export default class extends Controller {
       if (response === "submitted") {
         console.log("Successful payment");
         this.formTarget.reset();
-        this.displayFlashMessage("Thank you for order, your painting will arrive soon.", 'info');
+        this.displayFlashMessage(
+          "Thank you for order, your painting will arrive soon.",
+          "info"
+        );
         setTimeout(() => {
           window.location.href = "/paintings";
         }, 1000);
@@ -350,7 +365,7 @@ export default class extends Controller {
       console.log(error.message);
     }
   }
-// @dev Calls calculatePrice then postPayment if success of tx (test values present)
+  // @dev Calls calculatePrice then postPayment if success of tx (test values present)
   async #sendEth() {
     this.loaderTarget.style.display = "inline-block";
     const price = await this.calculatePrice();
@@ -360,26 +375,24 @@ export default class extends Controller {
     console.log("CONVERTED PRICE in WEI", convertPrice);
 
     try {
+      const limit = await this.web3.eth.estimateGas({
+        from: this.accounts[0],
+        to: address,
+        // value: this.web3.utils.toHex(convertPrice),
+        // @dev Test value
+        value: this.web3.utils.toWei(0.0001, "ether"),
+      });
+      console.log("LIMIT", limit);
 
-    const limit = await this.web3.eth.estimateGas({
-      from: this.accounts[0],
-      to: address,
-      // value: this.web3.utils.toHex(convertPrice),
-      // @dev Test value
-      value: this.web3.utils.toWei(0.0001, "ether"),
-    });
-    console.log("LIMIT", limit);
+      // @dev Test values
+      // const maxPriorityFeePerGas = this.web3.utils.toWei(3, "gwei");
+      // console.log("MAX PRIORITY FEE PER GAS", maxPriorityFeePerGas);
+      // const maxFeePerGas = this.web3.utils.toWei(3, "gwei");
+      // console.log("MAX FEE PER GAS", maxFeePerGas);
 
-    // @dev Test values
-    // const maxPriorityFeePerGas = this.web3.utils.toWei(3, "gwei");
-    // console.log("MAX PRIORITY FEE PER GAS", maxPriorityFeePerGas);
-    // const maxFeePerGas = this.web3.utils.toWei(3, "gwei");
-    // console.log("MAX FEE PER GAS", maxFeePerGas);
-
-    // const baseFee = await this.web3.eth.getGasPrice(); // Get the current base fee
-    // // Calculate maxFeePerGas as the sum of maxPriorityFeePerGas and baseFee
-    // const maxFeePerGas = (BigInt(maxPriorityFeePerGas) + BigInt(baseFee)).toString();
-
+      // const baseFee = await this.web3.eth.getGasPrice(); // Get the current base fee
+      // // Calculate maxFeePerGas as the sum of maxPriorityFeePerGas and baseFee
+      // const maxFeePerGas = (BigInt(maxPriorityFeePerGas) + BigInt(baseFee)).toString();
 
       const txHash = await ethereum.request({
         method: "eth_sendTransaction",
@@ -393,7 +406,7 @@ export default class extends Controller {
             value: this.web3.utils.toWei(0.0001, "ether"),
             gas: this.web3.utils.numberToHex(limit),
             maxPriorityFeePerGas: this.web3.utils.toWei(3, "gwei"), // 3 or 5 (tip to miner)
-            // maxFeePerGas: this.web3.utils.toWei(3, "gwei"), // Optional Default in web3.js
+            maxFeePerGas: this.web3.utils.toWei(5, "gwei"), // Optional Default in web3.js. Errors on metamask. Must be equal or higher.
           },
         ],
       });
@@ -401,34 +414,42 @@ export default class extends Controller {
 
       const interval = setInterval(() => {
         console.log("Attempting to get transaction receipt...");
-        this.web3.eth.getTransactionReceipt(txHash)
-        .then((rec) => {
-          if (rec) {
-            console.log(rec);
-            let receipt = rec;
-            clearInterval(interval);
-            if (receipt.status) {
-              this.noteTarget.value = `Please verify this transaction is confirmed in your wallet & amount is comprable: https://etherscan.io/tx/${txHash}`;
-              this.payTarget.innerText = "Paid";
-              return this.postPayment(); // Goes to create order
-              // this.loaderTarget.style.display = "none";
+        this.displayFlashMessage(
+          "Please leave the page open for a moment. I'm grabbing a transaction receipt 🔐",
+          "info"
+        );
+        this.web3.eth
+          .getTransactionReceipt(txHash)
+          .then((rec) => {
+            if (rec) {
+              console.log(rec);
+              let receipt = rec;
+              clearInterval(interval);
+              if (receipt.status) {
+                this.noteTarget.value = `Please verify this transaction is confirmed in your wallet & amount is comprable: https://etherscan.io/tx/${txHash}`;
+                this.payTarget.innerText = "Paid";
+                return this.postPayment(); // Goes to create order
+                // this.loaderTarget.style.display = "none";
+              }
             }
-          }
-        }).then(() => {
-          console.log("Transaction confirmed, posting payment");
-          this.loaderTarget.style.display = "none";
-        });
+          })
+          .then(() => {
+            console.log("Transaction confirmed, posting payment");
+            this.loaderTarget.style.display = "none";
+          });
       }, 1000);
-
     } catch (error) {
       console.log(error.message);
       this.loaderTarget.style.display = "none";
-      this.displayFlashMessage("Transaction didn't go through. Please try again. 🤔", 'warning');
+      this.displayFlashMessage(
+        "Transaction didn't go through. Please try again. 🤔",
+        "warning"
+      );
       await this.handleCancelPrintify();
       // alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
-// @dev Calls calculateBTCPrice then postPayment if success of tx (test values present)
+  // @dev Calls calculateBTCPrice then postPayment if success of tx (test values present)
   async #sendBTC() {
     this.loaderTarget.style.display = "inline-block";
     console.log("BTC PAYMENT");
@@ -440,9 +461,12 @@ export default class extends Controller {
       console.log("FEE RATE", feeRate);
       const amount = 10000; // @dev test amount of Satoshis
       console.log("BALANCE", balance);
-      if ((amount + feeRate) > balance) {
+      if (amount + feeRate > balance) {
         this.loaderTarget.style.display = "none";
-        this.displayFlashMessage("Not enough funds in your wallet. Please try again. 🤔", 'warning');
+        this.displayFlashMessage(
+          "Not enough funds in your wallet. Please try again. 🤔",
+          "warning"
+        );
         // alert("Not enough funds in your wallet. Please try again.");
         return;
       }
@@ -475,7 +499,6 @@ export default class extends Controller {
               resolve(result);
             } else {
               reject(error || new Error("Transaction failed"));
-
             }
           }
         );
@@ -492,15 +515,20 @@ export default class extends Controller {
         console.log("ERROR", result.error);
         this.loaderTarget.style.display = "none";
         this.handleCancelPrintify();
-        this.displayFlashMessage("Transaction didn't go through. Please try again. 🤔", 'warning');
+        this.displayFlashMessage(
+          "Transaction didn't go through. Please try again. 🤔",
+          "warning"
+        );
         // alert("Transaction didn't go through 🤔. Please try again.");
       }
-
     } catch (error) {
       console.log(error.message);
       this.loaderTarget.style.display = "none";
       this.handleCancelPrintify();
-      this.displayFlashMessage("Transaction didn't go through. Please try again. 🤔", 'warning');
+      this.displayFlashMessage(
+        "Transaction didn't go through. Please try again. 🤔",
+        "warning"
+      );
       // alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
@@ -509,35 +537,37 @@ export default class extends Controller {
     console.log("connectWallet");
     this.#permissions();
   }
-// @dev Calls either sendETH or sendBTC
+  // @dev Calls either sendETH or sendBTC
   pay(e) {
     e.preventDefault();
     // @dev Mainnet only
     // const btcRegex = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
-    const btcRegex = /\b((bc|tb)(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[ac-hj-np-z02-9]{8,87})|([13]|[mn2])[a-km-zA-HJ-NP-Z1-9]{25,39})\b/g;
+    const btcRegex =
+      /\b((bc|tb)(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[ac-hj-np-z02-9]{8,87})|([13]|[mn2])[a-km-zA-HJ-NP-Z1-9]{25,39})\b/g;
     const from = this.addressTarget.value;
     if (btcRegex.test(from) === true) {
       this.#sendBTC();
     } else {
       this.#sendEth();
     }
-
   }
 
   async getWalletConnect() {
+    let data;
+    let id;
+    try {
+      let res = await fetch("/alchemy");
+      if (!res.ok) throw new Error("Could not get alchemy endpoint");
 
-      let data;
-      let id;
-      try {
-        let res = await fetch("/alchemy");
-        if (!res.ok) throw new Error("Could not get alchemy endpoint");
-
-        data = await res.json();
-        // console.log(" WALLET CONNECT PROJECT ID: ", data.projectID);
-        id = data.projectID;
-      } catch (error) {
-        console.log("Something went wrong grabbing endpoint wallet connect: ", error);
-      }
+      data = await res.json();
+      // console.log(" WALLET CONNECT PROJECT ID: ", data.projectID);
+      id = data.projectID;
+    } catch (error) {
+      console.log(
+        "Something went wrong grabbing endpoint wallet connect: ",
+        error
+      );
+    }
 
     const web3Modal = await new Web3ModalAuth({
       projectId: id,
@@ -545,53 +575,64 @@ export default class extends Controller {
         name: "Web3Modal",
         description: "Web3Modal",
         url: "web3modal.com",
-        icons: [
-          "https://time.com/img/icons/wallet-connect.png",
-        ],
+        icons: ["https://time.com/img/icons/wallet-connect.png"],
       },
     });
     return web3Modal;
   }
 
   displayFlashMessage(message, type) {
-    const flashElement = document.createElement('div');
+    const flashElement = document.createElement("div");
     flashElement.className = `alert alert-${type} alert-dismissible fade show m-1`;
-    flashElement.role = 'alert';
-    flashElement.setAttribute('data-controller', 'flash');
+    flashElement.role = "alert";
+    flashElement.setAttribute("data-controller", "flash");
     flashElement.textContent = message;
 
-    const button = document.createElement('button');
-    button.className = 'btn-close';
-    button.setAttribute('data-bs-dismiss', 'alert');
+    const button = document.createElement("button");
+    button.className = "btn-close";
+    button.setAttribute("data-bs-dismiss", "alert");
 
     flashElement.appendChild(button);
     document.body.appendChild(flashElement);
 
     setTimeout(() => {
-        flashElement.remove();
+      flashElement.remove();
     }, 5000);
-}
-
-async handleCancelPrintify() {
-  console.log("Cancelling print order used to get shipping price");
-
-  try {
-    let res = await fetch(`/cancel_print_order`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "X-CSRF-Token": this.csrfToken,
-      },
-      body: new FormData(this.formTarget),
-    });
-    let response = await res.json();
-    console.log("RESPONSE:", response);
-    if (response.status === "success") {
-      console.log("Successfully cancelled print order");
-    }
-  } catch (error) {
-    console.log("Error cancelling shipping: ", error.message);
   }
-}
 
+  async handleCancelPrintify() {
+    console.log("Cancelling print order used to get shipping price");
+    const form = document.querySelector("#order-form");
+
+    const timeoutDuration = 30000; // 30 seconds
+    const startTime = Date.now();
+
+    let success = false;
+
+    while (!success && Date.now() - startTime < timeoutDuration) {
+      try {
+        let res = await fetch(`/cancel_print_order`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "X-CSRF-Token": this.csrfToken,
+          },
+          body: new FormData(form),
+        });
+
+        let response = await res.json();
+        console.log("RESPONSE:", response);
+
+        if (response.status === "success") {
+          console.log("Successfully cancelled print order");
+          success = true; // Break out of the loop if successful
+        } else {
+          // this.displayFlashMessage("Something went wrong, please refresh the page 🤔", 'warning');
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      } catch (error) {
+        console.log("Error cancelling shipping: ", error.message);
+      }
+    }
+  }
 }
