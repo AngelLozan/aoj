@@ -551,6 +551,7 @@ export default class extends Controller {
           "Not enough funds in your wallet. Please try again. 🤔",
           "warning"
         );
+        this.handleCancelPrintify();
         // alert("Not enough funds in your wallet. Please try again.");
         return;
       }
@@ -563,32 +564,6 @@ export default class extends Controller {
       console.log("RECIPIENT", recipient);
       console.log("FROM", from);
 
-      const result = await new Promise((resolve, reject) => {
-        window.xfi.bitcoin.request(
-          {
-            method: "transfer",
-            params: [
-              {
-                feeRate,
-                from,
-                recipient,
-                amount,
-                memo,
-              },
-            ],
-          },
-          (error, result) => {
-            console.debug(error, result);
-            if (result) {
-              resolve(result);
-            } else {
-              reject(error || new Error("Transaction failed"));
-            }
-          }
-        );
-      });
-
-      
       if (!window.xfi) {
         console.log("XVERSE payment")
         const sendBtcOptions = {
@@ -598,7 +573,7 @@ export default class extends Controller {
             },
             recipients: [
               {
-                address: recipient,
+                address: recipient.trim(),
                 amountSats: amount,
               },
             ],
@@ -619,8 +594,33 @@ export default class extends Controller {
 
       }
 
+        const result = await new Promise((resolve, reject) => {
+          window.xfi.bitcoin.request(
+            {
+              method: "transfer",
+              params: [
+                {
+                  feeRate,
+                  from,
+                  recipient,
+                  amount,
+                  memo,
+                },
+              ],
+            },
+            (error, result) => {
+              console.debug(error, result);
+              if (result) {
+                resolve(result);
+              } else {
+                reject(error || new Error("Transaction failed"));
+              }
+            }
+          );
+        });
+
       console.log("RESULT", result);
-      let test = await bitcoinTxHashRegex.test(Result);
+      let test = await bitcoinTxHashRegex.test(result);
       console.log("TEST", test);
 
       // let receipt = this.confirmBtcTransaction(Result);
