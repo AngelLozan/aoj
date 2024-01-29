@@ -322,7 +322,7 @@ class OrdersController < ApplicationController
 
   def btcwallet
     # @dev Test address:
-    address = 'tb1qn50cajady0d86wttx65w20kz4gweuw74n7m5rg'
+    address = 'tb1qn50cajady0d86wttx65w20kz4gweuw74n7m5rg' # "2N4fKgAq7YYb8RAzAYN6s593kbyWoDLJa4o"
     # address = 'bc1q23dtx34f748phdOnektyvxnnvehqvac3r35a63'
     Rails.logger.info ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }

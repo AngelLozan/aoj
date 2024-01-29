@@ -33,6 +33,8 @@ export default class extends Controller {
 
   printify_id;
 
+  xverse = false;
+
   async connect() {
     this.loaderTarget.style.display = "none";
     console.log("Crypto controller connected");
@@ -148,6 +150,7 @@ export default class extends Controller {
               this.buttonOpenTarget.innerText = "Connected!";
               console.log("BTC address: ", response);
               this.payTarget.disabled = false;
+              this.xverse = true;
             }
             this.closeModal();
           },
@@ -156,6 +159,7 @@ export default class extends Controller {
           }
 
         await getAddress(getAddressOptions);
+
       } else {
         this.xverseTarget.innerText = "Please install!";
       }
@@ -497,7 +501,7 @@ export default class extends Controller {
         this.web3.eth
           .getTransactionReceipt(txHash)
           .then((rec) => {
-            if (rec) {
+            if (rec) { //@dev True if transaction successful
               console.log(rec);
               let receipt = rec;
               clearInterval(interval);
@@ -507,6 +511,14 @@ export default class extends Controller {
                 return this.postPayment(); // Goes to create order
                 // this.loaderTarget.style.display = "none";
               }
+            } else {
+              console.log("Transaction reverted/unsuccessful.");
+              this.loaderTarget.style.display = "none";
+              this.displayFlashMessage(
+                "Transaction didn't go through. Please try again. 🤔",
+                "warning"
+              );
+              this.handleCancelPrintify();
             }
           })
           .then(() => {
@@ -522,13 +534,12 @@ export default class extends Controller {
         "warning"
       );
       await this.handleCancelPrintify();
-      // alert("Transaction didn't go through 🤔. Please try again.");
+
     }
   }
+
   // @dev Calls calculateBTCPrice then postPayment if success of tx (test values present)
   async #sendBTC() {
-    let Result;
-    let Response;
     const call = await this.checkFormElements()
     if (call) {
       this.displayFlashMessage("Please fill all required form fields 🙏", 'warning');
@@ -552,7 +563,6 @@ export default class extends Controller {
           "warning"
         );
         this.handleCancelPrintify();
-        // alert("Not enough funds in your wallet. Please try again.");
         return;
       }
 
@@ -563,36 +573,6 @@ export default class extends Controller {
       console.log("AMOUNT", amount);
       console.log("RECIPIENT", recipient);
       console.log("FROM", from);
-
-      if (!window.xfi) {
-        console.log("XVERSE payment")
-        const sendBtcOptions = {
-          payload: {
-            network: {
-              type: "Testnet", // or 'Mainnet'
-            },
-            recipients: [
-              {
-                address: recipient.trim(),
-                amountSats: amount,
-              },
-            ],
-            senderAddress: from,
-          },
-          onFinish: (response) => {
-            alert(response);
-            console.log("Xverse response", response);
-            Response = response;
-          },
-          onCancel: async () => {
-            alert("Canceled payment");
-            await this.handleCancelPrintify();
-          },
-        };
-
-        await sendBtcTransaction(sendBtcOptions);
-
-      }
 
         const result = await new Promise((resolve, reject) => {
           window.xfi.bitcoin.request(
@@ -620,7 +600,7 @@ export default class extends Controller {
         });
 
       console.log("RESULT", result);
-      let test = await bitcoinTxHashRegex.test(result);
+      let test = bitcoinTxHashRegex.test(result);
       console.log("TEST", test);
 
       // let receipt = this.confirmBtcTransaction(Result);
@@ -638,7 +618,6 @@ export default class extends Controller {
           "Transaction didn't go through. Please try again. 🤔",
           "warning"
         );
-        // alert("Transaction didn't go through 🤔. Please try again.");
       }
     } catch (error) {
       console.log(error.message);
@@ -648,9 +627,112 @@ export default class extends Controller {
         "Transaction didn't go through. Please try again. 🤔",
         "warning"
       );
-      // alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
+
+  // async #sendBTCXverse() {
+  //   const call = await this.checkFormElements()
+  //   if (call) {
+  //     this.displayFlashMessage("Please fill all required form fields 🙏", 'warning');
+  //     return;
+  //   }
+  //   this.loaderTarget.style.display = "inline-block";
+  //   console.log("BTC PAYMENT");
+  //   const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/gi;
+  //   try {
+  //     const balance = await this.checkBTCBalance(this.addressTarget.value);
+  //     // const amount = await this.calculateBtcPrice();
+  //     let testCall = await this.calculateBtcPrice(); //@dev Used for testnet to ensure printify order submitted.
+  //     const feeRate = await this.calculateBTCFee();
+  //     console.log("FEE RATE", feeRate);
+  //     const amount = 10000; // @dev test amount of Satoshis
+  //     console.log("BALANCE", balance);
+  //     if (amount + feeRate > balance) {
+  //       this.loaderTarget.style.display = "none";
+  //       this.displayFlashMessage(
+  //         "Not enough funds in your wallet. Please try again. 🤔",
+  //         "warning"
+  //       );
+  //       this.handleCancelPrintify();
+  //       return;
+  //     }
+
+  //     const recipient = await this.getBtcWallet();
+  //     const from = this.addressTarget.value;
+  //     const memo = "AOJ";
+
+  //     console.log("AMOUNT", amount);
+  //     console.log("RECIPIENT", recipient.trim());
+  //     console.log("FROM", from);
+
+  //       console.log("XVERSE payment")
+  //       const sendBtcOptions = {
+  //         payload: {
+  //           network: {
+  //             type: "Testnet", // or 'Mainnet'
+  //           },
+  //           recipients: [
+  //             {
+  //               address: recipient.trim(),
+  //               amountSats: amount,
+  //             },
+  //           ],
+  //           senderAddress: from,
+  //         },
+  //         onFinish: (response) => {
+  //           // alert(response);
+  //         this.displayFlashMessage(
+  //           `${response}`,
+  //           "info"
+  //         );
+  //           console.log("Xverse response", response);
+  //           Response = response;
+  //         },
+  //         onCancel: async () => {
+  //           // alert("Canceled payment");
+  //           this.displayFlashMessage(
+  //             `${response}`,
+  //             "info"
+  //           );
+  //           await this.handleCancelPrintify();
+  //         },
+  //       };
+
+  //       console.log("OPTIONS: ", sendBtcOptions);
+
+  //       const result = await sendBtcTransaction(sendBtcOptions);
+
+
+  //     console.log("RESULT", result);
+  //     let test = bitcoinTxHashRegex.test(result);
+  //     console.log("TEST", test);
+
+  //     // let receipt = this.confirmBtcTransaction(Result); // @dev Pings blockcypher for tx details. Alternative to regex
+  //     // if (receipt) {
+  //     if (test) {
+  //       this.noteTarget.value = `Please verify this transaction is confirmed in your wallet & amount is comprable: https://mempool.space/tx/${result}`;
+  //       this.payTarget.innerText = "Paid";
+  //       await this.postPayment();
+  //       this.loaderTarget.style.display = "none";
+  //     } else {
+  //       console.log("ERROR", Result.error);
+  //       this.loaderTarget.style.display = "none";
+  //       this.handleCancelPrintify();
+  //       this.displayFlashMessage(
+  //         "Transaction didn't go through. Please try again. 🤔",
+  //         "warning"
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     this.loaderTarget.style.display = "none";
+  //     this.handleCancelPrintify();
+  //     this.displayFlashMessage(
+  //       "Transaction didn't go through. Please try again. 🤔",
+  //       "warning"
+  //     );
+  //   }
+  // }
 
   connectWallet(e) {
     console.log("connectWallet");
@@ -665,6 +747,12 @@ export default class extends Controller {
       /\b((bc|tb)(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[ac-hj-np-z02-9]{8,87})|([13]|[mn2])[a-km-zA-HJ-NP-Z1-9]{25,39})\b/g;
     const from = this.addressTarget.value;
     if (btcRegex.test(from) === true) {
+      // if (this.xverse) {
+      //   console.log("Identified xverse payment");
+      //   this.#sendBTCXverse();
+      // } else {
+      //   this.#sendBTC();
+      // }
       this.#sendBTC();
     } else {
       this.#sendEth();
