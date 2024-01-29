@@ -24,7 +24,6 @@ export default class extends Controller {
   };
 
   web3Modal;
-  // static targets = ["connect", "pay", "address", "form", "loader"];
 
   web3;
 
@@ -48,6 +47,7 @@ export default class extends Controller {
   }
 // @dev Returns price plus shipping
   async getTotalPrice() {
+    console.log("Getting price total with shipping");
     try {
       let res = await fetch(`/total_price`, {
         method: "POST",
@@ -59,23 +59,12 @@ export default class extends Controller {
       });
       let response = await res.json();
       console.log("RESPONSE:", response);
-      return response.amount;
-      // let res = await fetch(
-      //   `/orders/total_price`,
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Accept: "application/json",
-      //       "X-CSRF-Token": this.csrfToken,
-      //     },
-      //   }
-      // );
-      // let data = await res.json();
-      // console.log(data);
-      // return data.amount;
+      let amount = response.amount;
+      let stripe_order_id = response.stripe_order_id;
+      return [amount, stripe_order_id];
     } catch (error) {
       console.log("Was not able to get price total with shipping: ", error.message);
+      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
     }
   }
 
@@ -171,7 +160,8 @@ export default class extends Controller {
   // @dev calls getTotalPrice
   async calculatePrice() {
     // const price = this.priceValue;
-    const price = await this.getTotalPrice();
+    const values = await this.getTotalPrice();
+    const price = values[0];
     try {
       let res = await fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=eur`,
@@ -192,12 +182,14 @@ export default class extends Controller {
       return calculatedPrice;
     } catch (error) {
       console.log(error.message);
+      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
     }
   }
 // @dev Calls getTotalPrice
   async calculateBtcPrice() {
     // const price = this.priceValue;
-    const price = await this.getTotalPrice();
+    const values = await this.getTotalPrice();
+    const price = values[0];
     try {
       let res = await fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur`,
@@ -218,6 +210,7 @@ export default class extends Controller {
       return calculatedPrice;
     } catch (error) {
       console.log(error.message);
+      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
     }
   }
 
@@ -241,6 +234,7 @@ export default class extends Controller {
       return btcFee;
     } catch (error) {
       console.log(error.message);
+      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
     }
   }
 
@@ -264,6 +258,7 @@ export default class extends Controller {
       return balance;
     } catch (error) {
       console.log(error.message);
+      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
     }
   }
 
@@ -319,7 +314,12 @@ export default class extends Controller {
 
       if (response === "submitted") {
         console.log("Successful payment");
-        window.location.href = "/paintings";
+        this.formTarget.reset();
+        this.displayFlashMessage("Thank you for order, your painting will arrive soon.", 'info');
+        setTimeout(() => {
+          window.location.href = "/paintings";
+        }, 1000);
+        // window.location.href = "/paintings";
         // alert("Payment successful! You will receive an email with the details of your order.");
       }
     } catch (error) {
@@ -417,7 +417,8 @@ export default class extends Controller {
     } catch (error) {
       console.log(error.message);
       this.loaderTarget.style.display = "none";
-      alert("Transaction didn't go through 🤔. Please try again.");
+      this.displayFlashMessage("Transaction didn't go through. Please try again. 🤔", 'warning');
+      // alert("Transaction didn't go through 🤔. Please try again.");
     }
   }
 // @dev Calls calculateBTCPrice then postPayment if success of tx (test values present)
@@ -434,7 +435,8 @@ export default class extends Controller {
       console.log("BALANCE", balance);
       if ((amount + feeRate) > balance) {
         this.loaderTarget.style.display = "none";
-        alert("Not enough funds in your wallet. Please try again.");
+        this.displayFlashMessage("Not enough funds in your wallet. Please try again. 🤔", 'warning');
+        // alert("Not enough funds in your wallet. Please try again.");
         return;
       }
 
@@ -466,6 +468,7 @@ export default class extends Controller {
               resolve(result);
             } else {
               reject(error || new Error("Transaction failed"));
+
             }
           }
         );
@@ -538,4 +541,23 @@ export default class extends Controller {
     });
     return web3Modal;
   }
+
+  displayFlashMessage(message, type) {
+    const flashElement = document.createElement('div');
+    flashElement.className = `alert alert-${type} alert-dismissible fade show m-1`;
+    flashElement.role = 'alert';
+    flashElement.setAttribute('data-controller', 'flash');
+    flashElement.textContent = message;
+
+    const button = document.createElement('button');
+    button.className = 'btn-close';
+    button.setAttribute('data-bs-dismiss', 'alert');
+
+    flashElement.appendChild(button);
+    document.body.appendChild(flashElement);
+
+    setTimeout(() => {
+        flashElement.remove();
+    }, 5000);
+}
 }

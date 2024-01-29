@@ -144,6 +144,7 @@ export default class extends Controller {
       return [amount, stripe_order_id];
     } catch (error) {
       console.log("Was not able to get price total with shipping: ", error.message);
+      this.displayFlashMessage("Something went wrong, please try again 🤔", 'warning');
     }
   }
 

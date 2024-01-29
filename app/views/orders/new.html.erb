@@ -140,15 +140,13 @@
                 <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
                 <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
                 <%= f.input :note, as: :hidden, input_html: { value: 'Paypal' } %>
+                <%= f.input :stripe_order_id, input_html: {data: { paypal_target: "id"}}, as: :hidden %>
               </div>
 
             <% end %>
 
              <div id="paypal-button-container"></div>
             <% if true %>
-
-
-              <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV['PAYPAL_CLIENT_ID'] %>&components=buttons"></script>
 
               <script>
                 try {
@@ -195,6 +193,8 @@
                   console.log("Something went wrong loading buttons on new page", e);
                 }
               </script>
+
+              <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV['PAYPAL_CLIENT_ID'] %>&components=buttons"></script>
             <% end %>
 
           </div>

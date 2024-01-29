@@ -9,8 +9,6 @@ class OrdersController < ApplicationController
   before_action :set_order, only: %i[ show edit update destroy ]
   before_action :load_orders
   before_action :load_cart
-  # before_action :load_products, only: :load_cart_prints
-  # before_action :load_cart_prints
 
   def index
     @orders = Order.all
@@ -30,14 +28,7 @@ class OrdersController < ApplicationController
   end
 
   def new
-    # if @cart.nil?
-    #   redirect_to paintings_url, notice: "Your cart is empty."
-    # else
       @order = Order.new
-    # end
-
-    # @dev Another way to generate a client side token
-    # gon.client_token = generate_client_token
   end
 
   def create_paypal
@@ -45,6 +36,7 @@ class OrdersController < ApplicationController
     # @dev If there are prints in the cart, submit the order to Printify & get shipping to submit with paypal order.
     # @dev Works because order params (form data) is sent here from script in view.
     if @prints_total > 0
+      Rails.logger.info ">>>>>>>>>>>>>>> Paypal prints being submitted <<<<<<<<<<<<<<<<<<<"
       order_id = submit_printify_order
       shipping_cost = calculate_shipping(order_id)
     end
@@ -100,8 +92,8 @@ class OrdersController < ApplicationController
 
     if raw_data["id"]
       Rails.logger.info "ID: #{raw_data["id"]}"
-      order_id = raw_data["id"]
-      return render :json => { :orderID => order_id }, :status => :ok
+      orderID = raw_data["id"]
+      return render :json => { :orderID => orderID, :paypal_order_id => order_id }, :status => :ok
     else
       Rails.logger.info " >>>>>>>>> ERROR: #{raw_data} <<<<<<<<<<<<<"
       if @order.prints.any?
@@ -240,13 +232,12 @@ class OrdersController < ApplicationController
     else
       # Crypto
       Rails.logger.info "Crypto"
-
+      crypto_prints_id = 0
       # @dev Do this in total price to send to the js controller.
-      # if @order.prints.any?
-      #   Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being submitted <<<<<<<<<<<<<<<<<<<"
-      #   order_id = submit_printify_order
-      #   shipping_cost = calculate_shipping(order_id)
-      # end
+      if @order.prints.any?
+        Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being submitted <<<<<<<<<<<<<<<<<<<"
+        crypto_prints_id = submit_printify_order
+      end
 
       # total_price = (@amount + shipping_cost)
 
@@ -255,9 +246,7 @@ class OrdersController < ApplicationController
           @cart.each do |painting|
             painting.update(status: "sold")
           end
-          # if @order.prints.any?
-          #   submit_printify_order
-          # end
+
           session[:cart] = []
           session[:prints_cart] = []
           # byebug
@@ -270,7 +259,7 @@ class OrdersController < ApplicationController
           format.html { render :new, status: :unprocessable_entity }
           if @order.prints.any?
             Rails.logger.info ">>>>>>>>>>>>>>> Crypto prints being cancelled <<<<<<<<<<<<<<<<<<<"
-            cancel_order(order_id)
+            cancel_order(crypto_prints_id)
           end
         end
       end
@@ -291,9 +280,14 @@ class OrdersController < ApplicationController
 
   def cancel_print_order
     Rails.logger.info ">>>>>>>>>>>>>>> CANCEL PRINT ORDER CALLED <<<<<<<<<<<<<<<<<<<"
-    order_id = order_params[:stripe_order_id]
-    cancel_order(order_id)
-    render json: { status: "success" }, status: :ok
+    order_id = order_params[:stripe_order_id] # @dev Place order in this form element for paypal and stripe.
+    status = cancel_order(order_id)
+    if status.strip == "canceled"
+      render json: { status: "success" }, status: :ok
+    else
+      render json: { status: "error" }, status: :ok
+    end
+
     # redirect_to new_order_path
   end
 
@@ -548,6 +542,7 @@ class OrdersController < ApplicationController
       else
         Rails.logger.info ">>>>>>>>>>>>>>> ERROR CANCEL PRINTIFY: #{raw_data}<<<<<<<<<<<<<<<<<<<"
       end
+      return status
   end
 
 end
