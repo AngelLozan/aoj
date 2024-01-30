@@ -11,8 +11,8 @@ export default class extends Controller {
     try {
       paypal = await loadScript({
         clientId:
-          // "AXxF9LZQ1pC0oCdiQFiz7UtpRifxqtehKJIAZw0D-3Nj7o0SeKrB12XyzxDPWe3S-v1FYdO_O_yNK1VZ", // Live
-          "AccNOO58_WwdjzmEecpOcp7GN38vgmVjw17Pb1agIdsUIw4Yqb4w1mwGOTsTgQ3Dsqz1Qc9QjY3KKqhM", // Sandbox
+          "AXxF9LZQ1pC0oCdiQFiz7UtpRifxqtehKJIAZw0D-3Nj7o0SeKrB12XyzxDPWe3S-v1FYdO_O_yNK1VZ", // Live
+          // "AccNOO58_WwdjzmEecpOcp7GN38vgmVjw17Pb1agIdsUIw4Yqb4w1mwGOTsTgQ3Dsqz1Qc9QjY3KKqhM", // Sandbox
         components: ["buttons", "marks", "messages"],
         currency: "USD",
       });

@@ -204,7 +204,7 @@ export default class extends Controller {
     try {
       let memo = "AOJ";
       if (window.xfi && window.xfi.bitcoin) {
-        window.xfi.bitcoin.changeNetwork("testnet"); //@dev uncomment for testnet
+        // window.xfi.bitcoin.changeNetwork("testnet"); //@dev uncomment for testnet
         await window.xfi.bitcoin.request(
           { method: "request_accounts", params: [{ memo }] },
           (error, accounts) => {
@@ -304,8 +304,8 @@ export default class extends Controller {
   async calculateBTCFee() {
     try {
       let res = await fetch(
-        // `https://api.blockcypher.com/v1/btc/main`, // @dev Mainnet. Another api: https://api.blockchain.info/mempool/fees
-        `https://api.blockcypher.com/v1/btc/test3`, // @dev Testnet
+        `https://api.blockcypher.com/v1/btc/main`, // @dev Mainnet. Another api: https://api.blockchain.info/mempool/fees
+        // `https://api.blockcypher.com/v1/btc/test3`, // @dev Testnet
         {
           method: "GET",
           headers: {
@@ -361,8 +361,8 @@ export default class extends Controller {
   async checkBTCBalance(_address) {
     try {
       let res = await fetch(
-        // `https://api.blockcypher.com/v1/btc/main/addrs/${_address}`, // @dev Mainnet only
-        `https://api.blockcypher.com/v1/btc/test3/addrs/${_address}`, // @dev testnet only
+        `https://api.blockcypher.com/v1/btc/main/addrs/${_address}`, // @dev Mainnet only
+        // `https://api.blockcypher.com/v1/btc/test3/addrs/${_address}`, // @dev testnet only
         {
           method: "GET",
           headers: {

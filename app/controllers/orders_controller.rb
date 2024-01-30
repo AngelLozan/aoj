@@ -53,8 +53,8 @@ class OrdersController < ApplicationController
     whole_amount = sprintf('%.2f', total/100.0)
     access_token = generate_access_token
 
-    # uri = URI("https://api-m.paypal.com/v2/checkout/orders")
-    uri = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders")
+    uri = URI("https://api-m.paypal.com/v2/checkout/orders")
+    # uri = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
@@ -127,8 +127,8 @@ class OrdersController < ApplicationController
 
     orderID = params[:paypal_order_id] # @dev From create_paypal. Added onto params and not part of forrm data, but allowed in model as int.
     access_token = generate_access_token
-    # uri_capture = URI("https://api-m.paypal.com/v2/checkout/orders/#{orderID}/capture")
-    uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{orderID}/capture")
+    uri_capture = URI("https://api-m.paypal.com/v2/checkout/orders/#{orderID}/capture")
+    # uri_capture = URI("https://api-m.sandbox.paypal.com/v2/checkout/orders/#{orderID}/capture")
     http = Net::HTTP.new(uri_capture.host, uri_capture.port)
     http.use_ssl = true
     request_capture = Net::HTTP::Post.new(uri_capture.path, {'Content-Type' => 'application/json'})
@@ -313,17 +313,19 @@ class OrdersController < ApplicationController
   end
 
   def wallet
-    # @dev test address:
-    address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
-    # address = '0x4DE2d3C611cc080b22480Be43a32006b5b33e73'
+    # # @dev test address:
+    # address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
+    # @dev Mainnet address:
+    address = '0x4DE2d3C611cc080b22480Be43a32006b5b33e73'
     Rails.logger.info ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
 
   def btcwallet
-    # @dev Test address:
-    address = 'tb1qn50cajady0d86wttx65w20kz4gweuw74n7m5rg' # "2N4fKgAq7YYb8RAzAYN6s593kbyWoDLJa4o"
-    # address = 'bc1q23dtx34f748phdOnektyvxnnvehqvac3r35a63'
+    # # @dev Test address:
+    # address = 'tb1qn50cajady0d86wttx65w20kz4gweuw74n7m5rg' # "2N4fKgAq7YYb8RAzAYN6s593kbyWoDLJa4o"
+    # @dev Mainnet address:
+    address = 'bc1q23dtx34f748phdOnektyvxnnvehqvac3r35a63'
     Rails.logger.info ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
@@ -388,8 +390,8 @@ class OrdersController < ApplicationController
     client_id = ENV['PAYPAL_CLIENT_ID']
     app_secret = ENV['PAYPAL_SECRET_KEY']
     auth = Base64.strict_encode64("#{client_id}:#{app_secret}")
-    # url = URI.parse('https://api-m.paypal.com/v1/oauth2/token')
-    url = URI.parse('https://api-m.sandbox.paypal.com/v1/oauth2/token')
+    url = URI.parse('https://api-m.paypal.com/v1/oauth2/token')
+    # url = URI.parse('https://api-m.sandbox.paypal.com/v1/oauth2/token')
 
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true
