@@ -43,6 +43,8 @@ Rails.application.routes.draw do
   patch '/orders/:id', to: "orders#update", as: 'update_order'
   delete '/orders/:id', to: "orders#destroy", as: 'destroy_order'
   get '/alchemy', to: "orders#alchemy", as: 'alchemy'
+  post '/total_price', to: "orders#total_price", as: 'total_price'
+  post '/cancel_print_order', to: "orders#cancel_print_order", as: 'cancel_print_order'
 
   get '/wallet', to: "orders#wallet", as: 'wallet'
   get '/btcwallet', to: "orders#btcwallet", as: 'btcwallet'

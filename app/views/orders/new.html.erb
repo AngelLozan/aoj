@@ -1,5 +1,5 @@
 
-<div class="container">
+<div class="container" data-controller="stripe" data-stripe-publishable-key-value="<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>">
   <div>
     <div class="text-center mt-3">
       <h1>Checkout</h1>
@@ -32,22 +32,22 @@
           <% end %>
           <% @flat_cart_arr.uniq.each do |item| %>
               <div class="col-12">
-                <div class="card-product mt-3 p-3">
+                <div class="card-product p-3 mt-3">
                   <%= image_tag item["image"] %>
 
                   <div class="card-product-infos">
                       <h2><%= item["title"] %></h2>
                     <div class="d-flex flex-row">
-                        <small>
-                         <%= number_to_currency(item["price"] / 100.00, :unit=> '$') %>
-                        </small>
+                      <small>
+                        <%= number_to_currency(item["price"] / 100.00, :unit=> '$') %>
+                      </small>
                     </div>
                     <div class="d-flex flex-row justify-content-evenly">
-                      <%= button_to add_to_cart_prints_path(item["id"]), method: :post, class: "btn btn-sm btn-outline-dark rounded-pill" do %>
+                      <%= button_to add_to_cart_prints_path(item["id"]), method: :post, class: "btn btn-sm btn-outline-dark rounded-pill", data: {"stripe-target" => "add"} do %>
                         <i class="fa-solid fa-plus fa-2xs"></i>
                       <% end %>
-                      <%= @flat_cart_arr.map {|i| i == item }.count %>
-                      <%= button_to remove_from_cart_prints_path(item["id"]), method: :delete, class: 'btn btn-sm btn-outline-dark rounded-pill' do %>
+                      <%= @flat_cart_arr.select { |i| i == item }.count %>
+                      <%= button_to remove_from_cart_prints_path(item["id"]), method: :delete, class: 'btn btn-sm btn-outline-dark rounded-pill', data: {"stripe-target" => "remove"} do %>
                         <i class="fa-solid fa-minus fa-2xs"></i>
                       <% end %>
                     </div>
@@ -57,7 +57,12 @@
             <% end %>
           <div class="mt-5">
             <hr>
-            <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></p>
+            <% if @cart.sum(&:price) + @prints_total >= 5000 %>
+              <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> <small>+ free shipping</small></p>
+            <% else %>
+              <p class="mt-3">Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> <small>+ shipping calculated at checkout</small></p>
+            <% end %>
+
           </div>
       </div>
     </div>
@@ -70,11 +75,15 @@
         <div class="panel">
           <h1 class="tabH1"><i class="fa-brands fa-stripe fa-2xl"></i></h1>
           <p class="tabP mb-3">Orders ship typically within a few days of purchase. They are packaged by the artist and delivered via the most expedient method possible. If you have any doubts, please message the artist via Instagram or email and she will follow up with you as soon as she is able: <a href="/contacts/new" target="_blank">Get in touch</a>. Thank you for supporting a more colorful world!</p>
-          <div>
-            <%= simple_form_for @order, url: create_order_path, method: :post do |f| %>
-              <div class="form-inputs">
+          <div >
+            <%= simple_form_for @order, url: create_order_path, method: :post, data: { stripe_target: "form"} do |f| %>
+              <div class="form-inputs" data-stripe-target="inputs">
                 <label class="amount mb-3">
-                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% if @cart.sum(&:price) + @prints_total >= 5000 %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% else %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> </strong><small>+ shipping calculated at checkout</small>
+                  <% end %>
                 </label>
 
                 <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
@@ -86,8 +95,11 @@
                 <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control form-control-sm' } %>
                 <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control form-control-sm' } %>
                 <%= f.input :note, as: :hidden %>
+                <%= f.input :total, input_html: {data: { stripe_target: "total"}}, as: :hidden %>
+                <%= f.input :stripe_order_id, input_html: {data: { stripe_target: "id"}}, as: :hidden %>
               </div>
 
+            <% if false %>
               <% amount = (@cart.sum(&:price) + @prints_total) %>
               <script
                 src="https://checkout.stripe.com/checkout.js" class="stripe-button"
@@ -96,8 +108,9 @@
                 data-amount="<%= amount %>"
                 data-locale="auto">
               </script>
+            <% end %>
 
-              <input type="submit" value="Pay with card" class="btn btn-primary">
+              <input id="stripe-submit" type="submit" value="Pay with card" class="btn btn-primary">
             <% end %>
           </div>
         </div>
@@ -111,7 +124,11 @@
             <%= simple_form_for @order, url: create_order_path, method: :post, html: { id: 'order-form' } do |f| %>
               <div class="form-inputs">
                 <label class="amount mb-3">
-                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% if @cart.sum(&:price) + @prints_total >= 5000 %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% else %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> </strong><small>+ shipping calculated at checkout</small>
+                  <% end %>
                 </label>
 
                 <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
@@ -123,58 +140,63 @@
                 <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
                 <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
                 <%= f.input :note, as: :hidden, input_html: { value: 'Paypal' } %>
+                <%= f.input :stripe_order_id, input_html: {data: { paypal_target: "id"}}, as: :hidden %>
               </div>
 
             <% end %>
-            <div id="paypal-button-container"></div>
 
-            <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV['PAYPAL_CLIENT_ID'] %>&components=buttons"></script>
+             <div id="paypal-button-container"></div>
+            <% if true %>
 
-            <script>
-              try {
-                paypal.Buttons({
-                  env: 'sandbox', // Valid values are sandbox and live.
-                  createOrder: async () => {
-                  try {
-                    const form = document.querySelector('#order-form');
-                    const formData = new FormData(form);
-                    const response = await fetch('/create_paypal', {
-                        method: 'POST',
-                        headers: {
-                          "X-CSRF-Token": csrfMetaTag.content,
-                        },
-                        body: formData,
-                      });
-                      const result = await response.json();
-                      console.log("Paypal order created: ", result.orderID);
-                      return result.orderID;
-                  } catch(e){
-                    console.log(e);
-                  }
-                  },
-                  onApprove: async (data) => {
-                    // const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
-                    const form = document.querySelector('#order-form');
-                    const formAction = form.getAttribute('action');
-                    const formData = new FormData(form);
-                    formData.append('paypal_order_id', data.orderID);
+              <script>
+                try {
+                  paypal.Buttons({
+                    env: 'live', //'sandbox', // Valid values are sandbox and live.
+                    createOrder: async () => {
                     try {
-                      const response = await fetch(formAction, {
-                        method: 'POST',
-                        body: formData,
-                      });
-                      const result = await response.json();
-                      console.log("Paypal order approved: ", result);
+                      const form = document.querySelector('#order-form');
+                      const formData = new FormData(form);
+                      const response = await fetch('/create_paypal', {
+                          method: 'POST',
+                          headers: {
+                            "X-CSRF-Token": csrfMetaTag.content,
+                          },
+                          body: formData,
+                        });
+                        const result = await response.json();
+                        console.log("Paypal order created: ", result.orderID);
+                        return result.orderID;
                     } catch(e){
                       console.log(e);
                     }
-                  }
-                }).render('#paypal-button-container');
-                console.log("Paypal buttons rendered from new page.")
-              } catch(e){
-                console.log("Something went wrong loading buttons on new page", e);
-              }
-            </script>
+                    },
+                    onApprove: async (data) => {
+                      // const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
+                      const form = document.querySelector('#order-form');
+                      const formAction = form.getAttribute('action');
+                      const formData = new FormData(form);
+                      formData.append('paypal_order_id', data.orderID);
+                      try {
+                        const response = await fetch(formAction, {
+                          method: 'POST',
+                          body: formData,
+                        });
+                        const result = await response.json();
+                        console.log("Paypal order approved: ", result);
+                      } catch(e){
+                        console.log(e);
+                      }
+                    }
+                  }).render('#paypal-button-container');
+                  console.log("Paypal buttons rendered from new page.")
+                } catch(e){
+                  console.log("Something went wrong loading buttons on new page", e);
+                }
+              </script>
+
+              <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV['PAYPAL_CLIENT_ID'] %>&components=buttons"></script>
+            <% end %>
+
           </div>
         </div>
         <input class="tabInput" name="tabs" type="radio" id="tab-3"/>
@@ -221,9 +243,18 @@
           <button data-action="click->crypto#xdefiConnect" class="btn btn-outline-primary tree mb-3">
             <div class="d-flex flex-column justify-content-center align-items-center">
               <div><img height="30px" size="24" src="https://www.gitbook.com/cdn-cgi/image/width=256,dpr=2,height=40,fit=contain,format=auto/https%3A%2F%2F4266502175-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FV16jazlRl57seHanahS6%252Flogo%252FioIrYN9TYWHNeHKcyuhj%252Fimage%2520(2).jpg%3Falt%3Dmedia%26token%3D8c5b33e0-7098-47ae-b59c-f43945b753cb" alt="xdefi Logo"></div>
-              <div data-crypto-target="xdefi" class="mx-5">Xdefi crypto <i class="fa-brands fa-bitcoin fa-xs"></i></div>
+              <div data-crypto-target="xdefi" class="mx-5">Xdefi Wallet <i class="fa-brands fa-bitcoin fa-xs"></i></div>
             </div>
           </button>
+
+        <% if false %>
+          <button id="xverse" data-action="click->crypto#xverseConnect" class="btn btn-outline-primary tree mb-3">
+            <div class="d-flex flex-column justify-content-center align-items-center">
+              <div><img height="30px" size="24" src="https://play-lh.googleusercontent.com/UiUoRVY5QVI5DAZyP5s6xanuPRrd8HNbKGpjKt3HVPVuT6VJcnXVqR7V4ICQ9rYRCg=w240-h480-rw" alt="xverse Logo"></div>
+              <div data-crypto-target="xverse" class="mx-5">Xverse Wallet <i class="fa-brands fa-bitcoin fa-xs"></i></div>
+            </div>
+          </button>
+        <% end %>
 
 
       </section>
@@ -252,7 +283,11 @@
             <%= simple_form_for @order, data: { crypto_target: "form"} do |f| %>
               <div class="form-inputs">
                 <label class="amount mb-3">
-                  <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% if @cart.sum(&:price) + @prints_total >= 5000 %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %></strong>
+                  <% else %>
+                    <strong>Your total: <%= number_to_currency((@cart.sum(&:price) + @prints_total) / 100.00, :unit=> '$') %> </strong><small>+ shipping calculated at checkout</small>
+                  <% end %>
                 </label>
 
                 <%= f.input :address, label: 'Street Address', input_html: { class: 'form-control' } %>
@@ -264,6 +299,7 @@
                 <%= f.input :name, label: 'Name for your order', input_html: { class: 'form-control' } %>
                 <%= f.input :email, label: 'Your email address', input_html: { class: 'form-control' } %>
                 <%= f.input :note, as: :hidden, input_html: { data: {crypto_target: "note"} } %>
+                <%= f.input :stripe_order_id, input_html: {data: { crypto_target: "id"}}, as: :hidden %>
               </div>
               <input type="submit" value="Pay with crypto" class="btn btn-primary" data-action="click->crypto#pay" data-crypto-target="pay">
             <% end %>
