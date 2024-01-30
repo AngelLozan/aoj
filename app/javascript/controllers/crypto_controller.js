@@ -40,6 +40,8 @@ export default class extends Controller {
 
   xverse = false;
 
+  accounts;
+
   async connect() {
     this.loaderTarget.style.display = "none";
     console.log("Crypto controller connected");
@@ -47,16 +49,21 @@ export default class extends Controller {
     try {
       this.web3 = await this.getWeb3Value();
       this.web3Modal = await this.getWalletConnect();
+      if (window.ethereum) {
+        window.ethereum.on("accountsChanged", this.handleMetamaskChange.bind(this));
+      };
       watchAccount(async (account) => {
         if (!account || account.isDisconnected ) {
           console.log("Disconnected");
           this.addressTarget.innerText = "";
+          this.addressTarget.value = "";
           this.buttonOpenTarget.innerText = "Connect Wallet";
           this.payTarget.disabled = true;
           return;
         }
           const reg = /\b(\w{6})\w+(\w{4})\b/g;
           const address = account.address;
+          this.addressTarget.value = address
           this.addressTarget.innerText = address.replace(
             reg,
             "$1****$2"
@@ -445,6 +452,16 @@ export default class extends Controller {
     }
   }
 
+  handleMetamaskChange(accounts) {
+    if (accounts.length === 0) {
+      console.log('Please connect to MetaMask.');
+      this.addressTarget.innerText = "";
+      this.buttonOpenTarget.innerText = "Connect Wallet";
+      this.payTarget.disabled = true;
+      this.addressTarget.value = "";
+    }
+  }
+
   async #permissions() {
     const reg = /\b(\w{6})\w+(\w{4})\b/g;
     try {
@@ -481,7 +498,8 @@ export default class extends Controller {
 
     try {
       const limit = await this.web3.eth.estimateGas({
-        from: this.accounts[0],
+        // from: this.accounts[0],
+        from: this.addressTarget.value,
         to: address,
         // value: this.web3.utils.toHex(convertPrice),
         // @dev Test value
@@ -503,7 +521,8 @@ export default class extends Controller {
         method: "eth_sendTransaction",
         params: [
           {
-            from: this.accounts[0],
+            // from: this.accounts[0],
+            from: this.addressTarget.value,
             to: address,
             // data: this.web3.utils.toHex("AOJ"),
             // value: this.web3.utils.numberToHex(convertPrice),
@@ -823,14 +842,14 @@ export default class extends Controller {
       if (!res.ok) throw new Error("Could not get alchemy endpoint");
 
       data = await res.json();
-      console.log(" WALLET CONNECT PROJECT ID: ", data.projectID);
+      // console.log(" WALLET CONNECT PROJECT ID: ", data.projectID);
       const projectId = data.projectID;
       const metadata = {
         name: 'The Art of Jaleh',
         description: 'Artist ecommerce app.',
         url: 'https://theartofjaleh.com',
-        icons: ['https://avatars.githubusercontent.com/u/37784886']
-        // icons: ['https://theartofjaleh.com/assets/AOJ-57a5e269e4c33d71958d7e4d68774460dcf66a6fb1af9673a4e8927352a01f24.png']
+        // icons: ['https://avatars.githubusercontent.com/u/37784886']
+        icons: ['https://theartofjaleh.com/assets/AOJ-57a5e269e4c33d71958d7e4d68774460dcf66a6fb1af9673a4e8927352a01f24.png']
       }
       const chains = [mainnet, sepolia]
       const config = defaultWagmiConfig({ chains, projectId, metadata })
