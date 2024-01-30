@@ -658,6 +658,7 @@ export default class extends Controller {
     }
   }
 
+  //@dev Not implemented due to error in recipient format?
   async #sendBTCXverse() {
     const call = await this.checkFormElements();
     if (call) {
