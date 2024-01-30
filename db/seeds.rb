@@ -99,9 +99,9 @@ we_call_their_names_so_we_remember = Painting.create!({ title: "We call their na
 })
   file_path_6 = Rails.root.join("app", "assets", "images", "we_call_their_names_so_we_remember.jpeg")
   file_6 = File.open(file_path_6)
-  we_call_their_name_so_we_remember.photos.attach(io: file_6, filename: "we_call_their_names_so_we_remember.jpeg", content_type: "image/jpeg")
+  we_call_their_names_so_we_remember.photos.attach(io: file_6, filename: "we_call_their_names_so_we_remember.jpeg", content_type: "image/jpeg")
   file_6.close
-puts "Created #{we_call_their_name_so_we_remember.title}"
+puts "Created #{we_call_their_names_so_we_remember.title}"
 
 our_family_is_our_strength = Painting.create!({ title: "Our family is our strength", price: 114500, description:
   """
@@ -193,12 +193,44 @@ gathering_of_women = Painting.create!({ title: "Gathering of women", price: 2610
 
   """
 })
-  file_path_12 = Rails.root.join("app", "assets", "images", "passing_down_our_wisdom.jpeg")
+  file_path_12 = Rails.root.join("app", "assets", "images", "gathering_of_women.jpeg")
   file_12 = File.open(file_path_12)
-  passing_down_our_wisdom.photos.attach(io: file_12, filename: "passing_down_our_wisdom.jpeg", content_type: "image/jpeg")
+  gathering_of_womenm.photos.attach(io: file_12, filename: "gathering_of_women.jpeg", content_type: "image/jpeg")
   file_12.close
 puts "Created #{gathering_of_women.title}"
 
+loving_care_of_community = Painting.create!({ title: "Loving care of community", price: 265000, description:
+  """
+  Original painting by Jaleh Sadravi
+
+  Size: 27.5 inches x 40 inches
+
+  Painting does not come framed.
+
+  """
+})
+  file_path_13 = Rails.root.join("app", "assets", "images", "loving_care_of_community.jpeg")
+  file_13 = File.open(file_path_13)
+  loving_care_of_community.photos.attach(io: file_13, filename: "loving_care_of_community.jpeg", content_type: "image/jpeg")
+  file_13.close
+puts "Created #{loving_care_of_community.title}"
+
+
+connected_by_our_love = Painting.create!({ title: "Connected by our love", price: 222200, description:
+  """
+  Original painting by Jaleh Sadravi
+
+  acrylic on canvas
+
+  25'x35' inches
+
+  """
+})
+  file_path_14 = Rails.root.join("app", "assets", "images", "connected_by_our_love.jpeg")
+  file_14 = File.open(file_path_14)
+  connected_by_our_love.photos.attach(io: file_14, filename: "connected_by_our_love.jpeg", content_type: "image/jpeg")
+  file_14.close
+puts "Created #{connected_by_our_love.title}"
 
 
 
