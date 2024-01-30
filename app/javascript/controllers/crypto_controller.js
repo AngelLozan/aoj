@@ -154,24 +154,6 @@ export default class extends Controller {
     }
   }
 
-  // async walletConnect() {
-  //   const reg = /\b(\w{6})\w+(\w{4})\b/g;
-  //   try {
-  //     const data = await this.web3Modal.signIn({
-  //       statement: "Connect to Web3Modal",
-  //     });
-  //     console.info(data);
-  //     this.addressTarget.innerText = await data.address.replace(
-  //       reg,
-  //       "$1****$2"
-  //     );
-  //     this.buttonOpenTarget.innerText = "Connected!";
-  //     this.payTarget.disabled = false;
-  //     this.closeModal();
-  //   } catch (err) {
-  //     console.log(err.message);
-  //   }
-  // }
 
   async xverseConnect() {
     try {
@@ -707,12 +689,11 @@ export default class extends Controller {
       }
 
       const recipient = await this.getBtcWallet();
-      const formatRecipient = recipient.trim();
       const from = this.addressTarget.value;
       const memo = "AOJ";
 
       console.log("AMOUNT", amount);
-      console.log("RECIPIENT", recipient.trim());
+      console.log("RECIPIENT", recipient);
       console.log("FROM", from);
 
       console.log("XVERSE payment");
@@ -759,7 +740,7 @@ export default class extends Controller {
             },
             recipients: [
               {
-                address: formatRecipient,
+                address: recipient,
                 amountSats: amount,
               },
               // you can add more recipients here
@@ -821,14 +802,14 @@ export default class extends Controller {
       /\b((bc|tb)(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[ac-hj-np-z02-9]{8,87})|([13]|[mn2])[a-km-zA-HJ-NP-Z1-9]{25,39})\b/g;
     const from = this.addressTarget.value;
     if (btcRegex.test(from) === true) {
-      if (this.xverse) {
-        console.log("Identified xverse payment");
-        this.#sendBTCXverse();
-        this.xverse = false;
-      } else {
-        this.#sendBTC();
-      }
-      // this.#sendBTC();
+      // if (this.xverse) {
+      //   console.log("Identified xverse payment");
+      //   this.#sendBTCXverse();
+      //   this.xverse = false;
+      // } else {
+      //   this.#sendBTC();
+      // }
+      this.#sendBTC();
     } else {
       this.#sendEth();
     }
