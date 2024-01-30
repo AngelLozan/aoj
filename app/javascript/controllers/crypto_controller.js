@@ -1,8 +1,13 @@
 import { Controller } from "@hotwired/stimulus";
 import Web3 from "web3";
-import { Web3ModalAuth } from "@web3modal/auth-html";
-import { getAddress } from 'sats-connect'
-import { sendBtcTransaction } from 'sats-connect'
+// import { Web3ModalAuth } from "@web3modal/auth-html";
+import { getAccount, disconnect, watchAccount } from '@wagmi/core'
+import { getAddress } from "sats-connect";
+import { sendBtcTransaction } from "sats-connect";
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi1'
+import { mainnet, sepolia } from 'viem/chains'
+
+
 
 // Connects to data-controller="crypto"
 export default class extends Controller {
@@ -42,6 +47,24 @@ export default class extends Controller {
     try {
       this.web3 = await this.getWeb3Value();
       this.web3Modal = await this.getWalletConnect();
+      watchAccount(async (account) => {
+        if (!account || account.isDisconnected ) {
+          console.log("Disconnected");
+          this.addressTarget.innerText = "";
+          this.buttonOpenTarget.innerText = "Connect Wallet";
+          this.payTarget.disabled = true;
+          return;
+        }
+          const reg = /\b(\w{6})\w+(\w{4})\b/g;
+          const address = account.address;
+          this.addressTarget.innerText = address.replace(
+            reg,
+            "$1****$2"
+          );
+          this.buttonOpenTarget.innerText = "Connected!";
+          this.payTarget.disabled = false;
+          this.closeModal();
+      });
       if (typeof window.ethereum !== "undefined") {
         console.log("Metamask Detected");
       } else {
@@ -114,36 +137,55 @@ export default class extends Controller {
 
   async walletConnect() {
     const reg = /\b(\w{6})\w+(\w{4})\b/g;
-    try {
-      const data = await this.web3Modal.signIn({
-        statement: "Connect to Web3Modal",
-      });
-      console.info(data);
-      this.addressTarget.innerText = await data.address.replace(
+    if (getAccount().isConnected) {
+      const account = await getAccount();
+      const address = account.address;
+      // this.web3Modal.close();
+      this.addressTarget.innerText = await address.replace(
         reg,
         "$1****$2"
       );
       this.buttonOpenTarget.innerText = "Connected!";
       this.payTarget.disabled = false;
       this.closeModal();
-    } catch (err) {
-      console.log(err.message);
+      // disconnect();
+    } else {
+      this.web3Modal.open();
     }
   }
 
+  // async walletConnect() {
+  //   const reg = /\b(\w{6})\w+(\w{4})\b/g;
+  //   try {
+  //     const data = await this.web3Modal.signIn({
+  //       statement: "Connect to Web3Modal",
+  //     });
+  //     console.info(data);
+  //     this.addressTarget.innerText = await data.address.replace(
+  //       reg,
+  //       "$1****$2"
+  //     );
+  //     this.buttonOpenTarget.innerText = "Connected!";
+  //     this.payTarget.disabled = false;
+  //     this.closeModal();
+  //   } catch (err) {
+  //     console.log(err.message);
+  //   }
+  // }
+
   async xverseConnect() {
     try {
-      if(window.BitcoinProvider) {
+      if (window.BitcoinProvider) {
         const getAddressOptions = {
           payload: {
-            purposes: ['payment'],
-            message: 'Address for sending & receiving BTC payments',
+            purposes: ["payment"],
+            message: "Address for sending & receiving BTC payments",
             network: {
-              type:'Testnet' // or 'Mainnet'
+              type: "Testnet", // or 'Mainnet'
             },
           },
           onFinish: async (response) => {
-            console.log(response)
+            console.log(response);
             if (response.addresses) {
               this.addressTarget.value = response.addresses[0].address;
               this.addressTarget.innerText = response.addresses[0].address;
@@ -154,19 +196,17 @@ export default class extends Controller {
             }
             this.closeModal();
           },
-          onCancel: async () => alert('Request canceled'),
+          onCancel: async () => alert("Request canceled"),
           onError: async (error) => console.log(error.message),
-          }
+        };
 
         await getAddress(getAddressOptions);
-
       } else {
         this.xverseTarget.innerText = "Please install!";
       }
     } catch (error) {
       console.log(error.message);
     }
-
   }
 
   //@dev Testnet / Mainnet uncomment
@@ -314,7 +354,7 @@ export default class extends Controller {
       let data = await res.json();
       console.log("Has it been received?", data["received"]);
       console.log("Block hash", data["block_hash"]);
-      if (data["received"] !== '' && data["block_hash"] !== '') {
+      if (data["received"] !== "" && data["block_hash"] !== "") {
         return true;
       } else {
         return false;
@@ -442,9 +482,12 @@ export default class extends Controller {
   }
   // @dev Calls calculatePrice then postPayment if success of tx (test values present)
   async #sendEth() {
-    const call = await this.checkFormElements()
+    const call = await this.checkFormElements();
     if (call) {
-      this.displayFlashMessage("Please fill all required form fields 🙏", 'warning');
+      this.displayFlashMessage(
+        "Please fill all required form fields 🙏",
+        "warning"
+      );
       return;
     }
     this.loaderTarget.style.display = "inline-block";
@@ -501,7 +544,8 @@ export default class extends Controller {
         this.web3.eth
           .getTransactionReceipt(txHash)
           .then((rec) => {
-            if (rec) { //@dev True if transaction successful
+            if (rec) {
+              //@dev True if transaction successful
               console.log(rec);
               let receipt = rec;
               clearInterval(interval);
@@ -534,15 +578,17 @@ export default class extends Controller {
         "warning"
       );
       await this.handleCancelPrintify();
-
     }
   }
 
   // @dev Calls calculateBTCPrice then postPayment if success of tx (test values present)
   async #sendBTC() {
-    const call = await this.checkFormElements()
+    const call = await this.checkFormElements();
     if (call) {
-      this.displayFlashMessage("Please fill all required form fields 🙏", 'warning');
+      this.displayFlashMessage(
+        "Please fill all required form fields 🙏",
+        "warning"
+      );
       return;
     }
     this.loaderTarget.style.display = "inline-block";
@@ -574,30 +620,30 @@ export default class extends Controller {
       console.log("RECIPIENT", recipient);
       console.log("FROM", from);
 
-        const result = await new Promise((resolve, reject) => {
-          window.xfi.bitcoin.request(
-            {
-              method: "transfer",
-              params: [
-                {
-                  feeRate,
-                  from,
-                  recipient,
-                  amount,
-                  memo,
-                },
-              ],
-            },
-            (error, result) => {
-              console.debug(error, result);
-              if (result) {
-                resolve(result);
-              } else {
-                reject(error || new Error("Transaction failed"));
-              }
+      const result = await new Promise((resolve, reject) => {
+        window.xfi.bitcoin.request(
+          {
+            method: "transfer",
+            params: [
+              {
+                feeRate,
+                from,
+                recipient,
+                amount,
+                memo,
+              },
+            ],
+          },
+          (error, result) => {
+            console.debug(error, result);
+            if (result) {
+              resolve(result);
+            } else {
+              reject(error || new Error("Transaction failed"));
             }
-          );
-        });
+          }
+        );
+      });
 
       console.log("RESULT", result);
       let test = bitcoinTxHashRegex.test(result);
@@ -630,109 +676,137 @@ export default class extends Controller {
     }
   }
 
-  // async #sendBTCXverse() {
-  //   const call = await this.checkFormElements()
-  //   if (call) {
-  //     this.displayFlashMessage("Please fill all required form fields 🙏", 'warning');
-  //     return;
-  //   }
-  //   this.loaderTarget.style.display = "inline-block";
-  //   console.log("BTC PAYMENT");
-  //   const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/gi;
-  //   try {
-  //     const balance = await this.checkBTCBalance(this.addressTarget.value);
-  //     // const amount = await this.calculateBtcPrice();
-  //     let testCall = await this.calculateBtcPrice(); //@dev Used for testnet to ensure printify order submitted.
-  //     const feeRate = await this.calculateBTCFee();
-  //     console.log("FEE RATE", feeRate);
-  //     const amount = 10000; // @dev test amount of Satoshis
-  //     console.log("BALANCE", balance);
-  //     if (amount + feeRate > balance) {
-  //       this.loaderTarget.style.display = "none";
-  //       this.displayFlashMessage(
-  //         "Not enough funds in your wallet. Please try again. 🤔",
-  //         "warning"
-  //       );
-  //       this.handleCancelPrintify();
-  //       return;
-  //     }
+  async #sendBTCXverse() {
+    const call = await this.checkFormElements();
+    if (call) {
+      this.displayFlashMessage(
+        "Please fill all required form fields 🙏",
+        "warning"
+      );
+      return;
+    }
+    this.loaderTarget.style.display = "inline-block";
+    console.log("BTC PAYMENT");
+    const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/gi;
+    try {
+      const balance = await this.checkBTCBalance(this.addressTarget.value);
+      // const amount = await this.calculateBtcPrice();
+      let testCall = await this.calculateBtcPrice(); //@dev Used for testnet to ensure printify order submitted.
+      const feeRate = await this.calculateBTCFee();
+      console.log("FEE RATE", feeRate);
+      const amount = 10000; // @dev test amount of Satoshis
+      console.log("BALANCE", balance);
+      if (amount + feeRate > balance) {
+        this.loaderTarget.style.display = "none";
+        this.displayFlashMessage(
+          "Not enough funds in your wallet. Please try again. 🤔",
+          "warning"
+        );
+        this.handleCancelPrintify();
+        return;
+      }
 
-  //     const recipient = await this.getBtcWallet();
-  //     const from = this.addressTarget.value;
-  //     const memo = "AOJ";
+      const recipient = await this.getBtcWallet();
+      const formatRecipient = recipient.trim();
+      const from = this.addressTarget.value;
+      const memo = "AOJ";
 
-  //     console.log("AMOUNT", amount);
-  //     console.log("RECIPIENT", recipient.trim());
-  //     console.log("FROM", from);
+      console.log("AMOUNT", amount);
+      console.log("RECIPIENT", recipient.trim());
+      console.log("FROM", from);
 
-  //       console.log("XVERSE payment")
-  //       const sendBtcOptions = {
-  //         payload: {
-  //           network: {
-  //             type: "Testnet", // or 'Mainnet'
-  //           },
-  //           recipients: [
-  //             {
-  //               address: recipient.trim(),
-  //               amountSats: amount,
-  //             },
-  //           ],
-  //           senderAddress: from,
-  //         },
-  //         onFinish: (response) => {
-  //           // alert(response);
-  //         this.displayFlashMessage(
-  //           `${response}`,
-  //           "info"
-  //         );
-  //           console.log("Xverse response", response);
-  //           Response = response;
-  //         },
-  //         onCancel: async () => {
-  //           // alert("Canceled payment");
-  //           this.displayFlashMessage(
-  //             `${response}`,
-  //             "info"
-  //           );
-  //           await this.handleCancelPrintify();
-  //         },
-  //       };
+      console.log("XVERSE payment");
+      // const sendBtcOptions = {
+      //   payload: {
+      //     network: {
+      //       type: "Testnet", // or 'Mainnet'
+      //     },
+      //     recipients: [
+      //       {
+      //         address: recipient.trim(),
+      //         amountSats: amount,
+      //       },
+      //     ],
+      //     senderAddress: from,
+      //   },
+      //   onFinish: (response) => {
+      //     // alert(response);
+      //   this.displayFlashMessage(
+      //     `${response}`,
+      //     "info"
+      //   );
+      //     console.log("Xverse response", response);
+      //     Response = response;
+      //   },
+      //   onCancel: async () => {
+      //     // alert("Canceled payment");
+      //     this.displayFlashMessage(
+      //       `${response}`,
+      //       "info"
+      //     );
+      //     await this.handleCancelPrintify();
+      //   },
+      // };
 
-  //       console.log("OPTIONS: ", sendBtcOptions);
+      // console.log("OPTIONS: ", sendBtcOptions);
 
-  //       const result = await sendBtcTransaction(sendBtcOptions);
+      // const result = await sendBtcTransaction(sendBtcOptions);
+
+        const result = await sendBtcTransaction({
+          payload: {
+            network: {
+              type: "Testnet",
+            },
+            recipients: [
+              {
+                address: formatRecipient,
+                amountSats: amount,
+              },
+              // you can add more recipients here
+            ],
+            senderAddress: from,
+          },
+          onFinish: (response) => {
+            this.displayFlashMessage(`${response}`, "info");
+            console.log("Xverse response", response);
+          },
+          onCancel: async () => {
+            this.displayFlashMessage(`${response}`, "info");
+            await this.handleCancelPrintify();
+          },
+        });
 
 
-  //     console.log("RESULT", result);
-  //     let test = bitcoinTxHashRegex.test(result);
-  //     console.log("TEST", test);
+      console.log("RESULT", result);
+      let test = bitcoinTxHashRegex.test(result);
+      console.log("TEST", test);
 
-  //     // let receipt = this.confirmBtcTransaction(Result); // @dev Pings blockcypher for tx details. Alternative to regex
-  //     // if (receipt) {
-  //     if (test) {
-  //       this.noteTarget.value = `Please verify this transaction is confirmed in your wallet & amount is comprable: https://mempool.space/tx/${result}`;
-  //       this.payTarget.innerText = "Paid";
-  //       await this.postPayment();
-  //       this.loaderTarget.style.display = "none";
-  //     } else {
-  //       console.log("ERROR", Result.error);
-  //       this.loaderTarget.style.display = "none";
-  //       this.handleCancelPrintify();
-  //       this.displayFlashMessage(
-  //         "Transaction didn't go through. Please try again. 🤔",
-  //         "warning"
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     this.loaderTarget.style.display = "none";
-  //     this.handleCancelPrintify();
-  //     this.displayFlashMessage(
-  //       "Transaction didn't go through. Please try again. 🤔",
-  //       "warning"
-  //     );
-  //   }
-  // }
+      // let receipt = this.confirmBtcTransaction(Result); // @dev Pings blockcypher for tx details. Alternative to regex
+      // if (receipt) {
+      if (test) {
+        this.noteTarget.value = `Please verify this transaction is confirmed in your wallet & amount is comprable: https://mempool.space/tx/${result}`;
+        this.payTarget.innerText = "Paid";
+        await this.postPayment();
+        this.loaderTarget.style.display = "none";
+      } else {
+        console.log("ERROR", result.error);
+        this.loaderTarget.style.display = "none";
+        this.handleCancelPrintify();
+        this.displayFlashMessage(
+          "Transaction didn't go through. Please try again. 🤔",
+          "warning"
+        );
+      }
+    } catch (error) {
+      console.log(error.message);
+      this.loaderTarget.style.display = "none";
+      this.handleCancelPrintify();
+      this.displayFlashMessage(
+        "Transaction didn't go through. Please try again. 🤔",
+        "warning"
+      );
+    }
+  }
 
   connectWallet(e) {
     console.log("connectWallet");
@@ -747,13 +821,14 @@ export default class extends Controller {
       /\b((bc|tb)(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[ac-hj-np-z02-9]{8,87})|([13]|[mn2])[a-km-zA-HJ-NP-Z1-9]{25,39})\b/g;
     const from = this.addressTarget.value;
     if (btcRegex.test(from) === true) {
-      // if (this.xverse) {
-      //   console.log("Identified xverse payment");
-      //   this.#sendBTCXverse();
-      // } else {
-      //   this.#sendBTC();
-      // }
-      this.#sendBTC();
+      if (this.xverse) {
+        console.log("Identified xverse payment");
+        this.#sendBTCXverse();
+        this.xverse = false;
+      } else {
+        this.#sendBTC();
+      }
+      // this.#sendBTC();
     } else {
       this.#sendEth();
     }
@@ -761,14 +836,29 @@ export default class extends Controller {
 
   async getWalletConnect() {
     let data;
-    let id;
     try {
       let res = await fetch("/alchemy");
       if (!res.ok) throw new Error("Could not get alchemy endpoint");
 
       data = await res.json();
-      // console.log(" WALLET CONNECT PROJECT ID: ", data.projectID);
-      id = data.projectID;
+      console.log(" WALLET CONNECT PROJECT ID: ", data.projectID);
+      const projectId = data.projectID;
+      const metadata = {
+        name: 'The Art of Jaleh',
+        description: 'Artist ecommerce app.',
+        url: 'https://theartofjaleh.com',
+        icons: ['https://avatars.githubusercontent.com/u/37784886']
+        // icons: ['https://theartofjaleh.com/assets/AOJ-57a5e269e4c33d71958d7e4d68774460dcf66a6fb1af9673a4e8927352a01f24.png']
+      }
+      const chains = [mainnet, sepolia]
+      const config = defaultWagmiConfig({ chains, projectId, metadata })
+
+      const web3Modal = await createWeb3Modal({
+        wagmiConfig: config,
+        projectId,
+        enableAnalytics: false
+      })
+      return web3Modal;
     } catch (error) {
       console.log(
         "Something went wrong grabbing endpoint wallet connect: ",
@@ -776,16 +866,18 @@ export default class extends Controller {
       );
     }
 
-    const web3Modal = await new Web3ModalAuth({
-      projectId: id,
-      metadata: {
-        name: "Web3Modal",
-        description: "Web3Modal",
-        url: "web3modal.com",
-        icons: ["https://time.com/img/icons/wallet-connect.png"],
-      },
-    });
-    return web3Modal;
+
+
+  //   const web3Modal = await new Web3ModalAuth({
+  //     projectId: id,
+  //     metadata: {
+  //       name: "Web3Modal",
+  //       description: "Web3Modal",
+  //       url: "web3modal.com",
+  //       icons: ["https://time.com/img/icons/wallet-connect.png"],
+  //     },
+  //   });
+  //   return web3Modal;
   }
 
   displayFlashMessage(message, type) {
@@ -850,13 +942,16 @@ export default class extends Controller {
     const formElements = form.elements;
     for (let i = 0; i < formElements.length; i++) {
       const element = formElements[i];
-      if (element.value === "" && element.type !== "hidden" && element.classList.contains('required')) {
+      if (
+        element.value === "" &&
+        element.type !== "hidden" &&
+        element.classList.contains("required")
+      ) {
         missingOne = true;
         break;
       }
+    }
+    console.log("Missing one: ", missingOne);
+    return missingOne;
   }
-  console.log("Missing one: ", missingOne);
-  return missingOne;
-}
-
 }
