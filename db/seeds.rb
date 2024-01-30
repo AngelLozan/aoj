@@ -195,7 +195,7 @@ gathering_of_women = Painting.create!({ title: "Gathering of women", price: 2610
 })
   file_path_12 = Rails.root.join("app", "assets", "images", "gathering_of_women.jpeg")
   file_12 = File.open(file_path_12)
-  gathering_of_womenm.photos.attach(io: file_12, filename: "gathering_of_women.jpeg", content_type: "image/jpeg")
+  gathering_of_women.photos.attach(io: file_12, filename: "gathering_of_women.jpeg", content_type: "image/jpeg")
   file_12.close
 puts "Created #{gathering_of_women.title}"
 
