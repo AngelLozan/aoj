@@ -100,7 +100,11 @@ class PrintsController < ApplicationController
     raw_data = JSON.parse(response.read_body)
 
     print = raw_data
+    images = []
 
+    print["images"].map do |image|
+      images << image["src"]
+    end
 
     description = print['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
 
@@ -120,7 +124,8 @@ class PrintsController < ApplicationController
         'id' => print['id'],
         'title' => print['title'],
         'description' => description,
-        'image' => print["images"].first["src"],
+        # 'image' => print["images"].first["src"],
+        'images' => images,
         'price' => print['variants'].first['price'],
       }
     end
