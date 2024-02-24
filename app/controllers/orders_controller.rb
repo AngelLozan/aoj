@@ -281,6 +281,10 @@ class OrdersController < ApplicationController
   def cancel_print_order
     Rails.logger.info ">>>>>>>>>>>>>>> CANCEL PRINT ORDER CALLED <<<<<<<<<<<<<<<<<<<"
     order_id = order_params[:stripe_order_id] # @dev Place order in this form element for paypal and stripe.
+    if order_id == ""
+      Rails.logger.info ">>>>>>>>>>>>>>> NO ORDER ID <<<<<<<<<<<<<<<<<<<"
+      return render json: { status: "success" }, status: :ok
+    end
     status = cancel_order(order_id)
     if status.strip == "canceled"
       render json: { status: "success" }, status: :ok
@@ -316,7 +320,8 @@ class OrdersController < ApplicationController
     # # @dev test address:
     # address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
     # @dev Mainnet address:
-    address = '0x4DE2d3C611cc080b22480Be43a32006b5b33e73'
+    # address = '0x4DE2d3C611cc080b22480Be43a32006b5b33e73'
+    address = '0xa0E20028fF45cCdE0060f5c13b4A9b00aE9807B5'
     Rails.logger.info ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end

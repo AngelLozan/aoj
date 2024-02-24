@@ -116,7 +116,7 @@ class PrintsController < ApplicationController
         'id' => print['id'],
         'title' => print['title'],
         'description' => description,
-        'image' => 'abstractart.png',
+        'images' => ['abstractart.png'],
         'price' => print['variants'].first['price']
       }
     else

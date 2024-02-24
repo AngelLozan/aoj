@@ -48,3 +48,5 @@ application.register("top", TopController)
 
 import WorksController from "./works_controller"
 application.register("works", WorksController)
+
+
