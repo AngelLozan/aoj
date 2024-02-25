@@ -489,18 +489,25 @@ export default class extends Controller {
       );
       return;
     }
-    this.loaderTarget.style.display = "inline-block";
-    const price = await this.calculatePrice();
-    console.log("PRICE", price);
-    const address = await this.getWallet();
-    const convertPrice = this.web3.utils.toWei(price, "ether");
-    console.log("CONVERTED PRICE in WEI", convertPrice);
+
 
     try {
+      this.web3 = await this.getWeb3Value();
+      this.loaderTarget.style.display = "inline-block";
+      const price = await this.calculatePrice();
+      console.log("PRICE", price);
+      console.log("WEB 3?", this.web3);
+      const address = await this.getWallet();
+      const convertPrice = this.web3.utils.toWei(price, "ether");
+      console.log("CONVERTED PRICE in WEI", convertPrice);
+
+      const artist_addy = this.web3.utils.toChecksumAddress(address);
+      console.log("ARTIST ADDRESS", artist_addy);
+
       const limit = await this.web3.eth.estimateGas({
         // from: this.accounts[0],
         from: this.addressTarget.value,
-        to: address,
+        to: this.web3.utils.toChecksumAddress(address),
         // value: this.web3.utils.toHex(convertPrice),
         // @dev Test value
         value: this.web3.utils.toWei(0.0001, "ether"),
@@ -523,7 +530,7 @@ export default class extends Controller {
           {
             // from: this.accounts[0],
             from: this.addressTarget.value,
-            to: address,
+            to: this.web3.utils.toChecksumAddress(address),
             // data: this.web3.utils.toHex("AOJ"),
             // value: this.web3.utils.numberToHex(convertPrice),
             // @dev Test value
@@ -574,10 +581,17 @@ export default class extends Controller {
     } catch (error) {
       console.log(error.message);
       this.loaderTarget.style.display = "none";
-      this.displayFlashMessage(
-        "Transaction didn't go through. Please try again. 🤔",
-        "warning"
-      );
+      if (error.message.includes("insufficient funds for gas * price + value")) {
+        this.displayFlashMessage(
+          "Not enough for gas fees. Please try again. 💦",
+          "warning"
+        );
+      } else {
+        this.displayFlashMessage(
+          "Transaction didn't go through. Please try again. 🤔",
+          "warning"
+        );
+      }
       await this.handleCancelPrintify();
     }
   }
