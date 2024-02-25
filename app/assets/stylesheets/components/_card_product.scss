@@ -387,3 +387,62 @@
 .prod-card button:hover {
   opacity: 0.7;
 }
+
+//@dev For the print show page
+
+.gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-gap: 20px;
+  grid-column-start: 1;
+  grid-row-start: 1;
+  grid-row-end: 3;
+  align-content: start;
+  max-width: 700px;
+  margin: 0 auto;
+  transition: all 150ms linear;
+}
+
+.gallery input[type="radio"] {
+  display: none;
+}
+
+.gallery label {
+  position: relative;
+  display: block;
+  padding-bottom: 60%;
+  margin: 5px;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+}
+
+.gallery label:before {
+  border: 1px solid #e3e3e3;
+  content: '';
+  position: absolute;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  top: -5px;
+}
+
+.gallery img {
+  display: none;
+  grid-column-start: 1;
+  grid-column-end: 5;
+  grid-row-start: 1;
+  grid-row-end: 2;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  width: 100%;
+  transition: all 150ms linear;
+}
+
+.gallery input[name="select"]:checked + label + img {
+  display: block;
+}
+
+.gallery input[name="select"]:checked + label:before {
+  border: 1px solid #000;
+}
