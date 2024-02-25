@@ -316,7 +316,7 @@ class OrdersController < ApplicationController
     # # @dev test address:
     # address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
     # @dev Mainnet address:
-    address = '0x4DE2d3C611cc080b22480Be43a32006b5b33e73'
+    address = '0x4DE2d3Cc611cc080b22480Be43a32006b5b33e73'
     Rails.logger.info ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
@@ -325,7 +325,7 @@ class OrdersController < ApplicationController
     # # @dev Test address:
     # address = 'tb1qn50cajady0d86wttx65w20kz4gweuw74n7m5rg' # "2N4fKgAq7YYb8RAzAYN6s593kbyWoDLJa4o"
     # @dev Mainnet address:
-    address = 'bc1q23dtx34f748phdOnektyvxnnvehqvac3r35a63'
+    address = 'bc1q23dtx34f748phd0nektyvxnnvehqvdc3r35a63'
     Rails.logger.info ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
