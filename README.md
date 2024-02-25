@@ -93,3 +93,11 @@ EXAMPLE_ENV_VAR: <value>
 - Restart nginx: `sudo systemctl restart nginx`
 - Then restart the server: `sudo systemctl restart rails.service`
 - View logs by changing into the rails user `sudo -i -u rails` and then `cd <app name>` and `tail -f log/production.log`
+
+
+## A note about Printify:
+With a custom (API) store set up, printify does not directly handle the publishing process. Clicking the "publish" button will not initiate any action. However, you can retrieve the data of your created products through an API GET request and manually create and publish your products on your storefront.
+
+Once you have completed this process, you can link the product page on your storefront to the corresponding product in Printify by using the "Set product publish status to succeeded" request mentioned in our Printify API Reference: https://developers.printify.com/#overview
+
+If you encounter any products that are stuck and need to be unlocked, you can use the "Set product publish status to failed" request provided in our Printify API
