@@ -101,3 +101,5 @@ With a custom (API) store set up, printify does not directly handle the publishi
 Once you have completed this process, you can link the product page on your storefront to the corresponding product in Printify by using the "Set product publish status to succeeded" request mentioned in our Printify API Reference: https://developers.printify.com/#overview
 
 If you encounter any products that are stuck and need to be unlocked, you can use the "Set product publish status to failed" request provided in our Printify API
+apiteam[@]printify.com
+
