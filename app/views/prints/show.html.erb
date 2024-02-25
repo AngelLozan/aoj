@@ -18,7 +18,7 @@
     <% @print["images"][1..-1].each_with_index do |image, index| %>
       <input type="radio" name="select" id="img-tab-<%= index + 2 %>">
       <label for="img-tab-<%= index + 2 %>" style="background-image: url(<%= image %>);"></label>
-      <%= image_tag(image) %>
+      <%= image_tag image, class: "shadow rounded"%>
     <% end %>
 
   </div>
