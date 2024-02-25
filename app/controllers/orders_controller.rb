@@ -320,8 +320,7 @@ class OrdersController < ApplicationController
     # # @dev test address:
     # address = '0xE133a2Ae863B3fAe3dE22D4D3982B1A1fc01DaBb'
     # @dev Mainnet address:
-    # address = '0x4DE2d3C611cc080b22480Be43a32006b5b33e73'
-    address = '0xa0E20028fF45cCdE0060f5c13b4A9b00aE9807B5'
+    address = '0x4DE2d3Cc611cc080b22480Be43a32006b5b33e73'
     Rails.logger.info ">>>>>>>>>>>>>>> ADDRESS: #{address}<<<<<<<<<<<<<<<<<<<"
     render json: { address: address }
   end
