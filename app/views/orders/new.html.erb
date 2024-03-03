@@ -227,14 +227,22 @@
 
           <button data-action="click->crypto#connectWallet" class="btn btn-outline-primary tree mb-3">
             <div class="d-flex flex-column justify-content-center align-items-center">
+              <% if false %>
               <div><img height="30px" size="24" src="https://opensea.io/static/images/logos/metamask-fox.svg" alt="Metamaks Fox"></div>
+
+              <% end %>
+              <div><%= image_tag('metamask-fox.svg', height: "30px", width: "24px", alt: "Metamask fox") %></div>
               <div data-wallet-target="metamask" class="mx-5">Metamask <i class="fa-brands fa-ethereum fa-xs"></i></div>
             </div>
           </button>
 
           <button data-action="click->crypto#walletConnect" class="btn btn-outline-primary tree mb-3">
             <div class="d-flex flex-column justify-content-center align-items-center">
+              <% if false %>
               <div><img height="30px" size="24" src="https://static.opensea.io/logos/walletconnect-alternative.png" alt="Wallet Connect"></div>
+
+              <% end %>
+              <div><%= image_tag('walletconnect.png', height: "30px", width: "24px", alt: "Wallet Connect") %></div>
               <div data-crypto-target="wc" class="mx-3">Wallet Connect <i class="fa-brands fa-ethereum fa-xs"></i><i class="fa-solid fa-mobile-screen-button fa-xs"></i></div>
             </div>
           </button>
@@ -242,7 +250,11 @@
 
           <button data-action="click->crypto#xdefiConnect" class="btn btn-outline-primary tree mb-3">
             <div class="d-flex flex-column justify-content-center align-items-center">
+              <% if false %>
               <div><img height="30px" size="24" src="https://www.gitbook.com/cdn-cgi/image/width=256,dpr=2,height=40,fit=contain,format=auto/https%3A%2F%2F4266502175-files.gitbook.io%2F~%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FV16jazlRl57seHanahS6%252Flogo%252FioIrYN9TYWHNeHKcyuhj%252Fimage%2520(2).jpg%3Falt%3Dmedia%26token%3D8c5b33e0-7098-47ae-b59c-f43945b753cb" alt="xdefi Logo"></div>
+
+              <% end %>
+              <div><%= image_tag('xdefi.png', height: "30px", width: "24px", alt: "Xdefi logo") %></div>
               <div data-crypto-target="xdefi" class="mx-5">Xdefi Wallet <i class="fa-brands fa-bitcoin fa-xs"></i></div>
             </div>
           </button>
