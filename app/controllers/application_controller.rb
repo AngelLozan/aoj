@@ -34,30 +34,40 @@ class ApplicationController < ActionController::Base
         p "=========================================="
 
 
+        html_tag_pattern = /<.*?>(.*?)<\/.*?>/i
         description = product['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
+        cleaned_description = description.gsub(html_tag_pattern, '')
+        default_variant = product['variants'].select { |variant| variant['is_default'] == true }
 
+
+        if default_variant
+          price = default_variant.first['price']
+          variant = default_variant.first['id']
+        else
+          first_variant = product['variants'].first
+          price = first_variant['price']
+          variant = first_variant['id']
+        end
 
         if product["images"].empty?
-
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => description,
+            'description' => cleaned_description,
             'image' => 'abstractart.png',
-            'price' => product['variants'].first['price'],
-            'variant' => product['variants'].first['id']
+            'price' => price, # product['variants'].first['price'],
+            'variant' => variant # product['variants'].first['id']
           }
         else
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => description,
+            'description' => cleaned_description,
             'image' => product["images"].first["src"],
-            'price' => product['variants'].first['price'],
-            'variant' => product['variants'].first['id']
+            'price' => price,
+            'variant' => variant
           }
         end
-
       end
     end
 
