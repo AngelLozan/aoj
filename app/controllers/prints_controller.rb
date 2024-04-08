@@ -42,14 +42,26 @@ class PrintsController < ApplicationController
         description = product['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
         cleaned_description = description.gsub(html_tag_pattern, '')
 
+        default_variant = product['variants'].select { |variant| variant['is_default'] == true }
+
+        if default_variant
+          price = default_variant.first['price']
+          variant = default_variant.first['id']
+        else
+          first_variant = product['variants'].first
+          price = first_variant['price']
+          variant = first_variant['id']
+        end
+
+
         if product["images"].empty?
           {
             'id' => product['id'],
             'title' => product['title'],
             'description' => cleaned_description,
             'image' => 'abstractart.png',
-            'price' => product['variants'].first['price'],
-            'variant' => product['variants'].first['id']
+            'price' => price, # product['variants'].first['price'],
+            'variant' => variant # product['variants'].first['id']
           }
         else
           {
@@ -57,8 +69,8 @@ class PrintsController < ApplicationController
             'title' => product['title'],
             'description' => cleaned_description,
             'image' => product["images"].first["src"],
-            'price' => product['variants'].first['price'],
-            'variant' => product['variants'].first['id']
+            'price' => price,
+            'variant' => variant
           }
         end
 
@@ -107,7 +119,16 @@ class PrintsController < ApplicationController
 
     description = print['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
 
+    default_variant = print['variants'].select { |variant| variant['is_default'] == true }
 
+    if default_variant
+      price = default_variant.first['price']
+      variant = default_variant.first['id']
+    else
+      first_variant = print['variants'].first
+      price = first_variant['price']
+      variant = first_variant['id']
+    end
 
     if print["images"].empty?
 
@@ -116,7 +137,7 @@ class PrintsController < ApplicationController
         'title' => print['title'],
         'description' => description,
         'image' => 'abstractart.png',
-        'price' => print['variants'].first['price']
+        'price' => price
       }
     else
       @print = {
@@ -124,18 +145,10 @@ class PrintsController < ApplicationController
         'title' => print['title'],
         'description' => description,
         'images' => images,
-        'price' => print['variants'].first['price'],
+        'price' => price
       }
     end
 
-    # @variants = product['variants'].map do |variant|
-    #   {
-    #     'variant_id' => variant['id'],
-    #     'variant_title' => variant['title'],
-    #     'variant_price' => variant['price'],
-    #     'variant_image' => variant['image']['src']
-    #   }
-    # end
     @print = @print
 
   end
