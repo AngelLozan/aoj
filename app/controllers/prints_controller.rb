@@ -2,6 +2,7 @@ require 'mail'
 require 'json'
 require 'uri'
 require 'net/http'
+require 'nokogiri'
 
 class PrintsController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :index , :show, :add_to_cart_prints, :remove_from_cart_prints ]
@@ -38,11 +39,12 @@ class PrintsController < ApplicationController
         p "Product is: #{product["id"]}"
         p "=========================================="
 
-        html_tag_pattern = /<.*?>(.*?)<\/.*?>/i
-        description = product['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
-        cleaned_description = description.gsub(html_tag_pattern, '')
+        # html_tag_pattern = /<.*?>(.*?)<\/.*?>/i
+        # description = product['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
+        # cleaned_description = description.gsub(html_tag_pattern, '')
+        parsed_description = Nokogiri::HTML.parse(product['description'])
 
-        default_variant = product['variants'].select { |variant| variant['is_default'] == true }
+        default_variant = product['variants'].select { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
 
         if default_variant
           price = default_variant.first['price']
@@ -58,7 +60,7 @@ class PrintsController < ApplicationController
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => cleaned_description,
+            'description' => parsed_description.text,
             'image' => 'abstractart.png',
             'price' => price, # product['variants'].first['price'],
             'variant' => variant # product['variants'].first['id']
@@ -67,7 +69,7 @@ class PrintsController < ApplicationController
           {
             'id' => product['id'],
             'title' => product['title'],
-            'description' => cleaned_description,
+            'description' => parsed_description.text,
             'image' => product["images"].first["src"],
             'price' => price,
             'variant' => variant
@@ -117,9 +119,11 @@ class PrintsController < ApplicationController
       images << image["src"]
     end
 
-    description = print['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
+    # description = print['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
+    parsed_description = Nokogiri::HTML.parse(print['description'])
 
-    default_variant = print['variants'].select { |variant| variant['is_default'] == true }
+
+    default_variant = print['variants'].select { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
 
     if default_variant
       price = default_variant.first['price']
@@ -135,7 +139,7 @@ class PrintsController < ApplicationController
       @print = {
         'id' => print['id'],
         'title' => print['title'],
-        'description' => description,
+        'description' => parsed_description.text,
         'image' => 'abstractart.png',
         'price' => price
       }
@@ -143,7 +147,7 @@ class PrintsController < ApplicationController
       @print = {
         'id' => print['id'],
         'title' => print['title'],
-        'description' => description,
+        'description' => parsed_description.text,
         'images' => images,
         'price' => price
       }
