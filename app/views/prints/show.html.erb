@@ -23,7 +23,7 @@
 
   </div>
 
-    <div my-3">
+    <div my-3 text-center">
       <h1 class="mt-3 px-5"><%= @print["title"] %></h1>
       <% if @print["price"] >= 5000 %>
         <p class="prod-price"> <%= number_to_currency(@print["price"] / 100.00, :unit=> '$') %> <small>Shipping included</small></p>
@@ -31,7 +31,7 @@
         <p class="prod-price"> <%= number_to_currency(@print["price"] / 100.00, :unit=> '$') %> <small>+ Shipping</small></p>
       <% end %>
 
-      <p class="d-flex px-5"><%= @print["description"] %></p>
+      <p class="px-5"><%= @print["description"] %></p>
 
       <% if @flat_cart_arr.any? { |print| print["id"] == @print["id"]} %>
         <div class="d-flex flex-column">

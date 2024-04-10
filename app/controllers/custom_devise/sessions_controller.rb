@@ -57,15 +57,11 @@ class CustomDevise::SessionsController < Devise::SessionsController
         p "=========================================="
 
         parsed_description = Nokogiri::HTML.parse(product['description'])
-
-        # html_tag_pattern = /<.*?>(.*?)<\/.*?>/i
-        # description = product['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
-        # cleaned_description = description.gsub(html_tag_pattern, '')
-        default_variant = product['variants'].select { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
+        default_variant = product['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
 
         if default_variant
-          price = default_variant.first['price']
-          variant = default_variant.first['id']
+          price = default_variant['price']
+          variant = default_variant['id']
         else
           first_variant = product['variants'].first
           price = first_variant['price']

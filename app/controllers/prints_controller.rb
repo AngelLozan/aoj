@@ -39,16 +39,15 @@ class PrintsController < ApplicationController
         p "Product is: #{product["id"]}"
         p "=========================================="
 
-        # html_tag_pattern = /<.*?>(.*?)<\/.*?>/i
-        # description = product['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
-        # cleaned_description = description.gsub(html_tag_pattern, '')
+
         parsed_description = Nokogiri::HTML.parse(product['description'])
 
-        default_variant = product['variants'].select { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
+        default_variant = product['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
+
 
         if default_variant
-          price = default_variant.first['price']
-          variant = default_variant.first['id']
+          price = default_variant['price']
+          variant = default_variant['id']
         else
           first_variant = product['variants'].first
           price = first_variant['price']
@@ -119,15 +118,16 @@ class PrintsController < ApplicationController
       images << image["src"]
     end
 
-    # description = print['description'].gsub(/\.:\s.*(?:\n|\z)/, '')
     parsed_description = Nokogiri::HTML.parse(print['description'])
 
-
-    default_variant = print['variants'].select { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
+    default_variant = print['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
+    puts"=========================================="
+    puts"Default variant is: #{default_variant}"
+    puts"=========================================="
 
     if default_variant
-      price = default_variant.first['price']
-      variant = default_variant.first['id']
+      price = default_variant['price']
+      variant = default_variant['id']
     else
       first_variant = print['variants'].first
       price = first_variant['price']
