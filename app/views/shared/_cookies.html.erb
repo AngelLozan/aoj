@@ -15,4 +15,38 @@
         <button class="cookie-button" id="declineBtn" data-action="click->cookies#reject">Decline</button>
       </div>
     </div>
+
+  <% if false %>
+   <div class="mailing-wrapper" data-cookies-target="mailing">
+      <header class="mailing-header">
+        <i class="fa fa-envelope"></i>
+        <h2 class="mailing-header">Join my mailing list!</h2>
+      </header>
+
+        <div class="text-center mb-3">
+          <div class="d-flex justify-content-center" id="mc_embed_shell">
+              <form class="form-inline" action="https://jsadravi.us7.list-manage.com/subscribe/post?u=986ea8046b29fee65e34eda26&amp;id=c5725164da&amp;f_id=0096d2e4f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" target="_blank">
+
+                  <input type="text" name="FNAME" id="mce-FNAME" value="" placeholder="First Name" aria-label="Recipient's first name">
+
+                  <input type="email" id="mce-EMAIL" name="EMAIL"  placeholder="Your Email" aria-label="Recipient's Email" value="">
+
+                  <button id="mc-embedded-subscribe" class="btn btn-outline-primary tree px-3 rounded-pill" type="submit" name="subscribe" value="Subscribe">Subscribe</button>
+
+                <div aria-hidden="true" style="position: absolute; left: -5000px;">
+                    /* real people should not fill this in and expect good things - do not remove this or risk form bot signups */
+                    <input type="text" name="b_986ea8046b29fee65e34eda26_c5725164da" tabindex="-1" value="">
+                </div>
+              </form>
+
+            <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script>
+            <script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+          </div>
+        </div>
+
+    </div>
+  <% end %>
+
+
+
   </div>

@@ -13,12 +13,20 @@ export default class extends Controller {
       this.wrapperTarget.classList.remove("hidden");
       this.wrapperTarget.classList.add("show");
     }
+
+    // window.addEventListener("beforeunload", this.joinMailing.bind(this));
   }
 
   accept() {
     this.wrapperTarget.classList.add("hidden");
     document.cookie = "cookieBy= AOJ; max-age=" + 60 * 60 * 24 * 30;
   }
+
+  // @dev To do: Add popup mailing list. Style and add to the view _cookies.html.erb
+  // joinMailing() {
+  //   this.wrapperTarget.classList.remove("hidden");
+  //   this.wrapperTarget.classList.add("show");
+  // }
 
   reject() {
     this.wrapperTarget.classList.add("hidden");
