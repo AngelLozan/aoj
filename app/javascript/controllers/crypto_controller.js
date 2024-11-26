@@ -330,8 +330,8 @@ export default class extends Controller {
   async confirmBtcTransaction(_tx) {
     try {
       let res = await fetch(
-        // `https://api.blockcypher.com/v1/btc/main`, // @dev Mainnet. Another api: https://api.blockchain.info/mempool/fees
-        `https://api.blockcypher.com/v1/btc/test3/txs/${_tx}`, // @dev Testnet
+        `https://api.blockcypher.com/v1/btc/main`, // @dev Mainnet. Another api: https://api.blockchain.info/mempool/fees
+       // `https://api.blockcypher.com/v1/btc/test3/txs/${_tx}`, // @dev Testnet
         {
           method: "GET",
           headers: {
@@ -508,9 +508,9 @@ export default class extends Controller {
         // from: this.accounts[0],
         from: this.addressTarget.value,
         to: this.web3.utils.toChecksumAddress(address),
-        // value: this.web3.utils.toHex(convertPrice),
+        value: this.web3.utils.toHex(convertPrice),
         // @dev Test value
-        value: this.web3.utils.toWei(0.0001, "ether"),
+       // value: this.web3.utils.toWei(0.0001, "ether"),
       });
       console.log("LIMIT", limit);
 
@@ -532,9 +532,9 @@ export default class extends Controller {
             from: this.addressTarget.value,
             to: this.web3.utils.toChecksumAddress(address),
             // data: this.web3.utils.toHex("AOJ"),
-            // value: this.web3.utils.numberToHex(convertPrice),
+            value: this.web3.utils.numberToHex(convertPrice),
             // @dev Test value
-            value: this.web3.utils.toWei(0.0001, "ether"),
+            // value: this.web3.utils.toWei(0.0001, "ether"),
             gas: this.web3.utils.numberToHex(limit),
             maxPriorityFeePerGas: this.web3.utils.toWei(3, "gwei"), // 3 or 5 (tip to miner)
             maxFeePerGas: this.web3.utils.toWei(5, "gwei"), // Optional Default in web3.js. Errors on metamask. Must be equal or higher.
@@ -611,11 +611,11 @@ export default class extends Controller {
     const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/gi;
     try {
       const balance = await this.checkBTCBalance(this.addressTarget.value);
-      // const amount = await this.calculateBtcPrice();
-      let testCall = await this.calculateBtcPrice(); // Used for testnet to ensure printify order submitted.
+      const amount = await this.calculateBtcPrice();
+      //let testCall = await this.calculateBtcPrice(); // Used for testnet to ensure printify order submitted.
       const feeRate = await this.calculateBTCFee();
       console.log("FEE RATE", feeRate);
-      const amount = 10000; // @dev test amount of Satoshis
+      //const amount = 10000; // @dev test amount of Satoshis
       console.log("BALANCE", balance);
       if (amount + feeRate > balance) {
         this.loaderTarget.style.display = "none";
@@ -706,11 +706,11 @@ export default class extends Controller {
     const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/gi;
     try {
       const balance = await this.checkBTCBalance(this.addressTarget.value);
-      // const amount = await this.calculateBtcPrice();
-      let testCall = await this.calculateBtcPrice(); //@dev Used for testnet to ensure printify order submitted.
+      const amount = await this.calculateBtcPrice();
+      //let testCall = await this.calculateBtcPrice(); //@dev Used for testnet to ensure printify order submitted.
       const feeRate = await this.calculateBTCFee();
       console.log("FEE RATE", feeRate);
-      const amount = 10000; // @dev test amount of Satoshis
+      //const amount = 10000; // @dev test amount of Satoshis
       console.log("BALANCE", balance);
       if (amount + feeRate > balance) {
         this.loaderTarget.style.display = "none";
