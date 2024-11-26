@@ -56,7 +56,6 @@ class CustomDevise::SessionsController < Devise::SessionsController
         p "Product is: #{product["id"]}"
         p "=========================================="
 
-
         parsed_description = Nokogiri::HTML.parse(product['description'])
         default_variant = product['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
 

@@ -36,10 +36,8 @@ class ApplicationController < ActionController::Base
         p "Product is: #{product["id"]}"
         p "=========================================="
 
-
         parsed_description = Nokogiri::HTML.parse(product['description'])
         default_variant = product['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
-
 
         if default_variant
           price = default_variant['price']
@@ -67,7 +65,7 @@ class ApplicationController < ActionController::Base
             'image' => product["images"].first["src"],
             'price' => price,
             'variant' => variant
-          }
+          }parsed
         end
       end
     end

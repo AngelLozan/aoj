@@ -43,7 +43,6 @@ class PrintsController < ApplicationController
 
         default_variant = product['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
 
-
         if default_variant
           price = default_variant['price']
           variant = default_variant['id']
