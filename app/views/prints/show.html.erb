@@ -5,7 +5,7 @@
       <div class="sticky" style="z-index: 2">
         <%= button_to add_to_cart_prints_path(@print["id"]), method: :post, class: "btn btn-outline-primary tree" do %>
           <i class="fa-solid fa-cart-plus fa-xl"></i>
-          Purchase Print
+          Purchase Item
         <% end %>
       </div>
 
@@ -40,7 +40,7 @@
         </div>
       <% else %>
         <p>
-          <%= button_to "Purchase Print", add_to_cart_prints_path(@print["id"]), method: :post, class: "btn btn-lg btn-outline-primary tree mt-3 mb-0" %>
+          <%= button_to "Purchase Item", add_to_cart_prints_path(@print["id"]), method: :post, class: "btn btn-lg btn-outline-primary tree mt-3 mb-0" %>
         </p>
       <% end %>
 

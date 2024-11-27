@@ -204,6 +204,12 @@
   align-items: center;
 }
 
+@media (max-width: 600px) {
+  .card-product {
+    height: 250px;
+  }
+}
+
 .card-product:hover{
   background: rgb(187, 184, 184);
   text-decoration: none;

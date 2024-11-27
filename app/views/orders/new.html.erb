@@ -70,6 +70,9 @@
        <div class="tabDiv" data-controller="crypto" data-crypto-price-value="<%= (@cart.sum(&:price) + @prints_total) / 100.00 %>">
 
       <div class="tabs">
+        <div class="text-center tabLabel show-choice-label">
+          <small>Choose between three ways to pay:</small>
+        </div>
         <input class="tabInput" name="tabs" type="radio" id="tab-1" checked="checked"/>
         <label class="tabLabel" for="tab-1">Pay With <i class="fa-brands fa-stripe fa-2xl"></i></label>
         <div class="panel">
