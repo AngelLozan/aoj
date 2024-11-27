@@ -69,11 +69,24 @@
   background: #fff;
   color: #000;
 }
+
+.show-choice-label {
+  display: none;
+}
+
 @media (min-width: 600px) {
   .label {
     width: auto;
   }
+
 }
+
+@media (max-width: 600px) {
+  .show-choice-label {
+    display: block;
+  }
+}
+
 .panel {
   display: none;
   padding: 20px 30px 30px;
