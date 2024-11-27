@@ -67,6 +67,8 @@ n you have an account available, log in
 
 - Give priviledges to rails user: `gpasswd -a rails sudo`
 - Change into user in drop cli: `sudo -i -u rails` or whatever you want to call the user. Rails is pre-existing.
+- Change directory up one level: `cd ../` to find the home and aoj directories
+
 
 
 - GO to home directory `cd ..`
@@ -102,4 +104,3 @@ Once you have completed this process, you can link the product page on your stor
 
 If you encounter any products that are stuck and need to be unlocked, you can use the "Set product publish status to failed" request provided in our Printify API
 apiteam[@]printify.com
-

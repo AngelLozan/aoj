@@ -176,36 +176,45 @@ class PrintsController < ApplicationController
   end
 
   def publish_print
-    id = sanitize_id(params[:id])
-    shop_id = ENV['PRINTIFY_SHOP_ID']
-    url = URI("https://api.printify.com/v1/shops/#{shop_id}/products/#{id}/publishing_succeeded.json");
-    http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true;
-    request = Net::HTTP::Post.new(url)
-    request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
-    request["Content-Type"] = "application/json"
-    request["Accept"] = "application/json"
-    request["User-Agent"] = "RUBY"
-    request.body = JSON.dump({
-      external: {
-        id: "#{id}",
-        handle: "https://theartofjaleh.com/prints/show/#{id}"
-      }
-    })
+    begin
+      id = sanitize_id(params[:id])
+      shop_id = ENV['PRINTIFY_SHOP_ID']
+      url = URI("https://api.printify.com/v1/shops/#{shop_id}/products/#{id}/publishing_succeeded.json");
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true;
+      request = Net::HTTP::Post.new(url)
+      request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
+      request["Content-Type"] = "application/json"
+      request["Accept"] = "application/json"
+      request["User-Agent"] = "RUBY"
+      request.body = JSON.dump({
+        external: {
+          id: "#{id}",
+          handle: "https://theartofjaleh.com/prints/show/#{id}"
+        }
+      })
 
-    response = http.request(request)
-    raw_data = JSON.parse(response.read_body)
-    Rails.logger.info("==========================================")
-    Rails.logger.info("Response is: #{raw_data}")
-    Rails.logger.info("==========================================")
+      response = http.request(request)
+      raw_data = JSON.parse(response.read_body)
+      Rails.logger.info("==========================================")
+      Rails.logger.info("Response is: #{raw_data}")
+      Rails.logger.info("==========================================")
 
-    if raw_data = "#{id}"
-      flash[:notice] = "Print has been published 👍, please verify it shows as such on your Printify shop."
-    else
-      flash[:notice] = "Could not publish the print 🚨, please try again."
+      if raw_data = "#{id}"
+        flash[:notice] = "Print has been published 👍, please verify it shows as such on your Printify shop."
+      else
+        flash[:notice] = "Could not publish the print 🚨, please try again."
+      end
+
+      redirect_to print_path(id: id)
+    rescue StandardError => e
+      Rails.logger.error("==========================================")
+      Rails.logger.error("Error is: #{e}")
+      Rails.logger.error("==========================================")
+      flash[:notice] = "Could not publish the print 🚨, please try again.
+      Error: #{e}"
+      redirect_to print_path(id: id)
     end
-
-    redirect_to print_path(id: id)
 
   end
 

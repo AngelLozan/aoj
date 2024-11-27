@@ -611,11 +611,11 @@ export default class extends Controller {
     const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/gi;
     try {
       const balance = await this.checkBTCBalance(this.addressTarget.value);
-      // const amount = await this.calculateBtcPrice();
-      let testCall = await this.calculateBtcPrice(); // Used for testnet to ensure printify order submitted.
+      const amount = await this.calculateBtcPrice();
+      // let testCall = await this.calculateBtcPrice(); // Used for testnet to ensure printify order submitted.
       const feeRate = await this.calculateBTCFee();
       console.log("FEE RATE", feeRate);
-      const amount = 10000; // @dev test amount of Satoshis
+      // const amount = 10000; // @dev test amount of Satoshis
       console.log("BALANCE", balance);
       if (amount + feeRate > balance) {
         this.loaderTarget.style.display = "none";
@@ -706,11 +706,11 @@ export default class extends Controller {
     const bitcoinTxHashRegex = /^[0-9a-fA-F]{64}$/gi;
     try {
       const balance = await this.checkBTCBalance(this.addressTarget.value);
-      // const amount = await this.calculateBtcPrice();
-      let testCall = await this.calculateBtcPrice(); //@dev Used for testnet to ensure printify order submitted.
+      const amount = await this.calculateBtcPrice();
+      // let testCall = await this.calculateBtcPrice(); //@dev Used for testnet to ensure printify order submitted.
       const feeRate = await this.calculateBTCFee();
       console.log("FEE RATE", feeRate);
-      const amount = 10000; // @dev test amount of Satoshis
+      // const amount = 10000; // @dev test amount of Satoshis
       console.log("BALANCE", balance);
       if (amount + feeRate > balance) {
         this.loaderTarget.style.display = "none";
