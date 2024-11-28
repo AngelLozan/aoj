@@ -108,5 +108,6 @@ apiteam[@]printify.com
 
 
 ## Troubleshooting:
+- Using `git status` first to ensure you have no unstaged changes then `git fetch` and then `git pull` on the droplet to update the repo with the latest changes from the master branch. `git status` on the droplet will show you if you have any changes that need to be committed on the droplet and pertain primarily to hot-fixes done, `yarn.lock` and similar changes you do not want to commit from the repo to the droplet. 
 - Issues with restarting the app: `journalctl -u rails.service -b` will give output of the logs for the service.
 - See status of nginx and rails: `sudo systemctl status rails.service` and `sudo systemctl status nginx` to troubleshoot if there is anything wrong with the services.

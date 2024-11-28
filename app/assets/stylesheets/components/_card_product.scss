@@ -457,3 +457,13 @@
 .gallery input[name="select"]:checked + label:before {
   border: 1px solid #000;
 }
+
+.carousel-img-responsive {
+ width: 100%;
+}
+
+@media screen and (min-width: 992px) {
+  .carousel-img-responsive {
+    width: 50%;
+  }
+}
