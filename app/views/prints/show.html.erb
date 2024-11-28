@@ -9,18 +9,26 @@
         <% end %>
       </div>
 
-  <div class="gallery mt-3">
-
-    <% singular = @print["images"].first %>
-    <input type="radio" checked="checked" name="select" id="img-tab-1">
-    <label for="img-tab-1" style="background-image: url(<%= singular %>);"></label>
-    <%= image_tag singular, class: "shadow rounded" %>
-    <% @print["images"][1..-1].each_with_index do |image, index| %>
-      <input type="radio" name="select" id="img-tab-<%= index + 2 %>">
-      <label for="img-tab-<%= index + 2 %>" style="background-image: url(<%= image %>);"></label>
-      <%= image_tag image, class: "shadow rounded"%>
-    <% end %>
-
+  <% singular = @print["images"].first %>
+  <div id="productCarouselControls" class="carousel slide mt-3" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <%= image_tag singular, class: "carousel-img-responsive shadow rounded" %>
+      </div>
+      <% @print["images"][1..-1].each do |image| %>
+        <div class="carousel-item">
+          <%= image_tag image, class: "carousel-img-responsive shadow rounded"%>
+        </div>
+      <% end %>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#productCarouselControls" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#productCarouselControls" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
   </div>
 
     <div my-3 text-center">
