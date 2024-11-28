@@ -65,7 +65,7 @@ class ApplicationController < ActionController::Base
             'image' => product["images"].first["src"],
             'price' => price,
             'variant' => variant
-          }parsed
+          }
         end
       end
     end
