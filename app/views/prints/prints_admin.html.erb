@@ -1,0 +1,40 @@
+
+
+<div class="container-fluid pb-5">
+  <div class="text-center">
+    <h1>Shop Admin Panel</h1>
+    <p>Here you can unpublish your prints via the API. Follow up in Printify dashboard to make sure they are removed.</p>
+  </div>
+  <div class="d-flex justify-content-center">
+    <%= link_to admin_path, class: 'btn btn-sm rounded btn-success' do %>
+      <i class="fa-solid fa-palette"></i>
+      <p>Back to Paintings Admin</p>
+    <% end %>
+  </div>
+
+  <div class="row" id="products" data-controller="prints">
+    <% @products.each do |product| %>
+      <div data-action="click->prints#openProduct" data-id="<%= product["id"] %>" data-url="/prints/show/<%= product["id"] %>">
+        <div class="col-12">
+          <div class="card-product mt-3 admin">
+            <%= image_tag product["image"] %>
+
+            <div class="card-product-infos">
+              <h2><%= product["title"] %></h2>
+              <div class="d-flex flex-row">
+                <small>
+                <%= number_to_currency(product["price"] / 100.00, :unit=> '$') %>
+                </small>
+              </div>
+              <div class="d-flex flex-row gap-1">
+                <%= link_to "Publish", publish_print_path(product["id"]), class: "btn btn-primary rounded mt-3 text-white" %>
+                <%= link_to "Unpublish", unpublish_print_path(product["id"]), class: "btn btn-danger rounded mt-3 text-white", data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+</div>
