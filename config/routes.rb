@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
   get 'prints/index', to: 'prints#index', as: 'prints'
+  get 'prints/prints_admin', to: 'prints#prints_admin', as: 'prints_admin'
   get 'prints/show/:id', to: 'prints#show', as: 'print'
   post '/add_to_cart_prints/:id', to: "prints#add_to_cart_prints", as: 'add_to_cart_prints'
   delete '/remove_from_cart_prints/:id', to: "prints#remove_from_cart_prints", as: 'remove_from_cart_prints'
   get '/publish_print/:id', to: "prints#publish_print", as: 'publish_print'
+  get '/unpublish_print/:id', to: "prints#unpublish_print", as: 'unpublish_print'
   # resources :nfts, only: [ :index ] do
   #   collection do
   #     post 'set_image_urls'

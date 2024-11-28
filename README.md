@@ -92,6 +92,7 @@ EXAMPLE_ENV_VAR: <value>
 
 - Exit rails user and as root enable OpenSSH: `ufw allow OpenSSH`
 - Obtain SSL certificate: `sudo certbot --nginx -d <domain name> -d <www.domain name>`
+- Restart daemon: `sudo systemctl daemon-reload`
 - Restart nginx: `sudo systemctl restart nginx`
 - Then restart the server: `sudo systemctl restart rails.service`
 - View logs by changing into the rails user `sudo -i -u rails` and then `cd <app name>` and `tail -f log/production.log`
@@ -104,3 +105,8 @@ Once you have completed this process, you can link the product page on your stor
 
 If you encounter any products that are stuck and need to be unlocked, you can use the "Set product publish status to failed" request provided in our Printify API
 apiteam[@]printify.com
+
+
+## Troubleshooting:
+- Issues with restarting the app: `journalctl -u rails.service -b` will give output of the logs for the service.
+- See status of nginx and rails: `sudo systemctl status rails.service` and `sudo systemctl status nginx` to troubleshoot if there is anything wrong with the services.

@@ -16,7 +16,10 @@
             <%= link_to "Home", "/", class: "nav-link" %>
           </li>
           <li class="nav-item">
-            <%= link_to "Admin", "/admin", class: "nav-link" %>
+            <%= link_to "Paintings Admin", "/admin", class: "nav-link" %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Shop Admin", "/prints/prints_admin", class: "nav-link" %>
           </li>
           <% if @orders.count > 0 && @orders.find_by(status: "open") != nil %>
              <%= link_to orders_path, class: "btn btn-success rounded position-relative me-3 mb-3" do %>
