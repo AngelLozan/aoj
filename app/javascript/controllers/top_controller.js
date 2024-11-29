@@ -1,6 +1,7 @@
 // Define your Stimulus controller
 import { Controller } from "@hotwired/stimulus"
 import Web3 from "web3";
+import metadata from "../../assets/metadata.json";
 
 export default class extends Controller {
   static targets = ["topBtn"];
@@ -84,7 +85,7 @@ export default class extends Controller {
     } catch (error) {
       console.log("Something went wrong in contract methods: ", error);
     }
-    // Add a scroll event listener when the controller connects
+
     window.addEventListener("scroll", this.scrollFunction.bind(this));
   }
 
@@ -146,89 +147,28 @@ export default class extends Controller {
   }
 
   async getNFTMetadata(contract) {
-    let images = [];
     let objectArr = [];
-
 
     const reg = /\b(\w{6})\w+(\w{4})\b/g;
 
     try {
       let maticPrice = await this.getMaticPrice();
 
-      for (let i = 1; i < 15; i++) {
-        if(i === 1 || i === 2) continue;
-        const tokenId = i;
-        let result = localStorage.getItem(`result${i}`);
-        let owner = localStorage.getItem(`owner${i}`);
-        let stringResponse = localStorage.getItem(`stringResponse${i}`);
+      metadata.forEach(async (nft) => {
+        const tokenId = nft.token_id;
+        let owner = localStorage.getItem(`owner${tokenId}`);
 
-
-        if (result === null || owner === null || stringResponse === null) {
-          console.log("Fetching data since something wasn't cached for token: ", tokenId);
-          result = await contract.methods.tokenURI(tokenId).call();
-          owner = await contract.methods.ownerOf(tokenId).call();
+        if (owner === null) {
           try {
-            let response = await fetch(result, { timeout: i === 3 ? 10000 : 5000 });
-            stringResponse = await response.text();
-
-            localStorage.setItem(`result${i}`, result);
-            localStorage.setItem(`owner${i}`, owner);
-            localStorage.setItem(`stringResponse${i}`, stringResponse);
+            console.log("Fetching owner, which wasn't cached for token: ", tokenId);
+            owner = await contract.methods.ownerOf(tokenId).call();
+            localStorage.setItem(`owner${tokenId}`, owner);
           } catch (error) {
             console.log("Error fetching data: ", error);
-            continue;
           }
         }
-
-        // console.log("OWNER >>> ", owner);
-        // console.log("RESULT >>> ", result);
-
-        if (!result) {
-          console.log(`No result for tokenId ${tokenId}!`);
-          continue;
-        } else if (result === "metadata") {
-          console.log(`Bad result for tokenId ${tokenId}!`);
-          continue;
-        }
-
-        try {
-          // console.log("String response >>> ", stringResponse);
-          let objj = JSON.parse(stringResponse);
-
-          let pic = objj.image;
-          let title = objj.name;
-          let description = objj.description;
-          let price = objj.attributes[4].value;
-          let formattedPrice = price.replace("$", "");
-          let formatOwner = owner.replace(reg, "$1****$2");
-
-          let calculatedPrice = (formattedPrice * maticPrice).toFixed(2);
-
-          let obj = {
-            id: tokenId,
-            title: title,
-            description: description,
-            price: calculatedPrice,
-            image: pic,
-            owner: formatOwner,
-          };
-
-          if (images.includes(pic)) {
-            console.log(`Duplicate image for tokenId ${tokenId}!`);
-          } else {
-            images.push(pic);
-            objectArr.push(obj);
-          }
-        } catch (error) {
-          console.log(
-            `Error fetching or parsing data for tokenId ${tokenId}:`,
-            error
-          );
-          continue;
-        }
-      }
-
-      return objectArr;
+        console.log("OWNER >>> ", owner);
+      });
     } catch (error) {
       console.log("Was unable to get NFT metadata: ", error);
     }
