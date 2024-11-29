@@ -108,7 +108,7 @@ class PrintsController < ApplicationController
     print_cart = session[:prints_cart]
     print_cart.delete_at(print_cart.index(id) || print_cart.length)
     # session[:prints_cart].delete(id)
-    if print_cart.empty?
+    if print_cart.empty? && session[:cart].empty?
       redirect_to prints_path
     else
       redirect_to new_order_path

@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus";
 import Web3 from "web3";
+import metadata from "../../assets/metadata.json";
 
 // Connects to data-controller="nfts"
 export default class extends Controller {
@@ -65,6 +66,7 @@ export default class extends Controller {
 
       this.web3 = await this.getWeb3Value();
 
+
       if (localStorage.getItem("contractInfo") === null) {
         console.log("Grabbing new contract");
         contract = await new this.web3.eth.Contract(
@@ -101,9 +103,11 @@ export default class extends Controller {
     }
   }
 
+
   get cardsTarget() {
     return this.targets.find("cards");
   }
+
 
   async getWeb3Value() {
     let data;
@@ -124,13 +128,6 @@ export default class extends Controller {
     }
     return web3;
   }
-
-
-  get csrfToken() {
-    const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
-    return csrfMetaTag ? csrfMetaTag.content : "";
-  }
-
 
   async renderCards(data) {
     await data.forEach((item) => {
@@ -208,12 +205,19 @@ export default class extends Controller {
     });
   }
 
+
   openNFT(e) {
     console.log("Open NFT");
     const nft = e.currentTarget;
     const url = nft.getAttribute("data-url");
     console.log(url);
     window.open(url, "_blank");
+  }
+
+
+  get csrfToken() {
+    const csrfMetaTag = document.querySelector("meta[name='csrf-token']");
+    return csrfMetaTag ? csrfMetaTag.content : "";
   }
 
   async getMaticPrice(_price) {
@@ -244,88 +248,52 @@ export default class extends Controller {
   }
 
   async getNFTMetadata(contract) {
-    let images = [];
     let objectArr = [];
-
 
     const reg = /\b(\w{6})\w+(\w{4})\b/g;
 
     try {
       let maticPrice = await this.getMaticPrice();
 
-      for (let i = 1; i < 15; i++) {
-        if(i === 1 || i === 2) continue;
-        const tokenId = i;
-        let result = localStorage.getItem(`result${i}`);
-        let owner = localStorage.getItem(`owner${i}`);
-        let stringResponse = localStorage.getItem(`stringResponse${i}`);
+      metadata.forEach(async (nft) => {
+        const tokenId = nft.token_id;
+        let owner = localStorage.getItem(`owner${tokenId}`);
 
-
-        if (result === null || owner === null || stringResponse === null) {
-          console.log("Fetching data since something wasn't cached for token: ", tokenId);
-          result = await contract.methods.tokenURI(tokenId).call();
-          owner = await contract.methods.ownerOf(tokenId).call();
+        if (owner === null) {
           try {
-            let response = await fetch(result, { timeout: i === 3 ? 10000 : 5000 });
-            stringResponse = await response.text();
-
-            localStorage.setItem(`result${i}`, result);
-            localStorage.setItem(`owner${i}`, owner);
-            localStorage.setItem(`stringResponse${i}`, stringResponse);
+            console.log("Fetching owner, which wasn't cached for token: ", tokenId);
+            owner = await contract.methods.ownerOf(tokenId).call();
+            localStorage.setItem(`owner${tokenId}`, owner);
           } catch (error) {
             console.log("Error fetching data: ", error);
-            continue;
           }
         }
+        console.log("OWNER >>> ", owner);
+        let formatOwner = owner.replace(reg, "$1****$2");
 
-        // console.log("OWNER >>> ", owner);
-        // console.log("RESULT >>> ", result);
+        let price = nft.attributes[4].value;
+        let formattedPrice = price.replace("$", "");
+        let calculatedPrice = (formattedPrice * maticPrice).toFixed(2);
 
-        if (!result) {
-          console.log(`No result for tokenId ${tokenId}!`);
-          continue;
-        } else if (result === "metadata") {
-          console.log(`Bad result for tokenId ${tokenId}!`);
-          continue;
-        }
 
         try {
-          // console.log("String response >>> ", stringResponse);
-          let objj = JSON.parse(stringResponse);
-
-          let pic = objj.image;
-          let title = objj.name;
-          let description = objj.description;
-          let price = objj.attributes[4].value;
-          let formattedPrice = price.replace("$", "");
-          let formatOwner = owner.replace(reg, "$1****$2");
-
-          let calculatedPrice = (formattedPrice * maticPrice).toFixed(2);
-
-          let obj = {
+          let nftObj = {
             id: tokenId,
-            title: title,
-            description: description,
+            title: nft.name,
+            description: nft.description,
             price: calculatedPrice,
-            image: pic,
+            image: nft.image,
             owner: formatOwner,
-          };
-
-          if (images.includes(pic)) {
-            console.log(`Duplicate image for tokenId ${tokenId}!`);
-          } else {
-            images.push(pic);
-            objectArr.push(obj);
           }
-        } catch (error) {
-          console.log(
-            `Error fetching or parsing data for tokenId ${tokenId}:`,
-            error
-          );
-          continue;
-        }
-      }
 
+          objectArr.push(nftObj);
+
+        } catch (error) {
+          console.log("Error fetching or parsing data for tokenId: ", error);
+        }
+
+      });
+      console.log("OBJECT ARRAY: ", objectArr);
       return objectArr;
     } catch (error) {
       console.log("Was unable to get NFT metadata: ", error);

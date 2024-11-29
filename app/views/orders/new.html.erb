@@ -107,13 +107,13 @@
               <script
                 src="https://checkout.stripe.com/checkout.js" class="stripe-button"
                 data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
-                data-description="Your art is on the way!"
+                data-description="Step 2: Your art will be on the way after this!"
                 data-amount="<%= amount %>"
                 data-locale="auto">
               </script>
             <% end %>
 
-              <input id="stripe-submit" type="submit" value="Pay with card" class="btn btn-primary">
+              <input id="stripe-submit" type="submit" value="Step 1: Pay with card" class="btn btn-primary">
             <% end %>
           </div>
         </div>
@@ -208,7 +208,7 @@
           <h1 class="tabH1">Crypto Payments <i class="fa-brands fa-ethereum fa-lg"></i><i class="fa-brands fa-bitcoin fa-lg"></i></h1>
 
           <p class="tabP">
-            Connect your preferred wallet, to pay
+            First, connect your preferred wallet, to pay
             <i class="fa-regular fa-hand-point-down"></i>
           </p>
 
