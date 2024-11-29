@@ -87,7 +87,7 @@ class ApplicationController < ActionController::Base
       end
 
       puts "=========================================="
-      puts "Cart is:"
+      puts "Prints cart is:"
       puts @prints_cart.flatten.inspect
       puts "total is: "
       puts @prints_total
