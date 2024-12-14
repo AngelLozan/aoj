@@ -447,14 +447,14 @@ class OrdersController < ApplicationController
       "is_printify_express": false,
       "send_shipping_notification": false,
       "address_to": {
-        "first_name": order_params[:name],
-        "last_name": order_params[:name],
+        "first_name": order_params[:name]&.split(" ")&.first || "No FirstName",
+        "last_name": order_params[:name]&.split(" ")&.last || "No LastName",
         "email": order_params[:email],
         "phone": order_params[:phone],
         "country": order_params[:country],
         "region": "",
         "address1": order_params[:address],
-        "address2": "",
+        "address2": order_params[:state],
         "city": order_params[:city],
         "zip": order_params[:zip]
       }
@@ -472,7 +472,7 @@ class OrdersController < ApplicationController
       request.body = JSON.dump(request_body)
 
       response = http.request(request)
-      # raw_data = response.read_body
+
       raw_data = JSON.parse(response.read_body)
 
       Rails.logger.info ">>>>>>>>>>>>>>> RAW DATA SUBMIT_PRINTIFY: #{raw_data}<<<<<<<<<<<<<<<<<<<"
