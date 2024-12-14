@@ -16,9 +16,6 @@ application.register("crypto", CryptoController)
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
-import HelloController from "./hello_controller"
-application.register("hello", HelloController)
-
 import NftsController from "./nfts_controller"
 application.register("nfts", NftsController)
 
