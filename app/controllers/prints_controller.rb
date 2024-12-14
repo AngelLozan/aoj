@@ -49,7 +49,6 @@ class PrintsController < ApplicationController
     # request.body = JSON.dump({}) # if you need to send a body with the request...
 
     response = http.request(request)
-    # products = response.read_body
     raw_data = JSON.parse(response.read_body)
 
     print = raw_data
@@ -127,12 +126,6 @@ class PrintsController < ApplicationController
       request["Content-Type"] = "application/json"
       request["Accept"] = "application/json"
       request["User-Agent"] = "RUBY"
-      # request.body = JSON.dump({
-      #   external: {
-      #     id: "#{id}",
-      #     handle: "https://theartofjaleh.com/prints/show/#{id}"
-      #   }
-      # })
       request.body = JSON.dump({
         reason: "I need to remove this print from my shop."
       })
@@ -221,7 +214,6 @@ class PrintsController < ApplicationController
       # request.body = JSON.dump({}) # if you need to send a body with the request...
 
       response = http.request(request)
-      # products = response.read_body
       raw_data = JSON.parse(response.read_body)
 
       products = raw_data["data"]
