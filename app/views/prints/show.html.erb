@@ -41,6 +41,12 @@
 
       <p class="px-5"><%= @print["description"] %></p>
 
+      <% puts "PRINT: #{@print}"%>
+      <% if !@print["variants"].empty? %>
+        <p>Available Sizes:</p>
+        <%= select_tag "Sizes", options_for_select(@print['variants'].collect{ |v| [v['title'], v['id'].to_i] })%>
+      <% end %>
+
       <% if @flat_cart_arr.any? { |print| print["id"] == @print["id"]} %>
         <div class="d-flex flex-column">
           <%= button_to 'Remove from cart', remove_from_cart_prints_path(@print["id"]), method: :delete, class: 'btn btn-lg btn-danger' %>

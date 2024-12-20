@@ -60,6 +60,9 @@ class PrintsController < ApplicationController
     parsed_description = Nokogiri::HTML.parse(print['description'])
 
     default_variant = print['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
+
+    variants = print['variants']
+
     puts"=========================================="
     puts"Default variant is: #{default_variant}"
     puts"=========================================="
@@ -68,7 +71,7 @@ class PrintsController < ApplicationController
       price = default_variant['price']
       variant = default_variant['id']
     else
-      first_variant = print['variants'].first
+      first_variant = variants.first
       price = first_variant['price']
       variant = first_variant['id']
     end
@@ -80,7 +83,8 @@ class PrintsController < ApplicationController
         'title' => print['title'],
         'description' => parsed_description.text,
         'image' => 'abstractart.png',
-        'price' => price
+        'price' => price,
+        'variants' => variants || []
       }
     else
       @print = {
@@ -88,11 +92,12 @@ class PrintsController < ApplicationController
         'title' => print['title'],
         'description' => parsed_description.text,
         'images' => images,
-        'price' => price
+        'price' => price,
+        'variants' => variants || []
       }
     end
 
-    @print = @print
+    @print
 
   end
 
@@ -223,6 +228,7 @@ class PrintsController < ApplicationController
         p "Product is: #{product["id"]}"
         p "=========================================="
 
+        next if product['visible'] != true # Skip if product is not published
 
         parsed_description = Nokogiri::HTML.parse(product['description'])
 
