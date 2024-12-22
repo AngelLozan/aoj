@@ -99,11 +99,23 @@ class CustomDevise::SessionsController < Devise::SessionsController
       @prints_cart = session[:prints_cart]
     else
       # Return array of prints in cart
-      @prints_cart = session[:prints_cart].map do |id|
-        @products.select { |product| product['id'] == id }
-      end
+      # @prints_cart = session[:prints_cart].map do |id|
+      #   @products.select { |product| product['id'] == id }
+      # end
 
-      @flat_cart_arr = @prints_cart.flatten
+      # @flat_cart_arr = @prints_cart.flatten
+
+      @prints_cart = session[:prints_cart].map do |item|
+        product = @products.find { |product| product['id'] == item["id"] }
+        if product
+          product.merge("variant_id" => item["variant_id"])
+        else
+          nil
+        end
+      end.compact
+
+      @flat_cart_arr = @prints_cart
+
 
       @prints_total = @flat_cart_arr.reduce(0) do |sum, product|
         sum + product["price"]

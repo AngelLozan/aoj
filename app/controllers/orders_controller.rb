@@ -424,7 +424,7 @@ class OrdersController < ApplicationController
       else
         all_items << {
           "product_id": print["id"], # string
-          "variant_id": print["variant"], # integer
+          "variant_id": print["variant_id"].present? ? print["variant_id"] : print["variant"], # integer
           "quantity": 1
         }
       end
