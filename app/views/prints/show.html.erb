@@ -1,13 +1,15 @@
 
 
-<div class="container-fluid p-5 text-center">
+<div class="container-fluid p-5 text-center" data-controller="prints">
 
+    <% if false %>
       <div class="sticky" style="z-index: 2">
         <%= button_to add_to_cart_prints_path(@print["id"]), method: :post, class: "btn btn-outline-primary tree" do %>
           <i class="fa-solid fa-cart-plus fa-xl"></i>
           Purchase Item
         <% end %>
       </div>
+    <% end %>
 
   <% singular = @print["images"].first %>
   <div id="productCarouselControls" class="carousel slide mt-3" data-bs-ride="carousel">
@@ -47,9 +49,11 @@
 
             <% if !(@print["variants"].count < 2) && !@print['tags'].include?("Canvas" || "Framed") %>
                <p>Available Options:</p>
-              <%= f.select :variant_id, @print['variants'].collect{ |v| [v['title'], v['id'].to_i] }, { selected: @print['variants'].first['id'] }, { class: "form-select border border-2 border-radius-lg" } %>
+              <%= f.select :variant_id, @print['variants'].collect{ |v| [v['title'], v['id'].to_i] }, { selected: @print['variants'].first['id'] }, { class: "form-select border border-2 border-radius-lg", data: { action: "change->prints#updateVariant" }} %>
+              <%= hidden_field_tag :variant_title, @print['variants'].first['title'], id: "variant_title", data: { prints_target: "title" } %>
             <% else %>
               <%= f.hidden_field :variant_id, value: @print['variants'].first['id'] %>
+              <%= f.hidden_field :variant_title, value: @print['variants'].first['title'] %>
             <% end %>
 
 

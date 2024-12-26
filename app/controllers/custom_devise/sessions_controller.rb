@@ -33,7 +33,7 @@ class CustomDevise::SessionsController < Devise::SessionsController
       shop_id = ENV['PRINTIFY_SHOP_ID']
       url = URI("https://api.printify.com/v1/shops/#{shop_id}/products.json");
       puts "=========================================="
-      puts "FROM APPLICATION CONTROLLER"
+      puts "FROM SESSIONS CONTROLLER"
       puts "=========================================="
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true;
@@ -109,6 +109,7 @@ class CustomDevise::SessionsController < Devise::SessionsController
         product = @products.find { |product| product['id'] == item["id"] }
         if product
           product.merge("variant_id" => item["variant_id"])
+          product.merge("variant_title" => item["variant_title"])
         else
           nil
         end

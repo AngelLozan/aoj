@@ -86,6 +86,7 @@ class ApplicationController < ActionController::Base
         product = @products.find { |product| product['id'] == item["id"] }
         if product
           product.merge("variant_id" => item["variant_id"])
+          product.merge("variant_title" => item["variant_title"])
         else
           nil
         end

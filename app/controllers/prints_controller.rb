@@ -62,7 +62,8 @@ class PrintsController < ApplicationController
 
     default_variant = print['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
 
-    variants = print['variants']
+    variants = []
+    variants = print['variants'].select { |variant| variant['is_enabled'] == true }
 
     if default_variant
       price = default_variant['price']
@@ -101,14 +102,15 @@ class PrintsController < ApplicationController
   def add_to_cart_prints
     id = params[:id]
     variant_id = params[:variant_id]
-    session[:prints_cart] << {"id" => id, "variant_id" => variant_id }
+    variant_title = params[:variant_title]
+    session[:prints_cart] << {"id" => id, "variant_id" => variant_id, "variant_title" => variant_title }
     redirect_to new_order_path
   end
 
   def remove_from_cart_prints
     id = params[:id]
     print_cart = session[:prints_cart]
-    index = print_cart.index { |item| item["id"] == id } # && item["variant_id"] == params[:variant_id] TO DO
+    index = print_cart.index { |item| item["id"] == id } # && item["variant_id"] == params[:variant_id] TO DO: Add variant_id to the session cart removal?
     print_cart.delete_at(index) if index
 
     # print_cart.delete_at((print_cart.find { |item| item["id"] == id }) || print_cart.length)
