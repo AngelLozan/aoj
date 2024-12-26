@@ -2,8 +2,27 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="prints"
 export default class extends Controller {
+
   connect() {
     console.log("Prints controller");
+
+    if (this.hasTitleTarget) {
+      document.addEventListener("DOMContentLoaded", function () {
+        const selects = document.querySelectorAll("select[id^='variant_select_']");
+
+        selects.forEach(select => {
+          select.addEventListener("change", function () {
+            const selectedOption = select.options[select.selectedIndex];
+            const printId = select.id.split("_").pop();
+            const variantTitleField = document.getElementById(`variant_title`);
+
+            if (variantTitleField) {
+              variantTitleField.value = selectedOption.text;
+            }
+          });
+        });
+      });
+    }
   }
 
   openProduct(e) {
@@ -12,6 +31,17 @@ export default class extends Controller {
     const url = painting.getAttribute("data-url");
     window.location.href = url;
   }
+
+  updateVariant(e) {
+    const select = e.currentTarget;
+    const selectedOption = select.options[select.selectedIndex];
+    const variantTitleField = document.getElementById(`variant_title`);
+
+    if (variantTitleField) {
+      variantTitleField.value = selectedOption.text;
+    }
+  }
+
   // // @dev Not needed for now.
   // async publishPrint() {
   //   console.log("Publish print");

@@ -1,13 +1,15 @@
 
 
-<div class="container-fluid p-5 text-center">
+<div class="container-fluid p-5 text-center" data-controller="prints">
 
+    <% if false %>
       <div class="sticky" style="z-index: 2">
         <%= button_to add_to_cart_prints_path(@print["id"]), method: :post, class: "btn btn-outline-primary tree" do %>
           <i class="fa-solid fa-cart-plus fa-xl"></i>
           Purchase Item
         <% end %>
       </div>
+    <% end %>
 
   <% singular = @print["images"].first %>
   <div id="productCarouselControls" class="carousel slide mt-3" data-bs-ride="carousel">
@@ -21,11 +23,11 @@
         </div>
       <% end %>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#productCarouselControls" data-bs-slide="prev">
+    <button class="carousel-control-prev" style="filter: invert(80%);" type="button" data-bs-target="#productCarouselControls" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#productCarouselControls" data-bs-slide="next">
+    <button class="carousel-control-next" style="filter: invert(80%);" type="button" data-bs-target="#productCarouselControls" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
@@ -41,16 +43,41 @@
 
       <p class="px-5"><%= @print["description"] %></p>
 
-      <% if @flat_cart_arr.any? { |print| print["id"] == @print["id"]} %>
-        <div class="d-flex flex-column">
-          <%= button_to 'Remove from cart', remove_from_cart_prints_path(@print["id"]), method: :delete, class: 'btn btn-lg btn-danger' %>
-          <%= button_to "Add Another", add_to_cart_prints_path(@print["id"]), method: :post, class: "btn btn-lg btn-primary" %>
+        <div class="d-flex flex-column gap-1 my-1 px-5 text-center col-md-6 mx-auto">
+
+          <%= form_with url: add_to_cart_prints_path(@print["id"]), method: :post, local: true do |f| %>
+
+            <% if !(@print["variants"].count < 2) && !@print['tags'].include?("Canvas" || "Framed") %>
+               <p>Available Options:</p>
+              <%= f.select :variant_id, @print['variants'].collect{ |v| [v['title'], v['id'].to_i] }, { selected: @print['variants'].first['id'] }, { class: "form-select border border-2 border-radius-lg", data: { action: "change->prints#updateVariant" }} %>
+              <%= hidden_field_tag :variant_title, @print['variants'].first['title'], id: "variant_title", data: { prints_target: "title" } %>
+            <% else %>
+              <%= f.hidden_field :variant_id, value: @print['variants'].first['id'] %>
+              <%= f.hidden_field :variant_title, value: @print['variants'].first['title'] %>
+            <% end %>
+
+
+            <% if @flat_cart_arr.any? { |print| print["id"] == @print["id"]} %>
+              <div class="d-flex flex-column mt-3">
+                <%= submit_tag "Add Another", class: "btn btn-lg btn-primary mb-2" %>
+              </div>
+            <% else %>
+              <div class="d-flex flex-column mt-3">
+                <%= submit_tag "Purchase Item", class: "btn btn-lg btn-outline-primary tree mt-3 mb-0" %>
+              </div>
+            <% end %>
+          <% end %>
+          <% if @flat_cart_arr.any? { |print| print["id"] == @print["id"]} %>
+            <div class="d-flex flex-column mt-0">
+               <%= button_to 'Remove from cart', remove_from_cart_prints_path(@print["id"]), method: :delete, class: 'btn btn-lg btn-danger mb-2' %>
+            </div>
+          <% end %>
+
+
         </div>
-      <% else %>
-        <p>
-          <%= button_to "Purchase Item", add_to_cart_prints_path(@print["id"]), method: :post, class: "btn btn-lg btn-outline-primary tree mt-3 mb-0" %>
-        </p>
-      <% end %>
+
+
+
 
 
 

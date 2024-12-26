@@ -3,6 +3,7 @@ require 'json'
 require 'uri'
 require 'net/http'
 require 'nokogiri'
+require 'byebug'
 
 class PrintsController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :index , :show, :add_to_cart_prints, :remove_from_cart_prints ]
@@ -60,17 +61,15 @@ class PrintsController < ApplicationController
     parsed_description = Nokogiri::HTML.parse(print['description'])
 
     default_variant = print['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
-    puts"=========================================="
-    puts"Default variant is: #{default_variant}"
-    puts"=========================================="
+
+    variants = []
+    variants = print['variants'].select { |variant| variant['is_enabled'] == true }
 
     if default_variant
       price = default_variant['price']
-      variant = default_variant['id']
     else
-      first_variant = print['variants'].first
+      first_variant = variants.first
       price = first_variant['price']
-      variant = first_variant['id']
     end
 
     if print["images"].empty?
@@ -80,7 +79,9 @@ class PrintsController < ApplicationController
         'title' => print['title'],
         'description' => parsed_description.text,
         'image' => 'abstractart.png',
-        'price' => price
+        'price' => price,
+        'tags' => print['tags'],
+        'variants' => variants || [default_variant]
       }
     else
       @print = {
@@ -88,24 +89,32 @@ class PrintsController < ApplicationController
         'title' => print['title'],
         'description' => parsed_description.text,
         'images' => images,
-        'price' => price
+        'price' => price,
+        'tags' => print['tags'],
+        'variants' => variants || [default_variant]
       }
     end
 
-    @print = @print
+    @print
 
   end
 
   def add_to_cart_prints
     id = params[:id]
-    session[:prints_cart] << id
+    variant_id = params[:variant_id]
+    variant_title = params[:variant_title]
+    session[:prints_cart] << {"id" => id, "variant_id" => variant_id, "variant_title" => variant_title }
     redirect_to new_order_path
   end
 
   def remove_from_cart_prints
     id = params[:id]
     print_cart = session[:prints_cart]
-    print_cart.delete_at(print_cart.index(id) || print_cart.length)
+    index = print_cart.index { |item| item["id"] == id } # && item["variant_id"] == params[:variant_id] TO DO: Add variant_id to the session cart removal?
+    print_cart.delete_at(index) if index
+
+    # print_cart.delete_at((print_cart.find { |item| item["id"] == id }) || print_cart.length)
+    # print_cart.delete_at(print_cart.index(id) || print_cart.length)
     # session[:prints_cart].delete(id)
     if print_cart.empty? && session[:cart].empty?
       redirect_to prints_path
@@ -223,6 +232,7 @@ class PrintsController < ApplicationController
         p "Product is: #{product["id"]}"
         p "=========================================="
 
+        next if product['visible'] != true # Skip if product is not published
 
         parsed_description = Nokogiri::HTML.parse(product['description'])
 
@@ -245,7 +255,8 @@ class PrintsController < ApplicationController
             'title' => product['title'],
             'description' => parsed_description.text,
             'image' => 'abstractart.png',
-            'price' => price, # product['variants'].first['price'],
+            'price' => price,
+            'tags' => product['tags'], # product['variants'].first['price'],
             'variant' => variant # product['variants'].first['id']
           }
         else
@@ -255,6 +266,7 @@ class PrintsController < ApplicationController
             'description' => parsed_description.text,
             'image' => product["images"].first["src"],
             'price' => price,
+            'tags' => product['tags'],
             'variant' => variant
           }
         end
