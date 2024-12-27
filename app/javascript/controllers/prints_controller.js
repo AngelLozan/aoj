@@ -39,7 +39,30 @@ export default class extends Controller {
 
     if (variantTitleField) {
       variantTitleField.value = selectedOption.text;
+      this.displayFlashMessage(
+        "Updated the selected option. 🎨",
+        "success"
+      );
     }
+  }
+
+  displayFlashMessage(message, type) {
+    const flashElement = document.createElement("div");
+    flashElement.className = `alert alert-${type} alert-dismissible fade show m-1`;
+    flashElement.role = "alert";
+    flashElement.setAttribute("data-controller", "flash");
+    flashElement.textContent = message;
+
+    const button = document.createElement("button");
+    button.className = "btn-close";
+    button.setAttribute("data-bs-dismiss", "alert");
+
+    flashElement.appendChild(button);
+    document.body.appendChild(flashElement);
+
+    setTimeout(() => {
+      flashElement.remove();
+    }, 5000);
   }
 
   // // @dev Not needed for now.
