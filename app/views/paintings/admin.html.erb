@@ -16,7 +16,7 @@
       <% if !painting.order || painting.order.status != "complete" %>
         <%= link_to painting, style: "text-decoration: none;" do %>
           <div class="col-12">
-            <div class="card-product mt-3">
+            <div class="card-product no-hover mt-3">
               <%= cl_image_tag painting.photos[0].key if painting.photos.present? %>
 
               <div class="card-product-infos">
