@@ -338,9 +338,12 @@ class OrdersController < ApplicationController
       if @order.update(order_params)
         if @order.tracking != "" && @order.link != "" && @order.status == "complete"
           OrderMailer.tracking(@order).deliver_later # Email customer
+          format.html { redirect_to admin_url, notice: "🎊 Order successfully updated and customer was emailed 🎊" }
+          format.json { render :show, status: :ok, location: @order }
+        else
+          format.html { redirect_to admin_url, notice: "Order was successfully updated." }
+          format.json { render :show, status: :ok, location: @order }
         end
-        format.html { redirect_to admin_url, notice: "Order was successfully updated." }
-        format.json { render :show, status: :ok, location: @order }
       else
         format.html { render :admin, status: :unprocessable_entity }
         format.json { render json: @order.errors, status: :unprocessable_entity }
