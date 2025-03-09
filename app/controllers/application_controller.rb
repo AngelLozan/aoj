@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
       puts "FROM APPLICATION CONTROLLER"
       puts "=========================================="
       http = Net::HTTP.new(url.host, url.port)
-      http.use_ssl = true;
+      http.use_ssl = true
 
       request = Net::HTTP::Get.new(url)
       request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"
@@ -26,7 +26,11 @@ class ApplicationController < ActionController::Base
       request["Cache-Control"] = "private, max-age=3600, no-revalidate"    # request.body = JSON.dump({}) # if you need to send a body with the request...
 
       response = http.request(request)
-      # products = response.read_body
+      puts "Status Code: #{response.code}"     
+      puts "Message: #{response.message}"     
+      puts "Headers: #{response.each_header.to_h}"
+      puts "Body: #{response.body}"  
+ 
       raw_data = JSON.parse(response.read_body)
 
       products = raw_data["data"]
