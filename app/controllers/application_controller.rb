@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
       puts "FROM APPLICATION CONTROLLER"
       puts "=========================================="
       http = Net::HTTP.new(url.host, url.port)
-      http.use_ssl = true;
+      http.use_ssl = true
 
       request = Net::HTTP::Get.new(url)
       request["Authorization"] = "Bearer #{ENV['PRINTIFY']}"

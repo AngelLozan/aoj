@@ -1,0 +1,35 @@
+[
+  {
+    "description": "An acrylic on canvas painting from the Art of Jaleh. The painting represents the love we find when we are in an authentic relationship with our fellow humans. Painted during a time of pandemic and separation, Jaleh's work represents family, community and love for one another. The themes expressed in Jaleh's works are deeply rooted in the personal experience of the artist and depict the lives of those who live in diverse communities. This work is shared here with the deep-seated belief in the global community of support that has shaped the vision of Jaleh's art and embodied by the decentralized community found on the blockchain. Love and prosperity. Special thanks to Richard and many other patrons who make these works possible.",
+    "image": "https://assets.objkt.media/file/assets-003/Qmc2q2oRdiw437bm8W6Nbr4AhmSqzJeDjaLFqWE7pqMQui/artifact",
+    "external_url": "https://theartofjaleh.com/",
+    "name": "Love of Community",
+    "token_id": 200929,
+    "attributes": [
+        {
+            "trait_type": "owner",
+            "value": "tz2XS8jaV624d8z521bp1tJgkna8APhourbE"
+        },
+        {
+            "trait_type": "tags",
+            "value": "Decentralized"
+        },
+        {
+            "trait_type": "tags",
+            "value": "Love"
+        },
+        {
+            "trait_type": "tags",
+            "value": "OBJKT"
+        },
+        {
+            "trait_type": "Original",
+            "value": "$716.15"
+        },
+        {
+          "trait_type": "XTZ",
+          "value": "222"
+        }
+    ]
+  }
+]
