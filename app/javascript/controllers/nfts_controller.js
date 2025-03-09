@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus";
 import Web3 from "web3";
 import metadata from "../../assets/metadata.json";
+import tezMetadata from "../../assets/tezMetadata.json";
+// import tezosImg from "../../assets/images/tezos.svg";
 
 // Connects to data-controller="nfts"
 export default class extends Controller {
@@ -143,10 +145,17 @@ export default class extends Controller {
         "shadow",
         "rounded"
       );
-      cardContainer.setAttribute(
-        "data-url",
-        `https://opensea.io/assets/matic/0x2562ffa357fbdd56024aea7d8e2111ad299766c9/${item.id}`
-      );
+      if(item.id === 200929){
+        cardContainer.setAttribute(
+          "data-url",
+          `https://objkt.com/tokens/hicetnunc/${item.id}`
+        );
+      } else {
+        cardContainer.setAttribute(
+          "data-url",
+          `https://opensea.io/assets/matic/0x2562ffa357fbdd56024aea7d8e2111ad299766c9/${item.id}`
+        );
+      }
       cardContainer.setAttribute("data-action", "click->nfts#openNFT");
 
       const image = document.createElement("img");
@@ -180,10 +189,15 @@ export default class extends Controller {
       const icon = document.createElement("img");
       // icon.classList.add("fa-brands", "fa-ethereum", "fa-xs", "mt-2", "mx-3");
       icon.classList.add("avatar", "mx-3");
-      icon.src = 'https://polygonscan.com/assets/poly/images/svg/logos/token-light.svg?v=23.12.1.0';
       const small = document.createElement("small");
-      small.textContent = `${item.price} MATIC`;
 
+      if(item.id === 200929){
+        icon.src = 'https://tezos.com/favicon.ico';
+        small.textContent = `${item.price} XTZ`;
+      } else {
+        icon.src = 'https://polygonscan.com/assets/poly/images/svg/logos/token-light.svg?v=23.12.1.0';
+        small.textContent = `${item.price} MATIC`;
+      }
 
       price.appendChild(icon);
       price.appendChild(small);
@@ -247,6 +261,33 @@ export default class extends Controller {
     }
   }
 
+  async getTezosPrice() {
+    let cachedPrice = localStorage.getItem("tezosPrice");
+    try {
+      let res = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=tezos&vs_currencies=usd`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-Token": this.csrfToken,
+          },
+        }
+      );
+      let data = await res.json();
+      if (res.status !== 200) {
+        return cachedPrice;
+      }
+      const tezosPrice = data["tezos"]["usd"];
+      console.log("Tezos PRICE IS: ", tezosPrice);
+      localStorage.setItem("tezosPrice", tezosPrice);
+      return tezosPrice;
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
   async getNFTMetadata(contract) {
     let objectArr = [];
 
@@ -293,10 +334,39 @@ export default class extends Controller {
         }
 
       });
+      const tezosObj = await this.setTezosMetadata();
+      objectArr.push(tezosObj);
       console.log("OBJECT ARRAY: ", objectArr);
       return objectArr;
     } catch (error) {
       console.log("Was unable to get NFT metadata: ", error);
     }
+  }
+
+  async setTezosMetadata() {
+    // let xtzPrice = await this.getTezosPrice();
+    // console.log("TEZOS PRICE: ", xtzPrice);
+
+    const data = tezMetadata[0];
+    const reg = /\b(\w{6})\w+(\w{4})\b/g;
+    let owner = data.attributes[0].value;
+    let formatOwner = owner.replace(reg, "$1****$2");
+
+    let price = data.attributes[5].value
+    // let formattedPrice = price.replace("$", "");
+    // let calculatedPrice = (formattedPrice * xtzPrice).toFixed(2);
+
+
+    let nftObj = {
+      id: data.token_id,
+      title: data.name,
+      description: data.description,
+      // price: calculatedPrice,
+      price: price,
+      image: data.image,
+      owner: formatOwner,
+    }
+
+    return nftObj;
   }
 }
