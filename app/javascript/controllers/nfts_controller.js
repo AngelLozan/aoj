@@ -238,7 +238,7 @@ export default class extends Controller {
     let cachedPrice = localStorage.getItem("maticPrice");
     try {
       let res = await fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd`,
+        `/api/crypto/matic-network?vs=usd`,
         {
           method: "GET",
           headers: {
@@ -249,10 +249,13 @@ export default class extends Controller {
         }
       );
       let data = await res.json();
-      if (res.status !== 200) {
+      if (!res.ok || data.price == null) {
         return cachedPrice;
       }
-      const maticPrice = data["matic-network"]["usd"];
+      const maticPrice = Number(data.price);
+      if (!Number.isFinite(maticPrice)) {
+        return cachedPrice;
+      }
       console.log("MATIC PRICE IS: ", maticPrice);
       localStorage.setItem("maticPrice", maticPrice);
       return maticPrice;
@@ -265,7 +268,7 @@ export default class extends Controller {
     let cachedPrice = localStorage.getItem("tezosPrice");
     try {
       let res = await fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=tezos&vs_currencies=usd`,
+        `/api/crypto/tezos?vs=usd`,
         {
           method: "GET",
           headers: {
@@ -276,10 +279,13 @@ export default class extends Controller {
         }
       );
       let data = await res.json();
-      if (res.status !== 200) {
+      if (!res.ok || data.price == null) {
         return cachedPrice;
       }
-      const tezosPrice = data["tezos"]["usd"];
+      const tezosPrice = Number(data.price);
+      if (!Number.isFinite(tezosPrice)) {
+        return cachedPrice;
+      }
       console.log("Tezos PRICE IS: ", tezosPrice);
       localStorage.setItem("tezosPrice", tezosPrice);
       return tezosPrice;
