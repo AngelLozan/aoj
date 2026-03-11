@@ -66,7 +66,7 @@ n you have an account available, log in
 ## Back to terminal:
 
 - Give priviledges to rails user: `gpasswd -a rails sudo`
-- Change into user in drop cli: `sudo -i -u rails` or whatever you want to call the user. Rails is pre-existing.
+- Change into user in droplet CLI: `sudo -i -u rails` (Rails user is pre-existing on the marketplace image).
 - Change directory up one level: `cd ../` to find the home and aoj directories
 
 
@@ -77,7 +77,7 @@ n you have an account available, log in
 - `cd <app name>`
 - Use rvm or ensure ruby installed
 - `bundle install`
-- yarn
+- `yarn install`
 - Install figaro and use `bundle exec figaro install` to generate a `config/application.yml` file where you can store ENV variables previously hosted in a .env. This will manage environment variables for you in production. Potential error will show, but check to see if the file was created (usually is).
 - Copy contents of .env into application.yml, but format as below:
 ```
@@ -95,7 +95,67 @@ EXAMPLE_ENV_VAR: <value>
 - Restart daemon: `sudo systemctl daemon-reload`
 - Restart nginx: `sudo systemctl restart nginx`
 - Then restart the server: `sudo systemctl restart rails.service`
+- Reminder: always run `bundle`, `yarn`, and `assets:precompile` as the **rails** user (not root) to avoid permissions issues.
 - View logs by changing into the rails user `sudo -i -u rails` and then `cd <app name>` and `tail -f log/production.log`
+
+## Clean Redeploy (Recommended)
+Use this flow to pull new code safely without breaking credentials.
+
+1) Ensure credentials stay server-only (run once on server):
+```
+cd /home/<app name>
+git update-index --skip-worktree config/credentials.yml.enc
+```
+If you ever *intend* to update credentials from GitHub, undo it with:
+```
+git update-index --no-skip-worktree config/credentials.yml.enc
+```
+
+2) Pull and deploy (server):
+```
+cd /home/<app name>
+git fetch origin
+git pull --ff-only
+
+bundle install
+yarn install
+RAILS_ENV=production bundle exec rails assets:precompile
+sudo systemctl restart rails.service
+sudo systemctl restart nginx
+```
+
+3) Verify:
+```
+sudo systemctl status rails.service
+sudo systemctl status nginx
+curl -i http://127.0.0.1/ -H "Host: <your-domain>"
+```
+
+## Node Version (for assets)
+Some dependencies require **Node >= 20.19.0** (e.g. `chokidar@5`).
+
+### Install NVM (server)
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.nvm/nvm.sh
+```
+
+### Install and use Node 20.19.0
+```
+nvm install 20.19.0
+nvm use 20.19.0
+nvm alias default 20.19.0
+node -v
+```
+
+## Troubleshooting
+- Permissions errors during assets compile usually mean a root-owned `tmp/` or `node_modules/`.
+  - Fix: `sudo chown -R rails:rails /home/<app name>/tmp /home/<app name>/node_modules /home/<app name>/public /home/<app name>/log`
+- If Rails won’t boot after deploy, check service logs:
+  - `journalctl -u rails.service -b`
+- If nginx returns 502, the app likely failed to start. Check:
+  - `sudo systemctl status rails.service`
+  - `tail -n 200 /home/<app name>/log/production.log`
 
 
 ## A note about Printify:
