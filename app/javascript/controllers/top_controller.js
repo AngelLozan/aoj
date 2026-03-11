@@ -120,7 +120,7 @@ export default class extends Controller {
     try {
       if (cachedPrice === null) {
         let res = await fetch(
-          `/api/crypto/matic-network?vs=usd`,
+          `/api/crypto/polygon-ecosystem-token?vs=usd`,
           {
             method: "GET",
             headers: {
