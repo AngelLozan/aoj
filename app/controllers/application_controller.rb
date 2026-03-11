@@ -1,5 +1,6 @@
 require 'nokogiri'
 
+
 class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :load_cart_prints
@@ -25,7 +26,11 @@ class ApplicationController < ActionController::Base
       request["Cache-Control"] = "private, max-age=3600, no-revalidate"    # request.body = JSON.dump({}) # if you need to send a body with the request...
 
       response = http.request(request)
-      # products = response.read_body
+      puts "Status Code: #{response.code}"     
+      puts "Message: #{response.message}"     
+      puts "Headers: #{response.each_header.to_h}"
+      puts "Body: #{response.body}"  
+ 
       raw_data = JSON.parse(response.read_body)
 
       products = raw_data["data"]
