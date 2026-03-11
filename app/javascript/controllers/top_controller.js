@@ -120,7 +120,7 @@ export default class extends Controller {
     try {
       if (cachedPrice === null) {
         let res = await fetch(
-          `https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd`,
+          `/api/crypto/matic-network?vs=usd`,
           {
             method: "GET",
             headers: {
@@ -131,10 +131,13 @@ export default class extends Controller {
           }
         );
         let data = await res.json();
-        // if (res.status !== 200) {
-        //   return cachedPrice;
-        // }
-        const maticPrice = data["matic-network"]["usd"];
+        if (!res.ok || data.price == null) {
+          return cachedPrice;
+        }
+        const maticPrice = Number(data.price);
+        if (!Number.isFinite(maticPrice)) {
+          return cachedPrice;
+        }
         // console.log("MATIC PRICE IS: ", maticPrice);
         localStorage.setItem("maticPrice", maticPrice);
         return maticPrice;

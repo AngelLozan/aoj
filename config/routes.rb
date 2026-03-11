@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   get '/nfts', to: 'nfts#nfts', as: 'nfts'
   get '/endpoint', to: 'nfts#endpoint', as: 'endpoint'
 
+  get "/api/crypto/:id", to: "crypto_prices#show", defaults: { format: :json }
+
 
   resources :contacts, only: [:new, :create]
 
