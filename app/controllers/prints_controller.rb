@@ -15,6 +15,7 @@ class PrintsController < ApplicationController
 
   def index
     @products = load_products
+
     if !params[:query] || params[:query].empty?
       @products = Kaminari.paginate_array(@products).page(params[:page]).per(10)
     end
@@ -59,7 +60,6 @@ class PrintsController < ApplicationController
     end
 
     parsed_description = Nokogiri::HTML.parse(print['description'])
-
     default_variant = print['variants'].find { |variant| variant['is_default'] == true && variant['is_enabled'] == true}
 
     variants = []

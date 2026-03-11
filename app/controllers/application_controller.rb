@@ -1,5 +1,6 @@
 require 'nokogiri'
 
+
 class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :load_cart_prints
