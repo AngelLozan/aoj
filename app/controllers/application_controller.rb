@@ -25,10 +25,12 @@ class ApplicationController < ActionController::Base
       request["Cache-Control"] = "private, max-age=3600, no-revalidate"    # request.body = JSON.dump({}) # if you need to send a body with the request...
 
       response = http.request(request)
-      # products = response.read_body
-      raw_data = JSON.parse(response.read_body)
-
+      raw_data = JSON.parse(response.read_body) rescue {}
       products = raw_data["data"]
+      unless response.code.to_i == 200 && products.is_a?(Array)
+        Rails.logger.error("Printify error status=#{response.code} body=#{response.body}")
+        products = []
+      end
 
       products = products.map do |product|
         p "=========================================="
