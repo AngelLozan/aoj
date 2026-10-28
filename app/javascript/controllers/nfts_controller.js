@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import Web3 from "web3";
 import metadata from "../../assets/metadata.json";
 import tezMetadata from "../../assets/tezMetadata.json";
-import tezosImg from "../../assets/images/tezos.svg";
+import tezosImg from "../../assets/images/tezos_custom.jpg";
 
 // Connects to data-controller="nfts"
 export default class extends Controller {
