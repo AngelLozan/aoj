@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import Web3 from "web3";
 import metadata from "../../assets/metadata.json";
 import tezMetadata from "../../assets/tezMetadata.json";
-// import tezosImg from "../../assets/images/tezos.svg";
+import tezosImg from "../../assets/images/tezos.svg";
 
 // Connects to data-controller="nfts"
 export default class extends Controller {
@@ -369,7 +369,7 @@ export default class extends Controller {
       description: data.description,
       // price: calculatedPrice,
       price: price,
-      image: data.image,
+      image: tezosImg,
       owner: formatOwner,
     }
 
