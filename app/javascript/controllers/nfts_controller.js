@@ -7,6 +7,7 @@ import tezMetadata from "../../assets/tezMetadata.json";
 // Connects to data-controller="nfts"
 export default class extends Controller {
   static targets = ["loader", "image", "cards", "message"];
+static values = { tezosImage: String };
 
   web3;
 
