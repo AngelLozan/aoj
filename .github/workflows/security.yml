@@ -38,9 +38,11 @@ jobs:
           path: '.'
           format: 'HTML'
           out: 'reports' # this is the default, no need to specify unless you wish to override it
+          # vendor/bundle holds gems installed by setup-ruby; Gemfile.lock is already covered by bundle-audit.
           args: >
             --failOnCVSS 7
             --enableRetired
+            --exclude "**/vendor/bundle/**"
 
       - name: Upload Test results
         uses: actions/upload-artifact@v4
