@@ -10,6 +10,8 @@ jobs:
       NODE_ENV: test
       EMAIL: ${{ secrets.EMAIL }}
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      # Placeholder so Cloudinary image helpers can build URLs; tests never upload.
+      CLOUDINARY_URL: cloudinary://123:abc@demo
     runs-on: ubuntu-latest # runner
     services:
       # Label used to access the service container
@@ -29,26 +31,20 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout repository # copies repo in runner
-        uses: actions/checkout@v2 # short for https://github.com/actions/checkout
+        uses: actions/checkout@v4 # short for https://github.com/actions/checkout
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1 # short for https://github.com/ruby/setup-ruby
         with:
           # runs 'bundle install' and caches installed gems automatically
           bundler-cache: true
       - name: Set up Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: "16"
-      - name: Get Yarn cache directory path
-        id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - name: Setup cache key and directory for node_modules cache
-        uses: actions/cache@v1
-        with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          node-version: "22"
+      - name: Enable Corepack # provides the Yarn version pinned in package.json "packageManager"
+        run: corepack enable
       - name: Yarn install
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Prepare DB
         run: cp config/database.github.yml config/database.yml
@@ -92,7 +88,7 @@ jobs:
         run: bundle exec rails test:system
 
       - name: Upload screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           path: tmp/capybara/

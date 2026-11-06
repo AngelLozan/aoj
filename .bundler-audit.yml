@@ -1,0 +1,10 @@
+---
+# Advisories that do not apply to this app. Re-check each one if the reason changes.
+ignore:
+  # Devise confirmable: User does not use :confirmable.
+  - CVE-2026-32700
+  # Devise timeoutable: User does not use :timeoutable.
+  - CVE-2026-40295
+  # Puma PROXY protocol v1: config/puma.rb does not enable proxy_protocol.
+  - CVE-2026-47736
+  - CVE-2026-47737

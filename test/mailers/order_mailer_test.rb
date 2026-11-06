@@ -41,7 +41,7 @@ class OrderMailerTest < ActionMailer::TestCase
   test "order" do
     mail = OrderMailer.order(@order).deliver_now
     assert_equal "You have a new order on your site!", mail.subject
-    assert_equal ["scottloz@protonmail.com"], mail.to
+    assert_equal ["hellojaleh@gmail.com"], mail.to
     assert_equal ["hellojaleh@gmail.com"], mail.from
     assert_match "Hi", mail.body.encoded
     puts "\n1- Order mailer works \n".green

@@ -45,3 +45,6 @@
 /config/credentials.yml.enc
 /config/master.key
 ```
+
+# Yarn 4 per-machine install state
+/.yarn/install-state.gz
