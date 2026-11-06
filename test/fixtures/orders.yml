@@ -4,3 +4,6 @@ one:
   name: 'Larry'
   email: 'scottloz@protonmail.com'
   status: 'open'
+  city: 'Louisville'
+  zip: '40202'
+  country: 'US'

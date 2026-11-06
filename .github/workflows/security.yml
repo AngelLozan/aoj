@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   security_scan:
@@ -11,26 +14,21 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.2.0
-
-      - name: Install dependencies
-        run: |
-          gem install bundler
-          bundle install
+          # Ruby version comes from .ruby-version; runs 'bundle install' and caches gems
+          bundler-cache: true
 
       - name: Run Bundler Audit
         run: |
-          bundle audit check --update
+          bundle exec bundle-audit check --update
 
       - name: Run Brakeman
         run: |
-          gem install brakeman
-          brakeman
+          bundle exec brakeman --no-pager
 
       - name: Depcheck
         uses: dependency-check/Dependency-Check_Action@main
@@ -45,7 +43,8 @@ jobs:
             --enableRetired
 
       - name: Upload Test results
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: Depcheck report
           path: ${{github.workspace}}/reports
