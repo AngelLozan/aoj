@@ -1,0 +1,53 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "932a91868dc53f992a275194818fad5c5762712867b27596de686956337f1638",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/orders_controller.rb",
+      "line": 132,
+      "code": "Net::HTTP.new(URI(\"https://api-m.paypal.com/v2/checkout/orders/#{params[:paypal_order_id]}/capture\").host, URI(\"https://api-m.paypal.com/v2/checkout/orders/#{params[:paypal_order_id]}/capture\").port)",
+      "confidence": "Weak",
+      "note": "False positive: Net::HTTP.new only receives the host and port of a hard-coded API hostname. The parameter is part of the URL path, never a file name."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "6118747cbf04f935bcc9f0e24289be30ba03fe7e7ce66c3d87ace7e256842053",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/prints_controller.rb",
+      "line": 43,
+      "code": "Net::HTTP.new(URI(\"https://api.printify.com/v1/shops/#{ENV[\"PRINTIFY_SHOP_ID\"]}/products/#{sanitize_id(params[:id])}.json\").host, URI(\"https://api.printify.com/v1/shops/#{ENV[\"PRINTIFY_SHOP_ID\"]}/products/#{sanitize_id(params[:id])}.json\").port)",
+      "confidence": "Weak",
+      "note": "False positive: Net::HTTP.new only receives the host and port of a hard-coded API hostname. The parameter is part of the URL path, never a file name."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "19f824b155ee8bc98cfdb8c092d81ef8c55ef12dd730a1c34da63c6e76fa649e",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/prints_controller.rb",
+      "line": 131,
+      "code": "Net::HTTP.new(URI(\"https://api.printify.com/v1/shops/#{ENV[\"PRINTIFY_SHOP_ID\"]}/products/#{sanitize_id(params[:id])}/publishing_failed.json\").host, URI(\"https://api.printify.com/v1/shops/#{ENV[\"PRINTIFY_SHOP_ID\"]}/products/#{sanitize_id(params[:id])}/publishing_failed.json\").port)",
+      "confidence": "Weak",
+      "note": "False positive: Net::HTTP.new only receives the host and port of a hard-coded API hostname. The parameter is part of the URL path, never a file name."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "f1bb35d1a1bb6eaf4c5e17e21b3f05e1bb75a6367f501d758c7f4ddd9ddf720c",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/prints_controller.rb",
+      "line": 170,
+      "code": "Net::HTTP.new(URI(\"https://api.printify.com/v1/shops/#{ENV[\"PRINTIFY_SHOP_ID\"]}/products/#{sanitize_id(params[:id])}/publishing_succeeded.json\").host, URI(\"https://api.printify.com/v1/shops/#{ENV[\"PRINTIFY_SHOP_ID\"]}/products/#{sanitize_id(params[:id])}/publishing_succeeded.json\").port)",
+      "confidence": "Weak",
+      "note": "False positive: Net::HTTP.new only receives the host and port of a hard-coded API hostname. The parameter is part of the URL path, never a file name."
+    }
+  ],
+  "brakeman_version": "8.1.0"
+}
