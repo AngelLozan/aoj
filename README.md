@@ -75,8 +75,9 @@ n you have an account available, log in
 - Clone your repo: `git clone <repo url>`
 - `sudo chmod 777 -R <app name>`
 - `cd <app name>`
-- Use rvm or ensure ruby installed
+- Use rvm or ensure ruby installed (version in `.ruby-version`, see "Upgrading Ruby" below)
 - `bundle install`
+- `corepack enable` (once per Node install; provides the Yarn version pinned in `package.json`)
 - `yarn install`
 - Install figaro and use `bundle exec figaro install` to generate a `config/application.yml` file where you can store ENV variables previously hosted in a .env. This will manage environment variables for you in production. Potential error will show, but check to see if the file was created (usually is).
 - Copy contents of .env into application.yml, but format as below:
@@ -147,6 +148,29 @@ nvm use 20.19.0
 nvm alias default 20.19.0
 node -v
 ```
+
+### Yarn
+The project uses Yarn 4, pinned by `packageManager` in `package.json`. Yarn 1 cannot read `yarn.lock` and rewrites it, so enable Corepack once for each Node install:
+```
+corepack enable
+yarn --version   # 4.13.0
+```
+
+## Upgrading Ruby
+Install the new Ruby before pulling code that needs it. The running app keeps using the old Ruby until it restarts. As the **rails** user:
+```
+rvm get stable                 # refreshes rvm's list of known Ruby releases
+rvm install 3.4.12
+cd /home/<app name>
+git pull --ff-only
+rvm use 3.4.12 --default
+ruby -v
+bundle install
+yarn install
+RAILS_ENV=production bundle exec rails assets:precompile
+```
+Then check that the service does not hard-code the old Ruby path (`sudo systemctl cat rails.service`), fix it with `sudo systemctl edit --full rails.service` if it does, and run `sudo systemctl daemon-reload` before restarting.
+To roll back, check out the previous commit, `rvm use <old version> --default`, then `bundle install`, precompile and restart.
 
 ## Troubleshooting
 - Permissions errors during assets compile usually mean a root-owned `tmp/` or `node_modules/`.

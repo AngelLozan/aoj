@@ -37,13 +37,13 @@ class PaintingsTest < ApplicationSystemTestCase
 
   test "visiting the index" do
     visit paintings_url
-    assert_selector "h1", text: "My works"
+    assert_selector "h1", text: "Jaleh's Originals"
     puts "\n1- Index route works \n".green
   end
 
   test "visiting the admin page" do
     visit admin_url
-    assert_selector "h1", text: "Administrative Panel"
+    assert_selector "h1", text: "Paintings Admin Panel"
     puts "\n2- Admin route works \n".green
   end
 

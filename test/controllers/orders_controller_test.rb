@@ -44,15 +44,18 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
     puts "\n1- Index route works \n".green
   end
 
+  # @dev Visit a page first so the prints cart is in the session, as it is for a real visitor.
   test "should get new" do
+    get root_url
     get new_order_url
     assert_response :success
     puts "\n2- New route works \n".green
   end
 
   test "should create order" do
+    get root_url
     assert_difference("Order.count") do
-      post orders_url, params: { order: { address: @order.address, email: @order.email, name: @order.name, phone: @order.phone, status: @order.status } }
+      post orders_url, params: { order: { address: @order.address, city: @order.city, zip: @order.zip, country: @order.country, email: @order.email, name: @order.name, phone: @order.phone, status: @order.status } }
     end
 
     assert_redirected_to paintings_url
